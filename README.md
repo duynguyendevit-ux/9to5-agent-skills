@@ -1,4 +1,4 @@
-# opencode-skills
+# 9to5 Agent Skills
 
 Agent skills for OpenCode v2, used for day-to-day work on the OTS/C7 platform (Jira, release pages, Oracle migrations, Kubernetes debugging, Spring conventions).
 
@@ -14,8 +14,8 @@ Skills are discovered from these directories (identical copies):
 - `~/.codex/skills/` — Codex
 
 ```bash
-git clone git@github.com:<account>/opencode-skills.git
-cd opencode-skills
+git clone git@github.com:<account>/9to5-agent-skills.git
+cd 9to5-agent-skills
 ./install.sh
 ```
 
