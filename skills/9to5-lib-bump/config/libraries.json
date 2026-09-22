@@ -1,0 +1,60 @@
+{
+  "_comment": "Shared library registry for 9to5-lib-bump. Maps the gradle.properties version property to the library repository that produces it. Paths are local checkouts; no secrets.",
+  "libraries": {
+    "KAFKA_STARTER_VERSION": {
+      "repo": "~/Documents/C777777777777/common/kafka-spring-boot-starter",
+      "artifact": "tech.source.common.starter.events:c7-kafka-spring-boot-starter",
+      "note": "event catalog + Spring Cloud Stream bindings"
+    },
+    "COMMON_CORE_VERSION": {
+      "repo": "~/Documents/C777777777777/common/common-core/java",
+      "artifact": "tech.source.common:c7-common-core",
+      "note": "shared domain, kafka contracts"
+    },
+    "ISC_VERSION": {
+      "repo": "~/Documents/C777777777777/common/internal-service-communication-spring-boot-starter",
+      "artifact": "tech.source.starter.isc:c7-isc-spring-boot-starter",
+      "note": "internal service communication, shared enums"
+    },
+    "TTCH_SERVICE_COMMON_VERSION": {
+      "repo": "~/Documents/C777777777777/common/ttch-service-common-spring-boot-starter",
+      "artifact": "tech.source.ttch:c7-ttch-service-common",
+      "note": "TTCH shared service layer"
+    },
+    "MICROSERVICE_VERSION": {
+      "repo": "~/Documents/duylab/microservice-spring-boot-starter",
+      "artifact": null,
+      "note": "base starter for new services"
+    }
+  },
+  "not_local": [
+    "MINIO_STARTER_VERSION",
+    "ELASTICSEARCH_STARTER_VERSION",
+    "FILESTORAGE_STARTER_VERSION",
+    "ACTIVITY_LOG_STARTER_VERSION",
+    "PLATFORM_PROTO_VERSION",
+    "COMMON_STARTER_VERSION",
+    "QUOTA_STARTER_VERSION",
+    "ENCRYPTION_VERSION",
+    "G_CONNECT_STARTER_VERSION",
+    "USAGE_STARTER_VERSION"
+  ],
+  "debug_flags": {
+    "DEBUG_KAFKA": "KAFKA_STARTER_VERSION",
+    "DEBUG_COMMON_CORE": "COMMON_CORE_VERSION",
+    "DEBUG_ISC": "ISC_VERSION",
+    "DEBUG_TTCH_SERVICE_COMMON": "TTCH_SERVICE_COMMON_VERSION",
+    "DEBUG_MICROSERVICE": "MICROSERVICE_VERSION",
+    "DEBUG_FILESTORAGE": "FILESTORAGE_STARTER_VERSION"
+  },
+  "build": {
+    "java_home": "~/.jdks/corretto-17.0.19",
+    "verify": "./gradlew build",
+    "fast_check": "./gradlew compileJava"
+  },
+  "commit_convention": {
+    "observed": ["update libs", "update lib", "update kafka, common core", "Update lib"],
+    "preferred": "update <lib> to <version>",
+    "rule": "match the newest subject style already used in that repository"
+  }
+}

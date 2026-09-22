@@ -1,0 +1,25 @@
+{
+  "_comment": "Paths for 9to5-skill-sync. The canonical copy is edited by hand; everything else is generated from it.",
+  "canonical": "~/.config/opencode/skills",
+  "mirrors": [
+    "~/.agents/skills",
+    "~/.claude/skills",
+    "~/.codex/skills"
+  ],
+  "repo": "~/Documents/duylab/9to5-agent-skills",
+  "repo_skills_subdir": "skills",
+  "vault": "~/Documents/obisian/OTS/vault",
+  "exclude_always": [
+    "__pycache__",
+    "*.pyc",
+    ".DS_Store"
+  ],
+  "exclude_from_repo": [
+    "cache.json",
+    "endpoints.json",
+    "debug/artifacts/*"
+  ],
+  "keep_empty_dirs": [
+    "debug/artifacts/.gitkeep"
+  ]
+}

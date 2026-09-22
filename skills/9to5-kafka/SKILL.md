@@ -1,0 +1,68 @@
+---
+name: 9to5-kafka
+description: Work on OTS/C7 Kafka event contracts and the transactional outbox — add or change an event type in the kafka starter catalog, fix Spring Cloud Stream bindings, topic placeholders, consumer groups and partition keys, wire a service onto common-outbox, and diagnose stuck or lagging outbox records (PENDING backlog, retry exhaustion, payload template misses, cleanup not running). Use when the user mentions a Kafka topic, event contract, producer/consumer binding, partition key, consumer group, protobuf event, transactional outbox, outbox_record, payload_template, outbox publish lag, or an event that was written but never published.
+license: MIT
+compatibility: Requires git checkouts of the kafka starter and common-outbox, JDK 17, and read access to the service Oracle schema for diagnosis (directly or through the 9to5-k8s-service-debug helper).
+metadata:
+  version: "1.0.0"
+---
+
+# Kafka Contracts and Outbox
+
+Two layers. Decide which one you are in before editing anything.
+
+| Layer | Where | Owns |
+|-------|-------|------|
+| Contract | `~/Documents/C777777777777/common/kafka-spring-boot-starter` | topic names, payload type, partition key, bindings, event catalog |
+| Delivery | `~/Documents/C777777777777/web-establishment-registration/common-outbox` | transactional write, retry, acknowledgement, cleanup |
+
+- `references/topics.md` — catalog layout, binding conventions, how to add an event type, contract failure signatures.
+- `references/outbox-queries.sql` — read-only Oracle diagnosis queries for `outbox_record` and `payload_template`.
+- Library setup (dependency, config block, DDL, `append(...)` forms) is documented in `common-outbox/README.md`. Read it rather than re-deriving it; do not duplicate it here.
+
+## Contract work
+
+1. Find the domain under `src/main/resources/events/<domain>/`; match the existing `consumer.properties` / `producer.properties` pair in that domain.
+2. Keep the Java package path aligned with the resource path.
+3. `destination` is always a `${topic.<...>}` placeholder. The literal topic belongs in the environment config (`ots-env-custom/service-configs/<env>/<service>/`), so a new topic needs an entry there too — otherwise the service fails at startup, not at publish time.
+4. Set the partition-key header on the producer. Without it every event lands on one partition and per-entity ordering silently breaks.
+5. Consumer group defaults to `spring.application.name`. Two services with the same name in one cluster share a group and will steal each other's messages.
+6. Build both sides before claiming done: `JAVA_HOME=~/.jdks/corretto-17.0.19 ./gradlew build` in the starter and in each affected service.
+
+Details and the annotation table (`@IncludeEventsProducer`, `@ExcludeEventsConsumer`) are in `references/topics.md`.
+
+## Outbox diagnosis
+
+Run the queries in `references/outbox-queries.sql`. Always scope to one `producer` — the table can be shared by several services in the same schema.
+
+Order that gets to a cause fastest:
+
+1. **Backlog by status** (query 1). `PENDING` growing with `PUBLISHED` flat means the publish worker is not draining. `PENDING` stable means records are being written and published normally.
+2. **Due now versus total pending** (query 3). Pending rows all scheduled into the future means backoff is doing its job, not that the service is stuck.
+3. **Failure reasons grouped** (query 4). One dominant `last_error` points at a single cause — a missing topic, an unreachable broker, or one malformed payload shape.
+4. **Stuck records** (query 2) — high `attempt_count` with a recent `next_attempt_at` means the worker is alive and the publish keeps failing.
+5. **Templates** (query 8) when `payload_template_code` is set: a `MISSING` or `INACTIVE` template row fails every event that uses it.
+6. **Cleanup** (query 9) when the table grows without bound: a large candidate count with cleanup enabled means the cron is not running.
+7. **Ordering** (query 6) when downstream reports out-of-order effects: `aggregate_id` is the Kafka key, so a published row that precedes a still-pending row for the same aggregate is the signature of a retry overtaking the original.
+
+### Outbox configuration surface
+
+Prefixes: `outbox`, `outbox.publish`, `outbox.cleanup`, `outbox.payload-template`. Defaults worth knowing when reading the queries: publish runs every 300 ms in batches of 100 with a 5 s retry backoff growing to 5 minutes; cleanup runs at 03:00 `Asia/Ho_Chi_Minh` with 7-day retention, batches of 500. Treat the library's `OutboxProperties` as the source of truth for exact defaults, and the service's `values.yaml` / `.env` for what is actually deployed.
+
+## Traps
+
+- **The append must be inside the business transaction.** Outside it, the business write and the outbox row commit separately and the event can be lost or duplicated.
+- **`outbox_record` can be shared by several services in one schema.** Every query needs `producer`, or the numbers are meaningless. Cleanup and the publish worker only touch their own rows.
+- **The library ships its own auto-configuration.** A service must not declare `OutboxModuleLoader`. A service whose base package is not `tech.app` needs the loader adapted, otherwise the feature repositories and entities are not scanned.
+- **Oracle-specific claim.** Claiming uses `ROWID` with `FOR UPDATE SKIP LOCKED`; local H2 runs cannot claim batches. A local "worker does nothing" report is expected, not a bug.
+- **Existing rows keep their stored topic.** Changing `outbox.topic` does not rewrite pending rows.
+- **Do not change the DDL from this skill.** Table changes go through a migration (see `9to5-sql-migration`); the reference DDL lives in `common-outbox/files/`.
+
+## Escalation
+
+| Situation | Skill |
+|-----------|-------|
+| Need the runtime symptom (pod logs, lag observed live) | `9to5-k8s-service-debug` |
+| Need a DDL or data fix for `outbox_record` / `payload_template` | `9to5-sql-migration` |
+| Library version needs bumping across services | `9to5-lib-bump` |
+| Environment variable or topic placeholder missing in a deployed env | `9to5-env-config-sync` |
