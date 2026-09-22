@@ -1,6 +1,7 @@
 ---
 name: 9to5-logwork
 description: "Log Jira worklogs via conversation: scan assigned issues, accept task/hours/note input in chat, generate Vietnamese descriptions via zjira logwork, and submit. Two flows: day and week (Mon–Fri); also supports week-status and task-list. Use when the user says log work, log my hours, log today, log this week, worklog, chấm công, log công, or asks which days are missing hours."
+license: MIT
 compatibility: Requires the zjira CLI on PATH and Jira credentials in ~/.config/zjira/config.yaml.
 metadata:
   version: "1.3.0"

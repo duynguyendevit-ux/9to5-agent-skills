@@ -1,6 +1,10 @@
 ---
 name: 9to5-release-confluence-sync
 description: Sync a project's daily Confluence release page — create it when missing, update it when it exists — and refresh version, current version, Release Tag and Docker image cells to the newest git tags of the project's service repos; also paint or clear release-row highlights and check pending releases. Projects come from the skill's projects.json registry (dev-c7, dev-c7-ttdvkh). Use when the user mentions a release page, release tag, Docker image tag, dev-c7 or ttdvkh release, asks to prepare today's release page, sync release tags, or check which services still need release.
+license: MIT
+compatibility: Requires the zjira CLI and Confluence credentials in ~/.config/zjira/config.yaml; GitLab SSH access for tag discovery. Reads non-secret endpoints from config/endpoints.json.
+metadata:
+  version: "1.0.0"
 ---
 
 # Release Sync

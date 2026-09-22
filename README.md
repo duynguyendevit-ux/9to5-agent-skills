@@ -28,7 +28,7 @@ cd 9to5-agent-skills
 | `9to5-jira` | 2.1.0 | Fetch a Jira issue and linked Confluence spec, explore the repo, write an implementation plan to `.kit/plans/`. |
 | `9to5-logwork` | 1.3.0 | Log Jira worklogs via conversation (day and week flows), with Vietnamese descriptions. |
 | `9to5-jira-day-check` | 1.0.0 | Daily read-only summary: sprint issues, missing worklogs, releases still pending tag sync. |
-| `9to5-release-confluence-sync` | — | Create or update the daily Confluence release page and refresh version, Release Tag, and Docker image cells. |
+| `9to5-release-confluence-sync` | 1.0.0 | Create or update the daily Confluence release page and refresh version, Release Tag, and Docker image cells. |
 | `9to5-confluence-doc` | 1.0.0 | Draft and publish Vietnamese technical design pages with the OTS structure. |
 | `9to5-sql-migration` | 1.0.0 | Write and review Oracle migration scripts (`admin/sql/oracle`, Flyway-style naming). |
 | `9to5-env-config-sync` | 1.0.0 | Compare and align service env configs across environments; keep secrets out. |
