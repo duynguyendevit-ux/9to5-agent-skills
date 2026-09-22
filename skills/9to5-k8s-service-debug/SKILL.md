@@ -2,7 +2,7 @@
 name: 9to5-k8s-service-debug
 description: Debug OTS/C7 services running on Kubernetes — locate a pod by app name across dev-c7 and dev-c7-ttdvkh, tail and filter logs, extract Hibernate SQL with bound parameters into runnable Oracle statements, inspect env/limits, and correlate failures back to the local repo. Use when the user asks to debug or investigate a service on the cluster, read pod logs, find an error in a pod, check why a worker did not run, inspect a service's runtime config, open SQL from logs, mentions klog/ksql/kerror/kfind, or pastes a stack trace from an OTS service. Read-only by default.
 license: MIT
-compatibility: Requires kubectl at /usr/bin/kubectl, a kubeconfig exposing the dev-buuchinhso context, and the shell helpers from ~/Documents/k8slog/rancher-log-alias.sh sourced in the interactive shell. Cluster access is dev only.
+compatibility: Requires kubectl, a kubeconfig exposing the cluster contexts recorded in config/k8s-env.json, and the shell helpers from ~/Documents/k8slog/rancher-log-alias.sh sourced in the interactive shell. Cluster access is dev only.
 metadata:
   version: "1.0.0"
 ---

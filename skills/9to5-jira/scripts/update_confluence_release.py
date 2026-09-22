@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import html
 import json
+import os
 import re
 import ssl
 import subprocess
@@ -19,12 +20,63 @@ from pathlib import Path
 from typing import Any, Iterable
 
 
-DEFAULT_CONFLUENCE_URL = "https://confluence-local.ots.vn"
-DEFAULT_GITLAB_URL = "http://10.0.0.40"
 DEFAULT_HIGHLIGHT = "#c0b6f2"
 DEFAULT_PROFILE_CONFIG = Path(__file__).resolve().parent.parent / "references" / "release-profiles.json"
+SKILL_DIR = Path(__file__).resolve().parent.parent
+ENDPOINTS_PATH = SKILL_DIR / "config" / "endpoints.json"
+ENDPOINT_KEYS = ("confluence_url", "jira_url", "gitlab_url", "git_ssh_base")
 CELL_RE = re.compile(r"<t[dh]\b[^>]*>.*?</t[dh]>", re.IGNORECASE | re.DOTALL)
 ROW_RE = re.compile(r"<tr\b[^>]*>.*?</tr>", re.IGNORECASE | re.DOTALL)
+
+
+def load_endpoints() -> dict[str, str]:
+    """Non-secret internal endpoints for this skill.
+
+    Version control holds only `config/endpoints.example.json`. Real values live
+    in `config/endpoints.json`, which is gitignored so internal hostnames never
+    enter the repository. Never invent a value — ask the user first.
+    """
+    if not ENDPOINTS_PATH.exists():
+        return {}
+    try:
+        data = json.loads(ENDPOINTS_PATH.read_text(encoding="utf-8"))
+    except Exception as exc:
+        sys.exit(f"{ENDPOINTS_PATH} is not valid JSON: {exc}")
+    if not isinstance(data, dict):
+        sys.exit(f"{ENDPOINTS_PATH} must contain a JSON object")
+    return {k: v.strip() for k, v in data.items()
+            if isinstance(v, str) and v.strip() and not k.startswith("_")}
+
+
+def save_endpoint(key: str, value: str) -> Path:
+    if key not in ENDPOINT_KEYS:
+        sys.exit(f"unknown endpoint '{key}'; expected one of: {', '.join(ENDPOINT_KEYS)}")
+    data: dict[str, Any] = {}
+    if ENDPOINTS_PATH.exists():
+        data = json.loads(ENDPOINTS_PATH.read_text(encoding="utf-8"))
+    data[key] = value.rstrip("/")
+    ENDPOINTS_PATH.parent.mkdir(parents=True, exist_ok=True)
+    ENDPOINTS_PATH.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
+    return ENDPOINTS_PATH
+
+
+def resolve_endpoint(key: str, cli_value: str | None, env_vars: tuple[str, ...]) -> str:
+    """CLI flag -> environment variable -> config/endpoints.json -> ask the user."""
+    if cli_value:
+        return cli_value.rstrip("/")
+    for var in env_vars:
+        if os.environ.get(var):
+            return os.environ[var].strip().rstrip("/")
+    value = load_endpoints().get(key)
+    if value:
+        return value.rstrip("/")
+    sys.exit(
+        f"missing {key}: ask the user for the internal URL, then persist it with\n"
+        f"  {Path(__file__).name} --set-endpoint {key}=<url>\n"
+        f"or write it into {ENDPOINTS_PATH}\n"
+        f"(version control only ships config/endpoints.example.json; do not commit the real value)"
+    )
+
 
 
 @dataclass(frozen=True)
@@ -148,8 +200,10 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--tag", action="append", default=[], metavar="SERVICE=TAG", help="Override discovered tag")
     parser.add_argument("--profile", help="Release profile; interactive mode asks when omitted")
     parser.add_argument("--service-config", type=Path, help="Override the service registry selected by --profile")
-    parser.add_argument("--base-url", default=DEFAULT_CONFLUENCE_URL)
-    parser.add_argument("--gitlab-url", default=DEFAULT_GITLAB_URL)
+    parser.add_argument("--base-url", help="Confluence base URL; resolved from config/endpoints.json when omitted")
+    parser.add_argument("--gitlab-url", help="GitLab base URL; resolved from config/endpoints.json when omitted")
+    parser.add_argument("--set-endpoint", metavar="KEY=VALUE",
+                        help=f"persist an internal endpoint to {ENDPOINTS_PATH} and exit; keys: {', '.join(ENDPOINT_KEYS)}")
     parser.add_argument("--highlight-color", default=DEFAULT_HIGHLIGHT)
     parser.add_argument("--highlight-columns", default="0-8")
     parser.add_argument("--include-hotfix", action="store_true")
@@ -160,6 +214,13 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--approved", action="store_true",
                         help="required for non-interactive writes; confirm the user approved the dry run")
     args = parser.parse_args(argv)
+    if args.set_endpoint:
+        if "=" not in args.set_endpoint:
+            parser.error("--set-endpoint expects KEY=VALUE")
+        key, value = args.set_endpoint.split("=", 1)
+        path = save_endpoint(key.strip(), value.strip())
+        print(f"saved {key.strip()} to {path}")
+        raise SystemExit(0)
     return args
 
 
@@ -782,6 +843,8 @@ def main(argv: list[str] | None = None) -> int:
     pushed_tags: list[str] = []
     try:
         args = parse_args(argv)
+        args.base_url = resolve_endpoint("confluence_url", args.base_url, ("CONFLUENCE_URL",))
+        args.gitlab_url = resolve_endpoint("gitlab_url", args.gitlab_url, ("GITLAB_URL",))
         choose_profile(args)
         args.service_config = resolve_service_config(args)
         color = args.highlight_color

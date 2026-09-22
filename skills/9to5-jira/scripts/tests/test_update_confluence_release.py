@@ -1,10 +1,17 @@
 import importlib.util
 import io
+import os
 import sys
 import unittest
 from contextlib import redirect_stdout
 from unittest.mock import patch
 from pathlib import Path
+
+
+# Endpoints resolve from the developer machine's config unless a test passes them
+# explicitly; blank the environment overrides so a test never reads real values.
+os.environ.pop("CONFLUENCE_URL", None)
+os.environ.pop("GITLAB_URL", None)
 
 
 SCRIPT = Path(__file__).resolve().parents[1] / "update_confluence_release.py"
@@ -147,6 +154,10 @@ class ReleaseScriptTest(unittest.TestCase):
                     "1",
                     "--release",
                     "svc|v2|http://git/svc/-/tags/v2|registry/svc:v2",
+                    "--base-url",
+                    "https://confluence.test",
+                    "--gitlab-url",
+                    "https://gitlab.test",
                     "--dry-run",
                 ]
             )

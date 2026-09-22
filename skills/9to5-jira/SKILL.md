@@ -81,6 +81,27 @@ Then ask the user which issue to plan (question tool where available, otherwise 
 
 If the sprint JQL returns empty or fails (no sprint configured, Jira Server without sprint support), fall back silently and ask the user to paste the key (single text-input option such as `"Paste the key (e.g. PROJ-123)"`).
 
+## Internal endpoints
+
+Internal hostnames are not hardcoded in this skill. They live in
+`config/endpoints.json` (gitignored; version control ships only
+`config/endpoints.example.json`).
+
+Resolution order: CLI flag -> environment variable (`CONFLUENCE_URL`,
+`GITLAB_URL`) -> `config/endpoints.json` -> fail with instructions. There is no
+hardcoded fallback.
+
+When a script reports a missing endpoint, ask the user for the internal URL,
+confirm it, then persist it:
+
+```bash
+python3 scripts/update_confluence_release.py --set-endpoint confluence_url=<url>
+python3 scripts/update_confluence_release.py --set-endpoint gitlab_url=<url>
+```
+
+Keys: `confluence_url`, `jira_url`, `gitlab_url`, `git_ssh_base`. Do this also
+when the user says an environment changed or a URL is wrong.
+
 ## Step 1: Check zjira config and binary
 
 **Config check first:**

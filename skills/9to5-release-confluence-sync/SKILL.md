@@ -55,13 +55,35 @@ and collect the values from the user before syncing:
 5. **Highlight color** — purple shade for rows that need release (default `#998dd9`).
 6. **Credentials** — Confluence base URL and token if `zjira whoami` fails.
 
-Store non-secret values with the registry command:
+## Internal endpoints — ask on first use
+
+Internal hostnames are never hardcoded in this skill. They live in
+`config/endpoints.json`, which is gitignored so they never enter the repository;
+version control ships only `config/endpoints.example.json`.
+
+Resolution order for every endpoint: CLI flag -> environment variable
+(`CONFLUENCE_URL`, `GIT_SSH_BASE`, `CONFLUENCE_SPACE`) -> `config/endpoints.json`
+-> ask the user. There is no hardcoded fallback.
+
+If a required value is missing the script exits with instructions. Ask the user
+for the internal URL or key, confirm it, then persist it:
+
+```bash
+python3 scripts/sync_release_tags.py --set-endpoint confluence_url=<url>
+python3 scripts/sync_release_tags.py --set-endpoint git_ssh_base=<ssh-base>
+python3 scripts/sync_release_tags.py --set-endpoint confluence_space=<KEY>
+```
+
+Keys: `confluence_url`, `confluence_space`, `git_ssh_base`, `jira_url`.
+Run this whenever the environment changes or the user corrects a value.
+
+Store non-secret project values with the registry command:
 
 ```bash
 python3 scripts/sync_release_tags.py --add-project dev-c7-ttdvkh \
   --root 92618730 --group c7-ttdvkh --hl-color '#c0b6f2' \
-  --page-link 'https://confluence-local.ots.vn/display/C7GSAFEDA/268.+22.09.2026' \
-  --doc-link 'https://confluence-local.ots.vn/display/C7GSAFEDA'
+  --page-link '<confluence-base>/display/<SPACE>/<page>' \
+  --doc-link '<confluence-base>/display/<SPACE>'
 ```
 
 Store secrets in `~/.config/opencode/release-sync.json` (mode `600`), which
@@ -69,7 +91,7 @@ overlays the zjira config:
 
 ```json
 {
-  "confluence_url": "https://confluence-local.ots.vn",
+  "confluence_url": "<confluence-base>",
   "confluence_token": "<token>"
 }
 ```
@@ -119,13 +141,14 @@ Flags:
 | `--add-project NAME` | Register/update a project, then exit (`--root --group --space --hl-color --page-link --doc-link`) |
 | `--page URL\|ID` | Explicit page; skips the today lookup and creation |
 | `--root URL\|ID` | Hierarchy root; daily pages resolve under its monthly children |
-| `--space KEY` | Confluence space key (default `C7GSAFEDA` or the project's) |
+| `--space KEY` | Confluence space key (default: the project's or `config/endpoints.json`) |
 | `--date YYYY-MM-DD` | Release date, default today |
 | `--template URL\|ID` | Page cloned when creating a missing page |
 | `--no-create` | Fail instead of creating a missing page |
 | `--hl-color HEX` | Highlight for rows that need release (project default) |
 | `--group G` | Git group, default from the registry or the cwd repo remote |
-| `--git-base URL` | SSH base, default `ssh://git@10.0.0.40:17122` |
+| `--git-base URL` | SSH base; default the cwd repo remote or `config/endpoints.json` |
+| `--set-endpoint KEY=VALUE` | Persist an internal endpoint to `config/endpoints.json` and exit |
 | `--service NAME` | Restrict to rows whose service name contains this string |
 | `--paint N,N` | Force the purple highlight on the given row numbers |
 | `--clear-highlight [N,N]` | Remove highlights: all highlighted rows, or the listed numbers |

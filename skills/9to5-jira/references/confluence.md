@@ -82,8 +82,8 @@ service/Docker image, and verifies that the tag exists on `origin`:
 
 ```bash
 python3 scripts/update_confluence_release.py \
-  --page 'https://confluence-local.ots.vn/display/C7GSAFEDA/243.+27.07.2026' \
-  --tag-url 'http://10.0.0.40/c7-ttdvkh/ttch/ttch-migration/-/tags/c7-ttdvkh-v0.0.123' \
+  --page '<confluence-base>/display/<SPACE>/243.+DD.MM.YYYY' \
+  --tag-url '<gitlab-base>/<group>/<project>/-/tags/<tag>' \
   --dry-run
 ```
 
@@ -118,7 +118,7 @@ For the TTDVKH release page, use the dedicated profile. It resolves the page
 ```bash
 python3 scripts/update_confluence_release.py \
   --profile c7-ttdvkh \
-  --page 'https://confluence-local.ots.vn/display/C7GSAFEDA/243.+27.07.2026' \
+  --page '<confluence-base>/display/<SPACE>/243.+DD.MM.YYYY' \
   --dry-run
 ```
 

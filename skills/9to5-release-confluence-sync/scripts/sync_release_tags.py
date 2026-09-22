@@ -24,15 +24,68 @@ from pathlib import Path
 CONFIG = Path.home() / ".config" / "zjira" / "config.yaml"
 SECRETS_PATH = Path.home() / ".config" / "opencode" / "release-sync.json"
 SKILL_DIR = Path(__file__).resolve().parent.parent
+ENDPOINTS_PATH = SKILL_DIR / "config" / "endpoints.json"
+ENDPOINT_KEYS = ("confluence_url", "git_ssh_base", "confluence_space", "jira_url")
 CACHE_PATH = SKILL_DIR / "cache.json"
 PROJECTS_PATH = SKILL_DIR / "projects.json"
 CACHE_TTL = 120
 SSH_OPTIONS = "-o BatchMode=yes -o ConnectTimeout=15"
-DEFAULT_SPACE = "C7GSAFEDA"
-DEFAULT_GIT_BASE = "ssh://git@10.0.0.40:17122"
 TAG_RE = re.compile(r"^(.*?)(\d+(?:\.\d+)*)$")
 DAILY_RE = re.compile(r"^(\d+)\.\s+(\d{2})\.(\d{2})\.(\d{4})$")
 HL_COLOR = "#998dd9"  # purple row highlight for services that need a release
+
+
+def load_endpoints():
+    """Non-secret internal endpoints for this skill.
+
+    Version control holds only `config/endpoints.example.json`. Real values live
+    in `config/endpoints.json`, which is gitignored so internal hostnames never
+    enter the repository. Never invent a value — ask the user first.
+    """
+    if not ENDPOINTS_PATH.exists():
+        return {}
+    try:
+        data = json.loads(ENDPOINTS_PATH.read_text(encoding="utf-8"))
+    except Exception as exc:
+        sys.exit(f"{ENDPOINTS_PATH} is not valid JSON: {exc}")
+    if not isinstance(data, dict):
+        sys.exit(f"{ENDPOINTS_PATH} must contain a JSON object")
+    return {k: v.strip() for k, v in data.items()
+            if isinstance(v, str) and v.strip() and not k.startswith("_")}
+
+
+def save_endpoint(key, value):
+    if key not in ENDPOINT_KEYS:
+        sys.exit(f"unknown endpoint '{key}'; expected one of: {', '.join(ENDPOINT_KEYS)}")
+    data = {}
+    if ENDPOINTS_PATH.exists():
+        data = json.loads(ENDPOINTS_PATH.read_text(encoding="utf-8"))
+    data[key] = value.rstrip("/")
+    ENDPOINTS_PATH.parent.mkdir(parents=True, exist_ok=True)
+    ENDPOINTS_PATH.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
+    return ENDPOINTS_PATH
+
+
+def resolve_endpoint(key, cli_value, env_vars, fallbacks=()):
+    """CLI flag -> env var -> config/endpoints.json -> caller fallback -> ask the user."""
+    if cli_value:
+        return cli_value.rstrip("/")
+    for var in env_vars:
+        if os.environ.get(var):
+            return os.environ[var].strip().rstrip("/")
+    value = load_endpoints().get(key)
+    if value:
+        return value.rstrip("/")
+    for fallback in fallbacks:
+        if fallback:
+            return fallback.rstrip("/")
+    sys.exit(
+        f"missing {key}: ask the user for the internal value, then persist it with\n"
+        f"  {Path(__file__).name} --set-endpoint {key}=<value>\n"
+        f"or write it into {ENDPOINTS_PATH}\n"
+        f"(version control only ships config/endpoints.example.json; do not commit the real value)"
+    )
+
 
 
 def load_config():
@@ -45,8 +98,11 @@ def load_config():
 
 
 def load_secrets():
-    """zjira config, overlaid by ~/.config/opencode/release-sync.json when present."""
+    """zjira config, overlaid by the skill endpoints config and the release-sync overlay."""
     cfg = load_config()
+    for key, value in load_endpoints().items():
+        if key in ("confluence_url", "confluence_space"):
+            cfg[key] = value
     if SECRETS_PATH.exists():
         try:
             extra = json.loads(SECRETS_PATH.read_text())
@@ -255,12 +311,13 @@ def save_cache(cache):
 
 
 def git_context():
+    """Derive the git SSH base and group from the cwd repo. Returns (None, None) when unavailable."""
     try:
         url = subprocess.run(
             ["git", "remote", "get-url", "origin"], capture_output=True, text=True, check=True
         ).stdout.strip()
     except Exception:
-        return DEFAULT_GIT_BASE, None
+        return None, None
     m = re.match(r"ssh://(?:([^@/]+)@)?([^:/]+)(?::(\d+))?/(.+?)(?:\.git)?$", url)
     if m:
         user, host, port, path = m.group(1) or "git", m.group(2), m.group(3), m.group(4)
@@ -270,7 +327,7 @@ def git_context():
     if m:
         user, host, path = m.group(1) or "git", m.group(2), m.group(3)
         return f"ssh://{user}@{host}", path.split("/")[0]
-    return DEFAULT_GIT_BASE, None
+    return None, None
 
 
 def remote_tags(git_base, repo):
@@ -408,7 +465,7 @@ def main():
     ap.add_argument("--page-link", help="reference link to the project's release page (stored by --add-project)")
     ap.add_argument("--doc-link", help="reference link to the release document/space root (stored by --add-project)")
     ap.add_argument("--config", default=None, help=f"project registry path (default {PROJECTS_PATH})")
-    ap.add_argument("--space", default=None, help=f"Confluence space key (default {DEFAULT_SPACE} or the project's)")
+    ap.add_argument("--space", default=None, help="Confluence space key (default: the project's or config/endpoints.json)")
     ap.add_argument("--root", help="hierarchy root page URL or ID; daily pages are resolved under its monthly children")
     ap.add_argument("--date", help="release date YYYY-MM-DD (default: today)")
     ap.add_argument("--template", help="page URL or ID cloned when creating today's page")
@@ -416,7 +473,7 @@ def main():
     ap.add_argument("--hl-color", default=None,
                     help=f"cell highlight for rows that need release (default {HL_COLOR} or the project's)")
     ap.add_argument("--group", help="git group to sync, e.g. c7/ttch (default: from cwd repo remote or the project's)")
-    ap.add_argument("--git-base", default=None, help=f"ssh base URL (default {DEFAULT_GIT_BASE})")
+    ap.add_argument("--git-base", default=None, help="ssh base URL; default: cwd repo remote or config/endpoints.json")
     ap.add_argument("--service", help="only rows whose service name contains this string")
     ap.add_argument("--paint", help="comma-separated row numbers to highlight purple, e.g. 1,2,4")
     ap.add_argument("--clear-highlight", nargs="?", const="all",
@@ -431,7 +488,17 @@ def main():
     ap.add_argument("--apply", action="store_true", help="write changes (default: dry run)")
     ap.add_argument("--approved", action="store_true",
                     help="confirm the user approved the dry-run result (required with --apply)")
+    ap.add_argument("--set-endpoint", metavar="KEY=VALUE",
+                    help=f"persist an internal endpoint to {ENDPOINTS_PATH} and exit; keys: {', '.join(ENDPOINT_KEYS)}")
     args = ap.parse_args()
+
+    if args.set_endpoint:
+        if "=" not in args.set_endpoint:
+            ap.error("--set-endpoint expects KEY=VALUE")
+        key, value = args.set_endpoint.split("=", 1)
+        path = save_endpoint(key.strip(), value.strip())
+        print(f"saved {key.strip()} to {path}")
+        return
 
     if args.apply and not args.approved:
         sys.exit("refusing to write: run the dry run, show the table to the user, get explicit approval, "
@@ -448,10 +515,14 @@ def main():
     projects = load_projects(projects_path)
 
     if args.add_project:
+        space_value = args.space or load_endpoints().get("confluence_space")
+        if not space_value:
+            sys.exit("missing confluence space key: pass --space <KEY>, or persist it with\n"
+                     f"  {Path(__file__).name} --set-endpoint confluence_space=<KEY>")
         entry = {
             "root": args.root,
             "group": args.group,
-            "space": args.space or DEFAULT_SPACE,
+            "space": space_value,
             "hl_color": args.hl_color or HL_COLOR,
             "page_link": args.page_link,
             "doc_link": args.doc_link,
@@ -478,7 +549,8 @@ def main():
     project = projects.get(project_name, {}) if project_name else {}
 
     root = args.root or project.get("root")
-    space = args.space or project.get("space") or DEFAULT_SPACE
+    space = resolve_endpoint("confluence_space", args.space or project.get("space"),
+                             ("CONFLUENCE_SPACE",))
     group = args.group or project.get("group") or cwd_group
     hl_color = args.hl_color or project.get("hl_color") or HL_COLOR
     if not group:
@@ -537,7 +609,7 @@ def main():
             "cell_tags": [c[0] for c in cells], "highlight": hl,
         })
 
-    git_base = args.git_base or git_base
+    git_base = resolve_endpoint("git_ssh_base", args.git_base or git_base, ("GIT_SSH_BASE",))
 
     cache = {} if args.no_cache else load_cache()
     cache_group = cache.setdefault(group, {})

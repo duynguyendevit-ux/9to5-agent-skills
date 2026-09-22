@@ -2,6 +2,9 @@
 cache.json
 **/cache.json
 
+# Local-only internal endpoints (real hostnames; ship the .example.json instead)
+skills/*/config/endpoints.json
+
 # Python
 __pycache__/
 *.pyc
