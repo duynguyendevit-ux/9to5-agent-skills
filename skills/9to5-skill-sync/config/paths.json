@@ -8,7 +8,6 @@
   ],
   "repo": "~/Documents/duylab/9to5-agent-skills",
   "repo_skills_subdir": "skills",
-  "vault": "~/Documents/obisian/OTS/vault",
   "exclude_always": [
     "__pycache__",
     "*.pyc",

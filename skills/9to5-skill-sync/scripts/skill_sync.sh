@@ -24,7 +24,6 @@ expand() { python3 -c "import os,sys;print(os.path.expanduser('$1'))"; }
 CANONICAL="$(expand "$(cfg "['canonical']")")"
 REPO="$(expand "$(cfg "['repo']")")"
 REPO_SUB="$(cfg "['repo_skills_subdir']")"
-VAULT="$(expand "$(cfg "['vault']")")"
 mapfile -t MIRRORS < <(cfg "['mirrors']" | while read -r p; do expand "$p"; done)
 mapfile -t EXCL_ALWAYS < <(cfg "['exclude_always']")
 mapfile -t EXCL_REPO < <(cfg "['exclude_from_repo']")
@@ -147,21 +146,6 @@ else
   echo "mirrors refreshed from $CANONICAL"
   if [[ "$DO_REPO" -eq 1 ]]; then
     echo "repo copy regenerated at $REPO/$REPO_SUB (commit it yourself)"
-  fi
-fi
-
-# Vault notes that mention a changed skill still need review.
-if [[ -d "$VAULT" ]]; then
-  hits=0
-  for name in "${skills[@]}"; do
-    n=$(grep -rl --include="*.md" "$name" "$VAULT" 2>/dev/null | wc -l) || true
-    if [[ "$n" -gt 0 ]]; then
-      echo "  vault: $n note(s) mention $name"
-      hits=$((hits + n))
-    fi
-  done
-  if [[ "$hits" -gt 0 ]]; then
-    echo "review those notes, then run vault/.ai/vault-health.sh"
   fi
 fi
 

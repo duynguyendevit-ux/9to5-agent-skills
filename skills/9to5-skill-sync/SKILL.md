@@ -1,6 +1,6 @@
 ---
 name: 9to5-skill-sync
-description: Keep an edited 9to5 skill consistent across its canonical directory, the three mirror directories, and the git repository copy — mirror the change, regenerate the repo copy with the correct exclusions, verify parity by hash, and report vault notes that reference the changed skill. Use when a skill has just been created or edited, when asked to sync or publish skills, when checking whether the skill copies have drifted, before committing skill changes, or when a skill works in one agent but not another.
+description: Keep an edited 9to5 skill consistent across its canonical directory, the three mirror directories, and the git repository copy — mirror the change, regenerate the repo copy with the correct exclusions, and verify parity by hash. Use when a skill has just been created or edited, when asked to sync or publish skills, when checking whether the skill copies have drifted, before committing skill changes, or when a skill works in one agent but not another.
 license: MIT
 compatibility: Requires bash, rsync, python3, and a checkout of the skills repository. Reads paths from config/paths.json.
 metadata:
@@ -46,8 +46,7 @@ The comparison therefore applies the repo exclusions to the canonical side too �
    ```
    Use `--skill <name>` to limit it, `--no-repo` when the repo should not be touched.
 4. **Verify** — re-run `--check`. It exits non-zero while any location differs, so a clean exit is the proof.
-5. **Review the vault.** The script lists vault notes that mention a changed skill. Update them, then run `vault/.ai/vault-health.sh` (from the vault repository) and expect zero broken links.
-6. **Commit and push the repo.** The script deliberately does not: skill changes deserve a real message, and the user decides when to publish. Run the leak check first — it derives the forbidden hostnames from the local `endpoints.json` files, so the repository itself never contains them:
+5. **Commit and push the repo.** The script deliberately does not: skill changes deserve a real message, and the user decides when to publish. Run the leak check first — it derives the forbidden hostnames from the local `endpoints.json` files, so the repository itself never contains them:
    ```bash
    scripts/skill_sync.sh --leak-check
    ```

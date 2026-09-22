@@ -33,7 +33,7 @@ Default posture is read-only: `get`, `logs`, `describe`, `exec` for inspection.
 - `kubectl get pods|deploy|svc|configmap|secret -o yaml`, `logs`, `describe` — proceed.
 - `exec` that only reads (printenv, cat config, `ls`) — proceed, but never print secret values to the transcript; report key names and whether a value is set.
 - `kubectl delete|scale|rollout restart|edit|apply|patch`, port-forward to a datastore, or any write — stop and get explicit confirmation first. State the exact namespace, target, and blast radius.
-- Never copy kubeconfig content, bearer tokens, or secret values into notes, `debug/`, or the vault.
+- Never copy kubeconfig content, bearer tokens, or secret values into notes or `debug/`.
 
 ## Workflow
 
