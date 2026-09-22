@@ -1,0 +1,16 @@
+{
+  "projects": {
+    "dev-c7": {
+      "root": "92618728",
+      "group": "c7",
+      "space": "C7GSAFEDA",
+      "hl_color": "#998dd9"
+    },
+    "dev-c7-ttdvkh": {
+      "root": "92618730",
+      "group": "c7-ttdvkh",
+      "space": "C7GSAFEDA",
+      "hl_color": "#c0b6f2"
+    }
+  }
+}

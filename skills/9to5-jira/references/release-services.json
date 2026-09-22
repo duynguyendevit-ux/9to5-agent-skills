@@ -1,0 +1,17 @@
+{
+  "ttch-event-diary-service": {
+    "repo": "/home/duynk/Documents/C777777777777/services/ttch-event-diary-service",
+    "gitlab_project": "c7/ttch/ttch-event-diary-service",
+    "docker_image": "nexus.gtel-ots:8082/ots/apps/c7/ttch/ttch-event-diary-service"
+  },
+  "ttch-receive-service": {
+    "repo": "/home/duynk/Documents/C777777777777/services/ttch-receive-service",
+    "gitlab_project": "c7/ttch/ttch-receive-service",
+    "docker_image": "nexus.gtel-ots:8082/ots/apps/c7/ttch/ttch-receive-service"
+  },
+  "export-file-service": {
+    "repo": "/home/duynk/Documents/C777777777777/services/export-file-service",
+    "gitlab_project": "c7/ttch/export-file-service",
+    "docker_image": "nexus.gtel-ots:8082/ots/apps/c7/ttch/export-file-service"
+  }
+}

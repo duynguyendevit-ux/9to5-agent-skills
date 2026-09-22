@@ -1,0 +1,17 @@
+# Working state, never committed
+cache.json
+**/cache.json
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# Investigation artifacts (durable conclusions belong in notes/)
+skills/*/debug/artifacts/*
+!skills/*/debug/artifacts/.gitkeep
+
+# Editors / OS
+.DS_Store
+.idea/
+*.swp

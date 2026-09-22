@@ -1,0 +1,92 @@
+{
+  "ttch-admin-service": {
+    "repo": "/home/duynk/Documents/service/ttch-admin-service",
+    "gitlab_project": "c7-ttdvkh/ttch/ttch-admin-service",
+    "docker_image": "nexus.gtel-ots:8082/ots/apps/c7-ttdvkh/ttch/ttch-admin-service"
+  },
+  "ttch-dashboard-service": {
+    "repo": "/home/duynk/Documents/service/ttch-dashboard-service",
+    "gitlab_project": "c7-ttdvkh/ttch/ttch-dashboard-service",
+    "docker_image": "nexus.gtel-ots:8082/ots/apps/c7-ttdvkh/ttch/ttch-dashboard-service"
+  },
+  "ttch-app-service": {
+    "repo": "/home/duynk/Documents/service/app-gsafe-service",
+    "gitlab_project": "c7-ttdvkh/ttch/app-gsafe-service",
+    "docker_image": "nexus.gtel-ots:8082/ots/apps/c7-ttdvkh/ttch/app-gsafe-service"
+  },
+  "ttch-migration": {
+    "repo": "/home/duynk/Documents/migration/ttch-migration",
+    "gitlab_project": "c7-ttdvkh/ttch/ttch-migration",
+    "docker_image": "nexus.gtel-ots:8082/ots/apps/ttdvkh/c7-ttdvkh/migrations-admin"
+  },
+  "ttch-portal-ui": {
+    "repo": "/home/duynk/Documents/portal-ui",
+    "gitlab_project": "c7-ttdvkh/ttch/portal-ui",
+    "docker_image": "nexus.gtel-ots:8082/ots/apps/c7-ttdvkh/ttch-portal"
+  },
+  "auth-service": {
+    "repo": "/home/duynk/Documents/auth-service",
+    "gitlab_project": "c7-ttdvkh/qtud/auth-service",
+    "docker_image": "nexus.gtel-ots:8082/ots/apps/ttdvkh/qtud/auth-service"
+  },
+  "notification-service": {
+    "repo": "/home/duynk/Documents/notification-service",
+    "gitlab_project": "c7-ttdvkh/notifications/notification-service",
+    "docker_image": "nexus.gtel-ots:8082/ots/apps/c7-ttdvkh/notification/notification-service"
+  },
+  "ttch-worker-service": {
+    "repo": "/home/duynk/Documents/service/ttch-woker-service",
+    "gitlab_project": "c7-ttdvkh/ttch/ttch-woker-service",
+    "docker_image": "nexus.gtel-ots:8082/ots/apps/c7-ttdvkh/ttch/ttch-worker-service"
+  },
+  "export-file": {
+    "repo": "/home/duynk/Documents/service/export-file-service",
+    "gitlab_project": "c7-ttdvkh/ttch/export-file-service",
+    "docker_image": "nexus.gtel-ots:8082/ots/apps/c7-ttdvkh/ttch/export-file-service"
+  },
+  "fire-event-sync-service": {
+    "repo": "/home/duynk/Documents/fire-event-sync-service",
+    "gitlab_project": "c7-ttdvkh/ttch/fire-event-sync-service",
+    "docker_image": "nexus.gtel-ots:8082/ots/apps/c7-ttdvkh/ttch/fire-event-sync-service"
+  },
+  "fire-event-notification": {
+    "repo": "/home/duynk/Documents/fire-event-notification",
+    "gitlab_project": "c7-ttdvkh/ttch/fire-event-notification",
+    "docker_image": "nexus.gtel-ots:8082/ots/apps/c7-ttdvkh/notification/fire-event-notification-service"
+  },
+  "ttdvkh-device-fire-alarm": {
+    "repo": "/home/duynk/Documents/service/ttdvkh-device-fire-alarm",
+    "gitlab_project": "c7-ttdvkh/ttch/ttdvkh-device-fire-alarm",
+    "docker_image": "nexus.gtel-ots:8082/ots/apps/c7-ttdvkh/ttdvkh-device-fire-alarm/ttdvkh-device-fire-alarm"
+  },
+  "ttdvkh-device-wireless-fire-alarm": {
+    "repo": "/home/duynk/Documents/service-alarms/ttdvkh-device-wireless-fire-alarm",
+    "gitlab_project": "c7-ttdvkh/ttch/ttdvkh-device-wireless-fire-alarm",
+    "docker_image": "nexus.gtel-ots:8082/ots/apps/c7-ttdvkh/ttdvkh-device-wireless-fire-alarm"
+  },
+  "ttdvkh-diary-service": {
+    "repo": "/home/duynk/Documents/ttdvkh-event-diary-service",
+    "gitlab_project": "c7-ttdvkh/ttch/ttdvkh-event-diary-service",
+    "docker_image": "nexus.gtel-ots:8082/ots/apps/c7-ttdvkh/ttch/ttdvkh-diary-service"
+  },
+  "flow-config-service": {
+    "repo": "/home/duynk/Documents/service/flow-config-service",
+    "gitlab_project": "c7-ttdvkh/ttch/flow-config-service",
+    "docker_image": "nexus.gtel-ots:8082/ots/apps/c7-ttdvkh/ttch/flow-config-service"
+  },
+  "availability-service": {
+    "repo": "/home/duynk/Documents/availability-service",
+    "gitlab_project": "c7-ttdvkh/availability-measurement/availability-service",
+    "docker_image": "nexus.gtel-ots:8082/ots/apps/c7-ttdvkh/ttch/availability-service"
+  },
+  "availability-cron": {
+    "repo": "/home/duynk/Documents/availability-cron",
+    "gitlab_project": "c7-ttdvkh/availability-measurement/availability-cron",
+    "docker_image": "nexus.gtel-ots:8082/ots/apps/c7-ttdvkh/ttch/availability-cron"
+  },
+  "ttdvkh-receive-service": {
+    "repo": "/home/duynk/Documents/service/ttdvkh-receive-service",
+    "gitlab_project": "c7-ttdvkh/ttch/ttdvkh-receive-service",
+    "docker_image": "nexus.gtel-ots:8082/ots/apps/c7-ttdvkh/ttch/ttdvkh-receive-service"
+  }
+}

@@ -1,0 +1,483 @@
+{
+  "alleyway-portal": {
+    "namespaces": [
+      "dev-c7"
+    ],
+    "repo": null
+  },
+  "app-gsafe-service": {
+    "namespaces": [
+      "dev-c7-ttdvkh"
+    ],
+    "repo": "/home/duynk/Documents/service/app-gsafe-service",
+    "repo_confidence": "remote"
+  },
+  "app-portal": {
+    "namespaces": [
+      "dev-c7",
+      "dev-c7-ttdvkh"
+    ],
+    "repo": null
+  },
+  "auth-devices-service": {
+    "namespaces": [
+      "dev-c7-ttdvkh"
+    ],
+    "repo": null
+  },
+  "auth-service": {
+    "namespaces": [
+      "dev-c7",
+      "dev-c7-ttdvkh"
+    ],
+    "repo": "/home/duynk/Documents/auth-service",
+    "repo_confidence": "remote"
+  },
+  "availability-cron": {
+    "namespaces": [
+      "dev-c7-ttdvkh"
+    ],
+    "repo": "/home/duynk/Documents/availability-cron",
+    "repo_confidence": "remote"
+  },
+  "availability-service": {
+    "namespaces": [
+      "dev-c7-ttdvkh"
+    ],
+    "repo": "/home/duynk/temp/availability-service",
+    "repo_confidence": "remote",
+    "duplicate_repos": [
+      "/home/duynk/Documents/availability-service"
+    ]
+  },
+  "boundary-service": {
+    "namespaces": [
+      "dev-c7"
+    ],
+    "repo": null
+  },
+  "c06-integration-service": {
+    "namespaces": [
+      "dev-c7"
+    ],
+    "repo": null
+  },
+  "c12-integration-service": {
+    "namespaces": [
+      "dev-c7"
+    ],
+    "repo": null
+  },
+  "call-relay-service": {
+    "namespaces": [
+      "dev-c7-ttdvkh"
+    ],
+    "repo": "/home/duynk/Documents/service/call-relay-service",
+    "repo_confidence": "remote"
+  },
+  "category-service": {
+    "namespaces": [
+      "dev-c7",
+      "dev-c7-ttdvkh"
+    ],
+    "repo": "/home/duynk/Documents/C777777777777/services/category-service",
+    "repo_confidence": "remote"
+  },
+  "collect-info-portal": {
+    "namespaces": [
+      "dev-c7"
+    ],
+    "repo": null
+  },
+  "collect-info-service": {
+    "namespaces": [
+      "dev-c7"
+    ],
+    "repo": null
+  },
+  "core-service": {
+    "namespaces": [
+      "dev-c7",
+      "dev-c7-ttdvkh"
+    ],
+    "repo": "/home/duynk/Documents/C777777777777/services/core-service",
+    "repo_confidence": "remote"
+  },
+  "crm-service": {
+    "namespaces": [
+      "dev-c7-ttdvkh"
+    ],
+    "repo": null
+  },
+  "device-event-receiver-service": {
+    "namespaces": [
+      "dev-c7-ttdvkh"
+    ],
+    "repo": null
+  },
+  "device-event-service": {
+    "namespaces": [
+      "dev-c7-ttdvkh"
+    ],
+    "repo": null
+  },
+  "device-latest-receiver-service": {
+    "namespaces": [
+      "dev-c7-ttdvkh"
+    ],
+    "repo": null
+  },
+  "device-latest-service": {
+    "namespaces": [
+      "dev-c7-ttdvkh"
+    ],
+    "repo": null
+  },
+  "device-latest-worker-service": {
+    "namespaces": [
+      "dev-c7-ttdvkh"
+    ],
+    "repo": null
+  },
+  "device-portal": {
+    "namespaces": [
+      "dev-c7-ttdvkh"
+    ],
+    "repo": null
+  },
+  "event-device-worker-service": {
+    "namespaces": [
+      "dev-c7-ttdvkh"
+    ],
+    "repo": null
+  },
+  "export-file-service": {
+    "namespaces": [
+      "dev-c7",
+      "dev-c7-ttdvkh"
+    ],
+    "repo": "/home/duynk/Documents/C777777777777/services/export-file-service",
+    "repo_confidence": "remote",
+    "duplicate_repos": [
+      "/home/duynk/Documents/service/export-file-service"
+    ]
+  },
+  "external-portal": {
+    "namespaces": [
+      "dev-c7",
+      "dev-c7-ttdvkh"
+    ],
+    "repo": null
+  },
+  "facility-reliability-receive-ots-service": {
+    "namespaces": [
+      "dev-c7"
+    ],
+    "repo": null
+  },
+  "facility-reliability-receive-service": {
+    "namespaces": [
+      "dev-c7"
+    ],
+    "repo": null
+  },
+  "facility-reliability-report-service": {
+    "namespaces": [
+      "dev-c7"
+    ],
+    "repo": null
+  },
+  "fire-event-notification-service": {
+    "namespaces": [
+      "dev-c7-ttdvkh"
+    ],
+    "repo": null
+  },
+  "fire-event-sync-service": {
+    "namespaces": [
+      "dev-c7-ttdvkh"
+    ],
+    "repo": "/home/duynk/Documents/fire-event-sync-service",
+    "repo_confidence": "remote"
+  },
+  "flow-config-service": {
+    "namespaces": [
+      "dev-c7-ttdvkh"
+    ],
+    "repo": "/home/duynk/Documents/service/flow-config-service",
+    "repo_confidence": "remote"
+  },
+  "gateway": {
+    "namespaces": [
+      "dev-c7",
+      "dev-c7-ttdvkh"
+    ],
+    "repo": null
+  },
+  "gateway-admin-service": {
+    "namespaces": [
+      "dev-c7-ttdvkh"
+    ],
+    "repo": null
+  },
+  "gateway-g2": {
+    "namespaces": [
+      "dev-c7-ttdvkh"
+    ],
+    "repo": null
+  },
+  "gateway-service": {
+    "namespaces": [
+      "dev-c7-ttdvkh"
+    ],
+    "repo": "/home/duynk/Documents/iot_gateway_ai",
+    "repo_confidence": "project",
+    "duplicate_repos": [
+      "/home/duynk/Documents/iot_gateway_uat"
+    ]
+  },
+  "integrate-c12-worker-service": {
+    "namespaces": [
+      "dev-c7"
+    ],
+    "repo": null
+  },
+  "internal-portal": {
+    "namespaces": [
+      "dev-c7",
+      "dev-c7-ttdvkh"
+    ],
+    "repo": null
+  },
+  "iot-config-portal": {
+    "namespaces": [
+      "dev-c7-ttdvkh"
+    ],
+    "repo": null
+  },
+  "iot-gateway-portal": {
+    "namespaces": [
+      "dev-c7-ttdvkh"
+    ],
+    "repo": null
+  },
+  "marker-listener-service": {
+    "namespaces": [
+      "dev-c7"
+    ],
+    "repo": null
+  },
+  "notification-service": {
+    "namespaces": [
+      "dev-c7",
+      "dev-c7-ttdvkh"
+    ],
+    "repo": "/home/duynk/Documents/C777777777777/services/notification-service",
+    "repo_confidence": "remote",
+    "duplicate_repos": [
+      "/home/duynk/Documents/notification-service",
+      "/home/duynk/notification-service"
+    ]
+  },
+  "push-gateway-service": {
+    "namespaces": [
+      "dev-c7",
+      "dev-c7-ttdvkh"
+    ],
+    "repo": null
+  },
+  "qtud-log-service": {
+    "namespaces": [
+      "dev-c7",
+      "dev-c7-ttdvkh"
+    ],
+    "repo": null
+  },
+  "qtud-portal": {
+    "namespaces": [
+      "dev-c7",
+      "dev-c7-ttdvkh"
+    ],
+    "repo": null
+  },
+  "raw-log-receiver-service": {
+    "namespaces": [
+      "dev-c7-ttdvkh"
+    ],
+    "repo": null
+  },
+  "raw-log-service": {
+    "namespaces": [
+      "dev-c7-ttdvkh"
+    ],
+    "repo": null
+  },
+  "receiver-g2-service": {
+    "namespaces": [
+      "dev-c7-ttdvkh"
+    ],
+    "repo": null
+  },
+  "receiver-g6-service": {
+    "namespaces": [
+      "dev-c7-ttdvkh"
+    ],
+    "repo": null
+  },
+  "redis-persistence": {
+    "namespaces": [
+      "dev-c7"
+    ],
+    "repo": null
+  },
+  "storage-service": {
+    "namespaces": [
+      "dev-c7",
+      "dev-c7-ttdvkh"
+    ],
+    "repo": "/home/duynk/Documents/storage-service",
+    "repo_confidence": "remote"
+  },
+  "ttch-admin-service": {
+    "namespaces": [
+      "dev-c7",
+      "dev-c7-ttdvkh"
+    ],
+    "repo": "/home/duynk/Documents/C777777777777/services/ttch-admin-service",
+    "repo_confidence": "remote",
+    "duplicate_repos": [
+      "/home/duynk/Documents/service/ttch-admin-service"
+    ]
+  },
+  "ttch-app-service": {
+    "namespaces": [
+      "dev-c7"
+    ],
+    "repo": "/home/duynk/Documents/C777777777777/services/ttch-app-service",
+    "repo_confidence": "remote"
+  },
+  "ttch-crm-receive-service": {
+    "namespaces": [
+      "dev-c7"
+    ],
+    "repo": null
+  },
+  "ttch-dashboard-service": {
+    "namespaces": [
+      "dev-c7",
+      "dev-c7-ttdvkh"
+    ],
+    "repo": "/home/duynk/Documents/C777777777777/services/ttch-dashboard-service",
+    "repo_confidence": "remote",
+    "duplicate_repos": [
+      "/home/duynk/Documents/service/ttch-dashboard-service"
+    ]
+  },
+  "ttch-event-diary-service": {
+    "namespaces": [
+      "dev-c7"
+    ],
+    "repo": "/home/duynk/Documents/C777777777777/services/ttch-event-diary-service",
+    "repo_confidence": "remote",
+    "duplicate_repos": [
+      "/home/duynk/Documents/ttdvkh-event-diary-service"
+    ]
+  },
+  "ttch-fire-event-worker": {
+    "namespaces": [
+      "dev-c7"
+    ],
+    "repo": "/home/duynk/Documents/C777777777777/services/ttch-event-worker",
+    "repo_confidence": "remote"
+  },
+  "ttch-marker-service": {
+    "namespaces": [
+      "dev-c7"
+    ],
+    "repo": null
+  },
+  "ttch-mobilization-service": {
+    "namespaces": [
+      "dev-c7"
+    ],
+    "repo": null
+  },
+  "ttch-portal": {
+    "namespaces": [
+      "dev-c7",
+      "dev-c7-ttdvkh"
+    ],
+    "repo": null
+  },
+  "ttch-receive-service": {
+    "namespaces": [
+      "dev-c7"
+    ],
+    "repo": "/home/duynk/Documents/C777777777777/services/ttch-receive-service",
+    "repo_confidence": "remote"
+  },
+  "ttch-worker-service": {
+    "namespaces": [
+      "dev-c7",
+      "dev-c7-ttdvkh"
+    ],
+    "repo": null
+  },
+  "ttch-worker-sync-elasticsearch-service": {
+    "namespaces": [
+      "dev-c7"
+    ],
+    "repo": null
+  },
+  "ttch-worker-sync-service": {
+    "namespaces": [
+      "dev-c7"
+    ],
+    "repo": null
+  },
+  "ttdvkh-device-fire-alarm": {
+    "namespaces": [
+      "dev-c7-ttdvkh"
+    ],
+    "repo": "/home/duynk/Documents/service/ttdvkh-device-fire-alarm",
+    "repo_confidence": "remote"
+  },
+  "ttdvkh-device-wireless-fire-alarm": {
+    "namespaces": [
+      "dev-c7-ttdvkh"
+    ],
+    "repo": "/home/duynk/Documents/service-alarms/ttdvkh-device-wireless-fire-alarm",
+    "repo_confidence": "remote"
+  },
+  "ttdvkh-diary-service": {
+    "namespaces": [
+      "dev-c7-ttdvkh"
+    ],
+    "repo": null
+  },
+  "ttdvkh-receive-service": {
+    "namespaces": [
+      "dev-c7-ttdvkh"
+    ],
+    "repo": "/home/duynk/Documents/service/ttdvkh-receive-service",
+    "repo_confidence": "remote"
+  },
+  "ttdvkh-worker-sync-service": {
+    "namespaces": [
+      "dev-c7-ttdvkh"
+    ],
+    "repo": null
+  },
+  "wireless-gateway-service": {
+    "namespaces": [
+      "dev-c7-ttdvkh"
+    ],
+    "repo": null
+  },
+  "worker-service": {
+    "namespaces": [
+      "dev-c7-ttdvkh"
+    ],
+    "repo": null
+  }
+}

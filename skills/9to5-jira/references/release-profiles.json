@@ -1,0 +1,8 @@
+{
+  "c7-ttch": {
+    "service_config": "references/release-services.json"
+  },
+  "c7-ttdvkh": {
+    "service_config": "references/release-services-ttdvkh.json"
+  }
+}
