@@ -26,7 +26,7 @@ cd 9to5-agent-skills
 | Skill | Version | Purpose |
 |-------|---------|---------|
 | `9to5-jira` | 2.1.0 | Fetch a Jira issue and linked Confluence spec, explore the repo, write an implementation plan to `.kit/plans/`. |
-| `9to5-logwork` | 1.3.0 | Log Jira worklogs via conversation (day and week flows), with Vietnamese descriptions. |
+| `9to5-logwork` | 1.4.0 | Log Jira worklogs via conversation (day, week, month flows) with Vietnamese descriptions, agent-activity sync from local session history, and a Jira REST fallback when zjira AI drafting is unavailable. |
 | `9to5-jira-day-check` | 1.0.0 | Daily read-only summary: sprint issues, missing worklogs, releases still pending tag sync. |
 | `9to5-release-confluence-sync` | 1.0.0 | Create or update the daily Confluence release page and refresh version, Release Tag, and Docker image cells. |
 | `9to5-release-audit` | 1.0.0 | Read-only Confluence release-record snapshots and comparisons; distinguishes recorded release state from actual deployment. |

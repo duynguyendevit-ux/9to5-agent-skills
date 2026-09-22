@@ -1,10 +1,10 @@
 ---
 name: 9to5-logwork
-description: "Log Jira worklogs via conversation: scan assigned issues, accept task/hours/note input in chat, generate Vietnamese descriptions via zjira logwork, and submit. Two flows: day and week (Mon–Fri); also supports week-status and task-list. Use when the user says log work, log my hours, log today, log this week, worklog, chấm công, log công, or asks which days are missing hours."
+description: "Log Jira worklogs via conversation: scan assigned issues, accept task/hours/note input in chat, generate Vietnamese descriptions, and submit. Flows: day, week (Mon–Fri), month, week-status, task-list, plus an agent-activity digest that derives what was actually done from local opencode/codex/claude session history. Falls back to the Jira REST API when zjira's AI drafting (claude CLI) is unavailable. Use when the user says log work, log my hours, log today, log this week, log this month, worklog, chấm công, log công, sync hôm đó làm gì, or asks which days are missing hours."
 license: MIT
-compatibility: Requires the zjira CLI on PATH and Jira credentials in ~/.config/zjira/config.yaml.
+compatibility: Requires the zjira CLI on PATH and Jira credentials in ~/.config/zjira/config.yaml. Agent-activity sync reads local session stores of opencode/codex/claude (read-only, optional).
 metadata:
-  version: "1.3.0"
+  version: "1.4.0"
 ---
 
 Prefix your first line with `🥷` inline. Be direct: show the issue list immediately, no preamble.
@@ -20,6 +20,7 @@ execute zjira logwork commands. Own the full flow from issue scan to submit conf
 - `zjira logwork` has no `--dry-run`: the confirmation table IS the dry run. Always show it (issue, date, time, description) before executing any logwork command
 - Never submit worklogs without explicit user approval of that table; do not treat the original request as approval
 - If Jira auth fails, stop immediately and tell the user to run `zjira whoami`
+- The Jira PAT lives in `~/.config/zjira/config.yaml`. Read it into a shell variable only; never print, echo, or paste it into output
 </security>
 
 <context>
@@ -36,9 +37,11 @@ ZJIRA=$(which zjira 2>/dev/null || echo "$HOME/go/bin/zjira")
 ## Arguments
 - `day [YYYY-MM-DD]` — log for a single date (default: today)
 - `week [YYYY-MM-DD]` — log Mon–Fri for the week containing the date (default: current week)
+- `month [YYYY-MM]` — log every weekday of the month up to today (default: current month), minus user-declared skip days
 - `week-status [YYYY-MM-DD]` — show week table (logged hours, gap, ✓/⚠/✗) and stop
 - `task-list` — show assigned issues table and stop
-- No argument → ask via AskUserQuestion: day or week?
+- `sync [YYYY-MM-DD]` — print the agent-activity digest for the date (default: today) and stop
+- No argument → ask via AskUserQuestion: day, week or month?
 </context>
 
 <instructions>
@@ -50,15 +53,19 @@ Parse argument:
 - `task-list` → **Flow 4** (display-only). Show assigned tasks and stop.
 - `day` or no arg → **Flow 1** (day). Date = today (`date +%Y-%m-%d`) unless explicit date given.
 - `week` → **Flow 2** (week). Compute Mon–Fri for the week containing the given date (or current week).
+- `month [YYYY-MM]` → **Flow 5** (month). Weekdays of the month up to today.
+- `sync [YYYY-MM-DD]` → **Flow 6** (display-only). Agent-activity digest and stop.
 
 If no argument provided, use AskUserQuestion:
 - Question: "Which worklog flow?"
-- Options: "Log today (day)", "Log this week (Mon–Fri)", "Show week status", "Show task list"
+- Options: "Log today (day)", "Log this week (Mon–Fri)", "Log this month", "Show week status", "Show task list"
 
 Vietnamese natural-language triggers (match before showing the question):
 - `week-status` / "xem tình trạng" / "tình trạng logwork" / "tuần này log gì" / "đã log được gì" / "check log" / "còn thiếu ngày nào" / "status tuần" → **Flow 3**
 - "log hôm nay" / "log today" → **Flow 1** (today)
 - "log cả tuần" / "log tuần này" → **Flow 2** (current week)
+- "log tháng này" / "log cả tháng" / "log work current month" → **Flow 5** (current month)
+- "sync hôm đó làm gì" / "hôm qua làm gì" / "agent làm gì" / "xem hoạt động agent" → **Flow 6**
 - "danh sách task" / "task của tôi" → **Flow 4**
 
 ## Step 1: Scan assigned issues + week status
@@ -99,6 +106,40 @@ Present the issue list as a clean markdown table:
 ```
 
 Show max 20 issues. If more, note "showing top 20 — add a key manually if yours isn't listed."
+
+## Step 1.5: Sync what was actually done from local agents (optional)
+
+Use when the user asks what they did on a date ("sync hôm đó làm gì", "hôm qua làm gì"), when a
+day entry has no note, or before generating descriptions for the week/month flows. The digest is
+read-only evidence — it replaces guessing, it does not replace the user's confirmation.
+
+```bash
+# single day
+python3 <skill-dir>/scripts/agent_activity.py --date 2026-09-22
+# range, weekdays only
+python3 <skill-dir>/scripts/agent_activity.py --from 2026-09-01 --to 2026-09-22
+```
+
+Sources read (never written):
+
+| Agent | Location | Extracted |
+|-------|----------|-----------|
+| opencode | `~/.local/share/opencode/opencode.db` — `session_v2` + `session_message` (falls back to legacy `session`/`message`/`part`) | session titles, user prompts, edited file names |
+| codex | `~/.codex/sessions/YYYY/MM/DD/*.jsonl` | cwd, user prompts, tool names |
+| claude | `~/.claude/projects/<slug>/*.jsonl` | cwd, user prompts, edited file names |
+
+Sessions whose cwd is under `/tmp` are filtered out (they are zjira's internal `claude` drafting
+calls, not real work).
+
+Rules:
+- **Never paste raw prompts into the worklog comment.** Synthesize a Vietnamese 2–3 câu description
+  from the repo/directory, the edited files, and the intent of the prompts.
+- Map the digest's repositories to Jira keys the user named (e.g. `ttch-dashboard-service` ↔ the
+  CTJ ticket) and mention the technical scope in the description.
+- Label these descriptions `[agent-sync]` in the parsed-entries block and the confirmation table.
+- `(no agent activity found)` for a date means no local evidence — ask the user instead of inventing.
+- Agent history reveals more than the timesheet needs (private chats, unrelated projects). Surface
+  only what belongs to the work item being logged.
 
 ## Step 2: Gather task input (conversation)
 
@@ -205,6 +246,32 @@ $ZJIRA logwork KEY --time Xh --note "VIETNAMESE_DESCRIPTION" --date YYYY-MM-DD -
 - Run sequentially (not parallel) to avoid race conditions on stacked started times
 - Capture JSON output: extract `worklogId` for the result summary
 
+### Step 4b — fallback when zjira AI drafting is unavailable
+
+`zjira logwork` drafts the final comment through the local `claude` CLI. If it exits with
+`Error: claude exec: exit status 1`, `unrecognized_model`, or a provider balance error
+(e.g. `credit insufficient balance`), the AI path is dead and **no worklog was created**.
+Do not retry zjira. Submit the same approved entries through Jira REST API v2 instead:
+
+```bash
+JIRA=$(sed -n 's/^jira_url:[[:space:]]*//p' ~/.config/zjira/config.yaml)
+TOKEN=$(sed -n 's/^token:[[:space:]]*//p' ~/.config/zjira/config.yaml | tr -d '"')
+payload=$(jq -n --arg c "$DESCRIPTION" --arg s "${DATE}T09:00:00.000+0700" \
+  --argjson t $((HOURS * 60)) '{comment: $c, started: $s, timeSpentSeconds: $t}')
+code=$(curl -sS -o /tmp/opencode/_resp.json -w '%{http_code}' \
+  -X POST "$JIRA/rest/api/2/issue/$KEY/worklog" \
+  -H "Authorization: Bearer $TOKEN" -H 'Content-Type: application/json' \
+  --data-binary "$payload")
+```
+
+- `201` → the `.id` field of the response is the worklogId.
+- Any other code → record the entry as failed and continue; report partial success at the end.
+- Read the token only inside the shell variable — never print, echo, or log it.
+- The direct API path skips zjira's bullet formatting: the comment is the description text as-is.
+- For large batches (≥ 10 entries) generate one sequential script that logs each entry and appends
+  `date key hours http=code id=...` to a results file; run it once, then verify with `weekstatus`.
+- Verify afterwards: `weekstatus` for every affected week must show the logged totals.
+
 ## Step 5: Report results
 
 ```
@@ -228,7 +295,10 @@ Report partial success — do not stop on first failure.
 | `zjira` not found | Tell user: "Install with `cd ~/Lab/zjira && make install`" |
 | Auth failure (401) | Tell user: "Run `zjira whoami` to check your token" |
 | Issue key not found in list | Warn user, ask to confirm key manually or skip |
-| Codex CLI not available | Proceed anyway — `--note` text becomes the comment directly |
+| `zjira logwork` fails with `claude exec` / `unrecognized_model` / balance error | zjira AI drafting is down → Step 4b REST fallback; do not retry zjira |
+| `zjira chat` / `logday` / `logweek` fail the same way | Same root cause (claude CLI + provider balance); use this skill's flows + Step 4b instead |
+| `claude -p "test"` errors | Confirms the CLI/provider is broken; REST fallback is the only working path |
+| Agent digest empty for a date | Ask the user what they did; never invent work |
 | Zero entries parsed | Ask user to rephrase using the example format |
 
 ## Key parsing rules
@@ -238,6 +308,39 @@ Report partial success — do not stop on first failure.
 3. Jira URL: `https://.../browse/CTJ-4242` → extract `CTJ-4242`
 4. Summary keyword: `planning` → match to first issue with "planning" in summary (ask user to confirm)
 5. Unknown key: warn `⚠ KEY not found in issue list — include anyway?` → AskUserQuestion yes/no
+
+## Flow 5 — month (log a whole month)
+
+- Target = every weekday from the 1st of the month (default: current month) through **today**.
+  Never log future dates.
+- Ask up-front which days to skip (holidays, leave): "Ngày nào nghỉ? (mặc định: không)". Vietnamese
+  users commonly skip 2/9 and Tết — confirm, do not assume.
+- Show status per week by looping weekstatus over the month's Mondays:
+  ```bash
+  for s in 2026-08-31 2026-09-07 2026-09-14 2026-09-21; do $ZJIRA weekstatus --start "$s" --json; done
+  ```
+  Render one month table (date | logged | gap | ✓/⚠/✗) plus the gap total: weekdays × 8h − logged.
+- Gather allocation. Recognize these terse answers directly:
+  - "chia đều" → split each day's target evenly across the active buckets (3 items on an 8h day →
+    rotate 3/3/2; keep whole hours unless the user asks for exact thirds)
+  - "task lớn nhiều nhất N ngày" → cap the main dev task at N full days
+  - "bug 1 hoặc 2h" → cap each bug entry at 1–2h
+  - per-week/per-day patterns: `tuần 1-2: CTJ-8915 8h`, `mon-thu CTJ-4243 2h`
+  - "thiếu task thì thêm KEY,KEY" → look the keys up (`$ZJIRA issue get KEY --json`) and fold them
+    into the plan as buckets
+- Shared "log work" buckets are normal (e.g. `[Meeting] Log Work Meeting`, `[Support & Communication]`,
+  `[Study]`) and are often assigned to a colleague while the whole team logs against them. Verify the
+  key exists, then log against it like any other issue.
+- Then run Step 1.5 for the date range and Step 2.5 for every task, show the day-by-day grid once,
+  and confirm with AskUserQuestion before executing.
+- Month flows routinely produce 30–50 entries: use the generated sequential batch script described in
+  Step 4b, then verify all weeks with `weekstatus`.
+
+## Flow 6 — agent-sync (display only)
+
+Trigger: `sync [YYYY-MM-DD]` argument, or "sync hôm đó làm gì", "hôm qua làm gì", "agent làm gì",
+"xem hoạt động agent". Run the Step 1.5 digest for the date (default: today), print it, then **stop** —
+do not prompt for logging unless the user asks to log from it.
 
 ## Flow 3 — week-status (display only)
 
@@ -275,10 +378,12 @@ Show max 30 issues. If more, note "showing top 30." Then **stop** — do not pro
 ## Notes
 
 - All worklog started times: `09:00` local for past/future dates; current time for today with no `--date`
-- Vietnamese descriptions: the skill generates/expands them in Step 2.5 and shows them at confirmation; the expanded Vietnamese text is then passed as `--note` to `zjira logwork`, which formats it into bullet-style via its internal Codex call
-- For tasks with no user note: the skill reads parent issue + Confluence page (from Step 1 JSON data) to auto-generate context-aware Vietnamese descriptions; label these `[auto-context]` in the confirmation table
+- Description source priority: user note > agent activity (Step 1.5, label `[agent-sync]`) > parent issue + Confluence auto-context (label `[auto-context]`)
+- `zjira logwork` formats the expanded description into bullet-style through its internal `claude` call; when that path is broken use the REST fallback (Step 4b), where the comment is the description text as-is
+- For tasks with no user note: the skill reads parent issue + Confluence page (from Step 1 JSON data) to auto-generate context-aware Vietnamese descriptions
 - Week status always shows Mon–Fri of the target week; future days appear as 0h logged / 8h gap / ✗
-- Week flow does NOT pre-check existing logged hours (deferred) — user manages targets themselves
-- Rollback: Jira worklogs can only be deleted via the Jira web UI (no delete in zjira v1)
+- Week/month flows do NOT pre-check existing logged hours (deferred) — user manages targets themselves
+- Agent digest: `scripts/agent_activity.py`, stdlib-only, read-only, supports `--date` (repeatable), `--from`/`--to` (weekdays), `--json`
+- Rollback: `zjira worklog delete <id>` (no AI drafting involved) or the Jira web UI
 
 </instructions>
