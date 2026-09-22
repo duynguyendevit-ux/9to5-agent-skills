@@ -1,0 +1,4 @@
+{
+  "_comment": "Copy to endpoints.json and set the local Confluence URL. Never commit endpoints.json.",
+  "confluence_url": "https://confluence.example.invalid"
+}
