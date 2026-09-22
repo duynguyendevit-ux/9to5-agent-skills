@@ -24,6 +24,17 @@ done
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SRC="$REPO/skills"
 
+if [[ ! -d "$SRC" ]]; then
+  echo "skills directory not found: $SRC" >&2
+  echo "run this script from a full checkout of the repository" >&2
+  exit 1
+fi
+
+if ! compgen -G "$SRC/*/" >/dev/null; then
+  echo "no skills found under $SRC" >&2
+  exit 1
+fi
+
 TARGETS=(
   "$HOME/.config/opencode/skills"
   "$HOME/.agents/skills"

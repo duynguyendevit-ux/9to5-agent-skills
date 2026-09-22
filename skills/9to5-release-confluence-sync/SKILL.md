@@ -87,14 +87,19 @@ python3 scripts/sync_release_tags.py --add-project dev-c7-ttdvkh \
 ```
 
 Store secrets in `~/.config/opencode/release-sync.json` (mode `600`), which
-overlays the zjira config:
+overlays the zjira config. Only the token belongs here — the URL belongs in
+`config/endpoints.json`:
 
 ```json
 {
-  "confluence_url": "<confluence-base>",
   "confluence_token": "<token>"
 }
 ```
+
+`config/endpoints.json` wins over this file for non-secret keys; if both define
+`confluence_url` with different values, the script warns and uses
+`config/endpoints.json`. A legacy `confluence_url` here still works when
+`config/endpoints.json` does not define one.
 
 Never print the token; write the file with the user's pasted value, then
 `chmod 600`. Prefer `zjira init` when the user already uses the zjira CLI.

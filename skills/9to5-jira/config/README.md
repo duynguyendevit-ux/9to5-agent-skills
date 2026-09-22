@@ -34,4 +34,5 @@ If a value is missing, ask the user for the internal URL, then persist it:
 python3 scripts/update_confluence_release.py --set-endpoint confluence_url=<url>
 ```
 
-Confirm before writing, and never commit `endpoints.json`.
+Confirm before writing, and never commit `endpoints.json`. `--set-endpoint`
+writes the file with mode `600`; keep it that way if you edit by hand.

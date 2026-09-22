@@ -54,9 +54,12 @@ def save_endpoint(key: str, value: str) -> Path:
     data: dict[str, Any] = {}
     if ENDPOINTS_PATH.exists():
         data = json.loads(ENDPOINTS_PATH.read_text(encoding="utf-8"))
+        if not isinstance(data, dict):
+            sys.exit(f"{ENDPOINTS_PATH} must contain a JSON object; fix or delete it before writing")
     data[key] = value.rstrip("/")
     ENDPOINTS_PATH.parent.mkdir(parents=True, exist_ok=True)
     ENDPOINTS_PATH.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
+    os.chmod(ENDPOINTS_PATH, 0o600)
     return ENDPOINTS_PATH
 
 
@@ -844,7 +847,6 @@ def main(argv: list[str] | None = None) -> int:
     try:
         args = parse_args(argv)
         args.base_url = resolve_endpoint("confluence_url", args.base_url, ("CONFLUENCE_URL",))
-        args.gitlab_url = resolve_endpoint("gitlab_url", args.gitlab_url, ("GITLAB_URL",))
         choose_profile(args)
         args.service_config = resolve_service_config(args)
         color = args.highlight_color
@@ -866,6 +868,11 @@ def main(argv: list[str] | None = None) -> int:
         original_body = page["body"]["storage"]["value"]
         interactive = not (args.service_name or args.service or args.release or args.tag_url)
         specs, releases = load_service_specs(args)
+        # gitlab_url is only needed when a tag URL has to be built: the interactive
+        # picker, or the direct branch with service specs. Resolve it lazily so a
+        # --tag-url-only run does not require a GitLab base it never uses.
+        if interactive or specs:
+            args.gitlab_url = resolve_endpoint("gitlab_url", args.gitlab_url, ("GITLAB_URL",))
         if interactive:
             releases = interactive_releases(args, original_body)
         else:

@@ -24,8 +24,17 @@ Internal endpoints for this skill. Not committed with real values.
 4. Caller fallback (project registry, cwd repo remote)
 5. Fail with instructions — never fall back to a hardcoded internal host
 
+`config/endpoints.json` is authoritative for non-secret keys. It wins over a
+legacy `confluence_url` in `~/.config/opencode/release-sync.json`; when both are
+set and differ, the script warns on stderr and uses this file.
+
 Credentials are not stored here. Tokens stay in `~/.config/zjira/config.yaml`
 or the `~/.config/opencode/release-sync.json` overlay (mode `600`).
+
+## File mode
+
+`--set-endpoint` writes `endpoints.json` with mode `600`. Keep it that way if you
+edit by hand.
 
 ## First use
 

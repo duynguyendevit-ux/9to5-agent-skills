@@ -60,14 +60,17 @@ def save_endpoint(key, value):
     data = {}
     if ENDPOINTS_PATH.exists():
         data = json.loads(ENDPOINTS_PATH.read_text(encoding="utf-8"))
+        if not isinstance(data, dict):
+            sys.exit(f"{ENDPOINTS_PATH} must contain a JSON object; fix or delete it before writing")
     data[key] = value.rstrip("/")
     ENDPOINTS_PATH.parent.mkdir(parents=True, exist_ok=True)
     ENDPOINTS_PATH.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
+    os.chmod(ENDPOINTS_PATH, 0o600)
     return ENDPOINTS_PATH
 
 
-def resolve_endpoint(key, cli_value, env_vars, fallbacks=()):
-    """CLI flag -> env var -> config/endpoints.json -> caller fallback -> ask the user."""
+def resolve_endpoint(key, cli_value, env_vars):
+    """CLI flag -> env var -> config/endpoints.json -> ask the user."""
     if cli_value:
         return cli_value.rstrip("/")
     for var in env_vars:
@@ -76,16 +79,12 @@ def resolve_endpoint(key, cli_value, env_vars, fallbacks=()):
     value = load_endpoints().get(key)
     if value:
         return value.rstrip("/")
-    for fallback in fallbacks:
-        if fallback:
-            return fallback.rstrip("/")
     sys.exit(
         f"missing {key}: ask the user for the internal value, then persist it with\n"
         f"  {Path(__file__).name} --set-endpoint {key}=<value>\n"
         f"or write it into {ENDPOINTS_PATH}\n"
         f"(version control only ships config/endpoints.example.json; do not commit the real value)"
     )
-
 
 
 def load_config():
@@ -98,19 +97,30 @@ def load_config():
 
 
 def load_secrets():
-    """zjira config, overlaid by the skill endpoints config and the release-sync overlay."""
+    """zjira config, overlaid by the secrets file, then the skill endpoints config.
+
+    `config/endpoints.json` is authoritative for non-secret keys so that
+    `--set-endpoint` always takes effect. A differing `confluence_url` in the
+    secrets overlay is reported rather than silently ignored.
+    """
     cfg = load_config()
-    for key, value in load_endpoints().items():
-        if key in ("confluence_url", "confluence_space"):
-            cfg[key] = value
+    overlay = {}
     if SECRETS_PATH.exists():
         try:
-            extra = json.loads(SECRETS_PATH.read_text())
+            overlay = json.loads(SECRETS_PATH.read_text())
         except Exception:
-            return cfg
+            overlay = {}
         for key in ("confluence_url", "confluence_token"):
-            if extra.get(key):
-                cfg[key] = extra[key]
+            if overlay.get(key):
+                cfg[key] = overlay[key]
+    for key, value in load_endpoints().items():
+        if key not in ("confluence_url", "confluence_space"):
+            continue
+        if (key == "confluence_url" and overlay.get(key)
+                and overlay[key].rstrip("/") != value.rstrip("/")):
+            print(f"warning: confluence_url differs between {SECRETS_PATH} and "
+                  f"{ENDPOINTS_PATH}; using {ENDPOINTS_PATH}", file=sys.stderr)
+        cfg[key] = value
     return cfg
 
 
@@ -515,10 +525,7 @@ def main():
     projects = load_projects(projects_path)
 
     if args.add_project:
-        space_value = args.space or load_endpoints().get("confluence_space")
-        if not space_value:
-            sys.exit("missing confluence space key: pass --space <KEY>, or persist it with\n"
-                     f"  {Path(__file__).name} --set-endpoint confluence_space=<KEY>")
+        space_value = resolve_endpoint("confluence_space", args.space, ("CONFLUENCE_SPACE",))
         entry = {
             "root": args.root,
             "group": args.group,
