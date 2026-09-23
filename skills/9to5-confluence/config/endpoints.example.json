@@ -1,0 +1,5 @@
+{
+  "_comment": "Copy to endpoints.json and fill in. endpoints.json is gitignored so internal hostnames never enter version control. Ask the user for a value before writing it.",
+  "confluence_url": "https://confluence.example.invalid",
+  "confluence_space": "C7GSAFEDA"
+}

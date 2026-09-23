@@ -31,6 +31,7 @@ cd 9to5-agent-skills
 | `9to5-release-confluence-sync` | 1.0.0 | Create or update the daily Confluence release page and refresh version, Release Tag, and Docker image cells. |
 | `9to5-release-audit` | 1.0.0 | Read-only Confluence release-record snapshots and comparisons; distinguishes recorded release state from actual deployment. |
 | `9to5-confluence-doc` | 1.0.0 | Draft and publish Vietnamese technical design pages with the OTS structure. |
+| `9to5-confluence` | 1.0.0 | General Confluence work: CQL search, reading, hierarchy, labels, then create/update/comment/attach behind a dry-run and approval gate. |
 | `9to5-sql-migration` | 1.0.0 | Write and review Oracle migration scripts (`admin/sql/oracle`, Flyway-style naming). |
 | `9to5-oracle-index` | 1.0.0 | Decide and verify an Oracle index for a query shape: access vs filter, column order, plan reading, write cost, DDL handoff. |
 | `9to5-id-design` | 1.0.0 | Choose and review primary-key strategy: identity vs UUID/ULID/UUIDv7/Snowflake, storage width, generator lifetime, exposure. |
