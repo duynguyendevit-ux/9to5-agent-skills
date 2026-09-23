@@ -33,6 +33,7 @@ cd 9to5-agent-skills
 | `9to5-confluence-doc` | 1.0.0 | Draft and publish Vietnamese technical design pages with the OTS structure. |
 | `9to5-sql-migration` | 1.0.0 | Write and review Oracle migration scripts (`admin/sql/oracle`, Flyway-style naming). |
 | `9to5-oracle-index` | 1.0.0 | Decide and verify an Oracle index for a query shape: access vs filter, column order, plan reading, write cost, DDL handoff. |
+| `9to5-id-design` | 1.0.0 | Choose and review primary-key strategy: identity vs UUID/ULID/UUIDv7/Snowflake, storage width, generator lifetime, exposure. |
 | `9to5-env-config-sync` | 1.0.0 | Compare and align service env configs across environments; keep secrets out. |
 | `9to5-spring-conventions` | 1.0.0 | Review Java/Spring changes against house conventions. |
 | `9to5-k8s-service-debug` | 1.0.0 | Debug cluster services: locate pods, tail and filter logs, reconstruct Hibernate SQL, correlate to the local repo. |
