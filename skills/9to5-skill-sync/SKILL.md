@@ -65,10 +65,16 @@ The `--check` output shows `missing` for a location that does not have the skill
 | a different digest | content differs; `--apply` fixes it |
 | `OK` in the repo column | matches canonical once the repo exclusions are applied |
 | `N location(s) differ` | count of cells needing action; exit code 1 |
+| `skipped (symlink, …)` | entry in the canonical directory that points elsewhere; never mirrored or published |
 
 ## Rules
 
 - Edit the canonical copy only. Editing a mirror or the repo copy directly guarantees drift on the next apply.
+- A symlinked entry in the canonical directory is not a skill this script owns — it is a working
+  tree or a package install, and its contents change without notice. It is skipped and reported,
+  never mirrored and never committed.
+- `--skill <name>` limits a run to one skill. A bare `--skill` with no name is an error; it must
+  never silently expand into a whole-collection sync.
 - Never hand-edit the repo copy to make `--check` pass; fix the canonical copy and re-apply.
 - Never commit `endpoints.json`, `cache.json`, or debug artifacts. If one appears in `git status`, the exclusion list or the copy step is wrong — fix the cause, do not `git add` around it.
 - Run `--check` before and after: before proves the baseline, after proves the change landed everywhere.

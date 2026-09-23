@@ -9,6 +9,8 @@
 #
 # The repository copy is generated, never edited: it excludes cache.json,
 # endpoints.json (local-only internal endpoints) and debug artifacts.
+# Symlinked entries in the canonical directory are skipped: they point at
+# working trees and package installs this script does not own.
 # This script never commits and never pushes.
 
 set -euo pipefail
@@ -45,6 +47,11 @@ for arg in "$@"; do
   esac
 done
 
+if [[ "${shift_next:-}" == "skill" ]]; then
+  echo "--skill requires a name, for example: --skill 9to5-kafka" >&2
+  exit 2
+fi
+
 [[ -d "$CANONICAL" ]] || { echo "canonical skills dir not found: $CANONICAL" >&2; exit 1; }
 
 # Hash a skill directory by relative path + content, so the same content in two
@@ -71,9 +78,17 @@ for p in "${EXCL_REPO[@]}"; do
 done
 
 skills=()
+skipped=()
 for d in "$CANONICAL"/*/; do
   name="$(basename "$d")"
   [[ -n "$ONLY" && "$name" != "$ONLY" ]] && continue
+  # A symlink points outside the collection: it is somebody else's working tree
+  # or a package-manager install, not a skill this script owns. Never mirror it
+  # and never publish it.
+  if [[ -L "${d%/}" ]]; then
+    skipped+=("$name")
+    continue
+  fi
   skills+=("$name")
 done
 [[ ${#skills[@]} -gt 0 ]] || { echo "no skills found in $CANONICAL" >&2; exit 1; }
@@ -136,6 +151,9 @@ for name in "${skills[@]}"; do
 done
 
 echo
+if [[ ${#skipped[@]} -gt 0 ]]; then
+  echo "skipped (symlink, not owned by this script): ${skipped[*]}"
+fi
 if [[ "$MODE" == "check" ]]; then
   if [[ "$drift" -gt 0 ]]; then
     echo "$drift location(s) differ from canonical — run with --apply"
