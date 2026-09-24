@@ -4,10 +4,26 @@ description: Work with local Jira and Confluence through the zjira CLI — fetch
 license: MIT
 compatibility: Requires the zjira CLI on PATH, Jira/Confluence credentials in ~/.config/zjira/config.yaml, git access to the service repositories, and network access to the Jira/Confluence host.
 metadata:
-  version: "2.1.0"
+  version: "2.1.1"
 ---
 
 Prefix your first line with 🥷 inline. Get to work immediately — no preamble.
+
+## Example output
+
+Illustrative planning result; substitute only ticket/repository evidence actually read.
+
+```text
+Plan: DEMO-123 — Retry failed report exports
+Requirements: retry transient failures; preserve completed results.
+Proposed changes: retry policy, worker state transitions, status response.
+Open question: maximum attempts is not specified in the ticket.
+Verification: existing worker tests plus retry-after-crash scenario.
+Implementation: not started.
+Plan written to .kit/plans/2026-09-24-demo-123/PLAN.md
+```
+
+Present the complete plan using the template below, not only this abbreviated example.
 
 <role>
 Act as a senior engineer working with Jira and Confluence. For Jira planning requests, fetch the ticket context, explore the relevant codebase, and produce an actionable coding plan without implementation. For Confluence-only requests, search, read, or update the requested page and verify the result; do not create a Jira plan unless the user requested one.
@@ -115,7 +131,7 @@ If the config file is missing → stop immediately:
 **Binary check:**
 ```bash
 ZJIRA=$(command -v zjira || echo "$HOME/.local/bin/zjira")
-"$ZJIRA" version 2>&1 | head -2
+"$ZJIRA" --help >/dev/null
 ```
 
 If the binary is not found → stop:

@@ -4,10 +4,24 @@ description: Read-only audit of a Confluence release page. Save a traceable snap
 license: MIT
 compatibility: Requires Python 3 and Confluence credentials in ~/.config/zjira/config.yaml or ~/.config/opencode/release-sync.json. Reads non-secret endpoints from config/endpoints.json. Does not require Kubernetes access and never writes Confluence.
 metadata:
-  version: "1.0.0"
+  version: "1.0.1"
 ---
 
 # Release Audit
+
+## Example output
+
+Illustrative comparison, describing only what is recorded in Confluence:
+
+```text
+RECORDED_CHANGE | example-api | release tag: 'v1.0.0' -> 'v1.0.1'
+UNCHANGED_RECORD | example-worker
+UNKNOWN | example-report | release cells are empty
+SOURCE_CHANGE | page_version: 7 -> 8
+
+Confluence record comparison: CHANGED
+This result describes the release page record; it does not verify a running deployment.
+```
 
 This skill audits the **release record** in Confluence. It does not prove that an
 artifact is running in production. A successful result means that the page records
@@ -27,8 +41,8 @@ python3 "$S" compare --page '<Confluence page URL or ID>' \
   --before /tmp/prod-release-before.json
 ```
 
-`--project` is optional metadata and is read from the adjacent `projects.json`
-registry. `--page` is required so the audit never guesses between similarly named
+`--project` is optional free-form metadata; this script does not read the adjacent
+`projects.json` reference registry. `--page` is required so the audit never guesses between similarly named
 release pages. The script accepts a numeric page ID, a `pageId` URL, or a
 Confluence `/display/<SPACE>/<TITLE>` URL.
 
@@ -49,12 +63,18 @@ production service information.
 
 | Result | Meaning |
 |---|---|
-| `RECORDED_RELEASE` | The current page records the expected release tag/version. |
 | `RECORDED_CHANGE` | The current page differs from the saved snapshot. |
-| `UNCHANGED_RECORD` | The page version and service values are unchanged. |
+| `UNCHANGED_RECORD` | The service values are unchanged and at least one release cell is populated. |
 | `MISSING_SERVICE` | A service existed in the baseline but is absent now. |
 | `NEW_SERVICE` | A service appears in the current page but not the baseline. |
-| `UNKNOWN` | The relevant cells are empty or the page does not identify an expected value. |
+| `UNKNOWN` | The service has no populated release cells and no field changes against the baseline. |
+| `SOURCE_CHANGE` | The source page ID or page version differs from the baseline. |
+
+Empty cells becoming populated or populated cells becoming empty are `RECORDED_CHANGE`.
+The script compares records; it does not validate an expected target release. Duplicate
+service names fail explicitly rather than silently discarding a row. Disambiguate the
+source rows before capturing a snapshot. Existing snapshots already missing duplicate
+rows must be recaptured; missing evidence cannot be recovered from the snapshot alone.
 
 The report must use the wording **recorded in Confluence**. It must not say
 `deployed`, `running`, or `production verified` based only on this audit.

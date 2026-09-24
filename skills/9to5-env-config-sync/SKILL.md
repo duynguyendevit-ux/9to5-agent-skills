@@ -3,10 +3,23 @@ name: 9to5-env-config-sync
 description: Compare and update OTS environment service configs in ots-env-custom/service-configs/<env>/<service>/ (values.yaml and .env) — align environment variables across dev-c7, dev-c7-ttdvkh, dev-uat-*, report drift, and keep secrets out of commits. Use when the user asks to sync env configs, add or change a service env variable, compare dev vs uat values, or investigate config drift between environments.
 license: MIT
 metadata:
-  version: "1.0.0"
+  version: "1.0.1"
 ---
 
 # Environment Config Sync
+
+## Example output
+
+Illustrative comparison; replace values with verified non-secret configuration.
+
+```text
+Service: example-worker
+Variable                 dev-c7   dev-uat-c7   Action
+WORKER_BATCH_SIZE         100      50           Intentional load difference; preserve
+WORKER_RETRY_ENABLED      true     missing      Add true to requested UAT config
+Validation: YAML parsed; git diff --check passed
+Changed: service-configs/dev-uat-c7/example-worker/values.yaml
+```
 
 Keep per-environment service configs consistent across the OTS environments.
 

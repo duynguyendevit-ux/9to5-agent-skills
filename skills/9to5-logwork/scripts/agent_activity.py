@@ -174,13 +174,14 @@ def opencode_activity(start: datetime, end: datetime):
 
 def codex_activity(start: datetime, end: datetime):
     out: dict[str, dict] = {}
-    d = start.date()
-    while d < end.date():
-        pattern = os.path.join(CODEX_DIR, d.strftime("%Y/%m/%d"), "*.jsonl")
-        for path in sorted(glob.glob(pattern)):
-            cwd, prompts, tools = None, [], []
-            try:
-                for line in open(path, encoding="utf-8", errors="replace"):
+    # Resumed sessions remain in their creation-day directory. Inspect each record,
+    # not the directory date; start/end use the local timezone like other collectors.
+    pattern = os.path.join(CODEX_DIR, "**", "*.jsonl")
+    for path in sorted(glob.glob(pattern, recursive=True)):
+        cwd, prompts, tools = None, [], []
+        try:
+            with open(path, encoding="utf-8", errors="replace") as stream:
+                for line in stream:
                     try:
                         rec = json.loads(line)
                     except json.JSONDecodeError:
@@ -190,6 +191,13 @@ def codex_activity(start: datetime, end: datetime):
                     if rtype == "session_meta":
                         cwd = payload.get("cwd") or cwd
                     elif rtype == "response_item":
+                        try:
+                            when = datetime.fromisoformat(rec.get("timestamp", "").replace("Z", "+00:00"))
+                            when = when.astimezone().replace(tzinfo=None)
+                        except (ValueError, TypeError):
+                            continue
+                        if not (start <= when < end):
+                            continue
                         ptype = payload.get("type")
                         if ptype == "message" and payload.get("role") == "user":
                             text = " ".join(
@@ -203,22 +211,20 @@ def codex_activity(start: datetime, end: datetime):
                             name = payload.get("name")
                             if name and name not in tools:
                                 tools.append(name)
-            except OSError:
-                continue
-            if not cwd or SKIP_CWD.match(cwd):
-                continue
-            key = cwd
-            entry = out.setdefault(
-                key, {"agent": "codex", "prompts": [], "files": [], "tools": [], "sessions": 0}
-            )
-            entry["sessions"] += 1
-            for p in prompts:
-                if p not in entry["prompts"] and len(entry["prompts"]) < MAX_PROMPTS:
-                    entry["prompts"].append(p)
-            for t in tools:
-                if t not in entry["tools"]:
-                    entry["tools"].append(t)
-        d += timedelta(days=1)
+        except OSError:
+            continue
+        if not cwd or SKIP_CWD.match(cwd) or (not prompts and not tools):
+            continue
+        entry = out.setdefault(
+            cwd, {"agent": "codex", "prompts": [], "files": [], "tools": [], "sessions": 0}
+        )
+        entry["sessions"] += 1
+        for p in prompts:
+            if p not in entry["prompts"] and len(entry["prompts"]) < MAX_PROMPTS:
+                entry["prompts"].append(p)
+        for t in tools:
+            if t not in entry["tools"]:
+                entry["tools"].append(t)
     return out
 
 

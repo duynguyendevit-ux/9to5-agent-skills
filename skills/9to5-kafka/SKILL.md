@@ -4,10 +4,24 @@ description: Work on OTS/C7 Kafka contracts, transactional outbox, and Kafka-ver
 license: MIT
 compatibility: Requires git checkouts of the kafka starter and common-outbox, JDK 17, and read access to the service Oracle schema for diagnosis (directly or through the 9to5-k8s-service-debug helper).
 metadata:
-  version: "1.1.0"
+  version: "1.1.1"
 ---
 
 # Kafka Contracts, Outbox, and Work Queues
+
+## Example output
+
+Illustrative long-running consumer review; report actual deployed settings when available.
+
+```text
+Finding: synchronous export can exceed the configured poll interval.
+Evidence: handler runs on the polling thread; observed export duration is 10 minutes.
+Group type: traditional consumer group.
+Design: register a deduplicated durable job, then acknowledge Kafka after DB commit.
+Worker responsibility: lease, progress, retries, cancellation and idempotent effects.
+Timeout distinction: missing heartbeats use session timeout; stalled polling uses max.poll.interval.ms.
+Verification pending: crash between DB commit and Kafka acknowledgement; duplicate registration must be harmless.
+```
 
 Two layers. Decide which one you are in before editing anything.
 
@@ -26,8 +40,8 @@ Two layers. Decide which one you are in before editing anything.
 1. Find the domain under `src/main/resources/events/<domain>/`; match the existing `consumer.properties` / `producer.properties` pair in that domain.
 2. Keep the Java package path aligned with the resource path.
 3. `destination` is always a `${topic.<...>}` placeholder. The literal topic belongs in the environment config (`ots-env-custom/service-configs/<env>/<service>/`), so a new topic needs an entry there too — otherwise the service fails at startup, not at publish time.
-4. Set the partition-key header on the producer. Without it every event lands on one partition and per-entity ordering silently breaks.
-5. Consumer group defaults to `spring.application.name`. Two services with the same name in one cluster share a group and will steal each other's messages.
+4. Set and verify the partition-key header expected by the binding. A missing header may fail expression validation or invoke binder/partitioner-specific behavior; do not assume a fixed partition. A constant key concentrates traffic. Verify actual routing before claiming per-entity ordering.
+5. Consumer group defaults to `spring.application.name`. Services with the same group that subscribe to the same topic load-balance its partitions rather than each receiving every event. Use separate groups for independent subscribers.
 6. Build both sides before claiming done: `JAVA_HOME=~/.jdks/corretto-17.0.19 ./gradlew build` in the starter and in each affected service.
 
 Details and the annotation table (`@IncludeEventsProducer`, `@ExcludeEventsConsumer`) are in `references/topics.md`.

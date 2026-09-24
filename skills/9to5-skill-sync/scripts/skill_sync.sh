@@ -34,23 +34,25 @@ MODE="check"
 ONLY=""
 DO_REPO=1
 LEAK_CHECK=0
-for arg in "$@"; do
+while [[ $# -gt 0 ]]; do
+  arg="$1"
   case "$arg" in
     --check) MODE="check" ;;
     --apply) MODE="apply" ;;
     --no-repo) DO_REPO=0 ;;
     --leak-check) LEAK_CHECK=1 ;;
-    --skill) shift_next="skill" ;;
+    --skill)
+      [[ $# -ge 2 && -n "$2" && "$2" != -* ]] || { echo "--skill requires a name" >&2; exit 2; }
+      ONLY="$2"; shift ;;
     --skill=*) ONLY="${arg#*=}" ;;
     -h|--help) sed -n '2,14p' "$0"; exit 0 ;;
-    *) [[ "${shift_next:-}" == "skill" ]] && { ONLY="$arg"; shift_next=""; } || { echo "unknown option: $arg" >&2; exit 2; } ;;
+    *) echo "unknown option: $arg" >&2; exit 2 ;;
   esac
+  if [[ "$arg" == --skill || "$arg" == --skill=* ]]; then
+    [[ "$ONLY" =~ ^9to5-[a-z0-9][a-z0-9-]*$ ]] || { echo "--skill requires a 9to5-* name" >&2; exit 2; }
+  fi
+  shift
 done
-
-if [[ "${shift_next:-}" == "skill" ]]; then
-  echo "--skill requires a name, for example: --skill 9to5-kafka" >&2
-  exit 2
-fi
 
 [[ -d "$CANONICAL" ]] || { echo "canonical skills dir not found: $CANONICAL" >&2; exit 1; }
 
@@ -79,7 +81,8 @@ done
 
 skills=()
 skipped=()
-for d in "$CANONICAL"/*/; do
+for d in "$CANONICAL"/9to5-*/; do
+  [[ -d "$d" ]] || continue
   name="$(basename "$d")"
   [[ -n "$ONLY" && "$name" != "$ONLY" ]] && continue
   # A symlink points outside the collection: it is somebody else's working tree
@@ -93,20 +96,22 @@ for d in "$CANONICAL"/*/; do
 done
 [[ ${#skills[@]} -gt 0 ]] || { echo "no skills found in $CANONICAL" >&2; exit 1; }
 
-rsync_excludes=()
-for p in "${EXCL_ALWAYS[@]}" "${EXCL_REPO[@]}"; do rsync_excludes+=( --exclude "$p" ); done
+mirror_excludes=()
+for p in "${EXCL_ALWAYS[@]}"; do mirror_excludes+=( --exclude "$p" ); done
+repo_excludes=("${mirror_excludes[@]}")
+for p in "${EXCL_REPO[@]}"; do repo_excludes+=( --exclude "$p" ); done
 
 if [[ "$MODE" == "apply" ]]; then
   for m in "${MIRRORS[@]}"; do
     mkdir -p "$m"
     for name in "${skills[@]}"; do
-      rsync -a --delete "${rsync_excludes[@]}" "$CANONICAL/$name/" "$m/$name/"
+      rsync -a --delete "${mirror_excludes[@]}" "$CANONICAL/$name/" "$m/$name/"
     done
   done
   if [[ "$DO_REPO" -eq 1 ]]; then
     mkdir -p "$REPO/$REPO_SUB"
     for name in "${skills[@]}"; do
-      rsync -a --delete "${rsync_excludes[@]}" "$CANONICAL/$name/" "$REPO/$REPO_SUB/$name/"
+      rsync -a --delete "${repo_excludes[@]}" "$CANONICAL/$name/" "$REPO/$REPO_SUB/$name/"
       # Recreate only the empty-dir keepers the canonical skill actually has, so a
       # skill without a debug/ tree does not gain one in the repository.
       while IFS= read -r keep; do
@@ -122,6 +127,19 @@ if [[ "$MODE" == "apply" ]]; then
 fi
 
 drift=0
+destinations=("${MIRRORS[@]}")
+[[ "$DO_REPO" -eq 0 ]] || destinations+=("$REPO/$REPO_SUB")
+for destination in "${destinations[@]}"; do
+  for d in "$destination"/9to5-*/; do
+    [[ -d "$d" ]] || continue
+    name="$(basename "$d")"
+    [[ -z "$ONLY" || "$name" == "$ONLY" ]] || continue
+    if [[ ! -d "$CANONICAL/$name" ]]; then
+      echo "orphan skill (not removed): $d" >&2
+      drift=$((drift + 1))
+    fi
+  done
+done
 printf '%-34s %-10s' "skill" "canonical"
 for m in "${MIRRORS[@]}"; do printf '%-10s' "$(basename "$(dirname "$m")")"; done
 printf '%-10s\n' "repo"
@@ -213,5 +231,8 @@ PY
   fi
 fi
 
-[[ "$MODE" == "check" && "$drift" -gt 0 ]] && exit 1
+if [[ "$drift" -gt 0 ]]; then
+  echo "$drift unresolved difference(s) or leak(s)" >&2
+  exit 1
+fi
 exit 0

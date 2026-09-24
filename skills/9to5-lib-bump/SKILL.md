@@ -4,10 +4,25 @@ description: Bump a shared OTS/C7 library version (kafka starter, common-core, I
 license: MIT
 compatibility: Requires git checkouts of the services and the library repositories, JDK 17 at ~/.jdks/corretto-17.0.19, and network access to Nexus for dependency resolution. Dry run by default; set --apply to write.
 metadata:
-  version: "1.0.0"
+  version: "1.0.1"
 ---
 
 # Shared Library Bump
+
+## Example output
+
+Illustrative dry run; versions below are placeholders, not publishable artifacts.
+
+```text
+Property: EXAMPLE_LIB_VERSION
+Mode: dry run
+Service          Old version      Proposed version    Result
+example-api      <old-version>    <target-version>    Would update
+example-worker   <target-version> <target-version>    Already current
+Ambiguous names: none
+Builds: not run in dry-run mode
+Files written: 0
+```
 
 Bump a shared library across every service that consumes it, without touching dead copies and without leaving debug flags enabled.
 
@@ -32,7 +47,7 @@ Prefer a released tag over a branch snapshot when one exists. If the library bra
 
 1. **Audit first.** `python3 scripts/lib_versions.py audit --property <PROP>` — reports enabled debug flags, duplicate checkouts, and drift for every tracked library. Read the duplicate section: `notification-service`, `export-file-service`, `ttch-admin-service`, `ttch-dashboard-service` each exist in two places with different versions, so "bump all" can mean editing a stale copy.
 2. **Resolve the target.** `suggest --property <PROP>` prints the candidate, the library's git state, and which services already match. Confirm the candidate with the user when it comes from a feature branch.
-3. **Preview.** `set --property <PROP> --version <V>` (dry run) lists every file that would change. Use `--only a,b` to restrict when the user only wants specific services.
+3. **Preview.** `set --property <PROP> --version <V>` (dry run) lists every file that would change. Use `--only a,b` for unique service names or comma-separated absolute checkout paths. Duplicate names are refused, including in unrestricted runs; select the intended paths explicitly.
 4. **Apply.** Re-run with `--apply`.
 5. **Verify each service.** From the changed checkout:
    ```bash

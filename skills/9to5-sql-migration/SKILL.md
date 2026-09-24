@@ -3,10 +3,25 @@ name: 9to5-sql-migration
 description: Write and review Oracle migration scripts for the C7/TTDVKH schemas (admin/sql/oracle, V<YYYYMMDD>_<NN>__<type>_<description>.sql). Use when the user asks to add or alter Oracle tables, columns, indexes, constraints, or seed/data fixes, mentions a migration/DDL/script file, or asks to review a migration before release.
 license: MIT
 metadata:
-  version: "1.0.0"
+  version: "1.0.1"
 ---
 
 # Oracle SQL Migration
+
+## Example output
+
+Illustrative migration review; the file date/counter and naming style must be resolved
+from the target repository rather than copied from this example.
+
+```text
+File: admin/sql/oracle/V20260924_01__ddl_create_example_job_index.sql
+Change: add index on example_job (status, created_at).
+Checks: version unique; identifier within schema limit; existence guard and verification query present.
+Operational note: index build requires space and may take locks; apply through the release pipeline.
+Execution: not run against a database.
+```
+
+For a newly written migration, show the full SQL after this summary.
 
 Write Flyway-style Oracle scripts that match the existing repository conventions.
 

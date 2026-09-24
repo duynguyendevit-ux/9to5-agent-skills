@@ -3,10 +3,24 @@ name: 9to5-confluence-doc
 description: Draft and publish Vietnamese technical design pages on Confluence with the OTS structure (bối cảnh, phạm vi, thiết kế, mô hình dữ liệu, API, rollout) using the zjira CLI. Use when the user asks to write or update a Confluence design/spec page (viết tài liệu, tạo page, cập nhật spec), document a feature for review, or pastes content to add to a Confluence page — always dry-run and get explicit approval before writing. Not for release tables — use 9to5-release-confluence-sync for those.
 license: MIT
 metadata:
-  version: "1.0.0"
+  version: "1.0.1"
 ---
 
 # Confluence Design Doc
+
+## Example output
+
+Illustrative draft summary; include the actual proposed storage diff for approval.
+
+```text
+Trang: Thiết kế export báo cáo (ID 12345, phiên bản 7)
+Trạng thái: Bản nháp — chưa ghi Confluence
+Bối cảnh: Export lớn cần xử lý nền và theo dõi tiến độ.
+Phạm vi: Tạo job, xem trạng thái, tải kết quả.
+Thiết kế: API đăng ký job; worker xử lý và cập nhật trạng thái.
+Cần xác nhận: Thời gian giữ file và giới hạn số job mỗi khách hàng.
+Thay đổi dự kiến: Bổ sung mục Xử lý lỗi và Rollout; giữ nguyên phần API.
+```
 
 ## Page structure
 

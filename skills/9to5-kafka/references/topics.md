@@ -48,7 +48,7 @@ Conventions to preserve:
 - `destination` is always a `${topic.<...>}` placeholder, never a literal topic. The literal lives in the service's configuration, per environment.
 - Payloads are protobuf (`application/x-protobuf;charset=UTF-8`).
 - `partition-count=20`; the partition key is a header expression, not the payload body. The header must be set by the producer.
-- Consumer group defaults to `spring.application.name`, so two services with the same name in one cluster share a group by accident. Check the name before adding a consumer.
+- Consumer group defaults to `spring.application.name`. Subscribers in the same group share topic partitions; use separate groups when each service needs its own copy of the events.
 - Consumers that need ordering per entity must use one partition key for that entity across all producers.
 
 ### Opting in and out
@@ -66,7 +66,7 @@ A service that consumes some events and not others uses `@ExcludeEventsConsumer`
 1. Add `producer.properties` and `consumer.properties` under the right `events/<domain>/` path, following an existing pair in the same domain.
 2. Add the Java package with the function definition and the payload type; keep the package path aligned with the resource path.
 3. Add the `${topic.<...>}` entry to every environment's service config (`ots-env-custom/service-configs/<env>/<service>/values.yaml` or `.env`) — a missing placeholder fails at startup, not at publish time.
-4. Set the partition-key header on the producer side; without it all events land on one partition.
+4. Set the partition-key header required by the expression. Verify missing-key behavior for the deployed binder/client; it may reject the message or use another routing path. Constant keys cause hot partitions; a missing header does not universally mean partition zero.
 5. Verify both sides: `JAVA_HOME=~/.jdks/corretto-17.0.19 ./gradlew build` in the starter (it versioning) and in each consumer.
 
 ## Topics in the outbox path
@@ -85,7 +85,8 @@ Contract naming and delivery retry are independent: a topic typo shows up as pub
 |-----------|-------|--------------|
 | startup fails on an unresolved `${topic...}` | config | placeholder missing in that environment |
 | no events, no errors, consumer idle | contract | wrong `destination`, wrong group, or the service excluded the consumer |
-| duplicate delivery to one consumer | contract | two services registered with the same `spring.application.name` and group |
-| one partition hot, others idle | contract | missing or constant partition-key header |
+| independent service sees only part of a topic | contract | it shares a consumer group with another subscriber, so partitions are load-balanced |
+| duplicate processing | delivery | redelivery after failure/rebalance, offset timing, producer retries, or application retry; shared group membership alone is not a duplicate mechanism |
+| one partition hot, others idle | contract | constant/skewed keys or binder/partitioner configuration; inspect resolved keys and partitions |
 | publish fails repeatedly, row stays `PENDING` | delivery | topic missing, broker unreachable, payload rejected — check `last_error` in `references/outbox-queries.sql` |
 | payload missing a field after publish | contract | template or schema mismatch between producer and consumer versions |

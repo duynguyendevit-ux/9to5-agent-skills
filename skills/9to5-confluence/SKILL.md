@@ -4,10 +4,23 @@ description: Work with Confluence pages generally — find a page with CQL when 
 license: MIT
 compatibility: Requires the zjira CLI and Confluence credentials in ~/.config/zjira/config.yaml. Reads non-secret endpoints from config/endpoints.json. Writes require --apply --approved.
 metadata:
-  version: "1.0.0"
+  version: "1.1.0"
 ---
 
 # Confluence
+
+## Example output
+
+Illustrative update preview; show the full replacement body/diff as well as this summary.
+
+```text
+Page: Example design (ID 12345)
+Base version: 7
+Action: replace storage body; target version 8
+Changes: add retry policy; preserve existing API section
+Mode: dry run — no remote write
+Apply requires the reviewed body, --expected-version 7, --apply --approved.
+```
 
 Two tools, one discipline: **zjira for reading, REST for everything else, and no write
 without a dry run and explicit approval.**
@@ -71,7 +84,7 @@ python3 "$S" labels   --page 141395368              # current labels
 # writes: dry run first, always
 python3 "$S" create --space C7GSAFEDA --parent 92610522 \
     --title 'New page' --body-file /tmp/page.html
-python3 "$S" update --page 141395368 --body-file /tmp/page.html
+python3 "$S" update --page 141395368 --expected-version <base-version> --body-file /tmp/page.html
 python3 "$S" comment --page 141395368 --text 'Reviewed, one question below.'
 python3 "$S" set-labels --page 141395368 --add spec,review
 python3 "$S" attach --page 141395368 --file /tmp/report.pdf
@@ -80,7 +93,7 @@ python3 "$S" attach --page 141395368 --file /tmp/report.pdf
 Every write prints the exact request it would send, then stops. To actually write:
 
 ```bash
-python3 "$S" update --page 141395368 --body-file /tmp/page.html --apply --approved
+python3 "$S" update --page 141395368 --expected-version <base-version> --body-file /tmp/page.html --apply --approved
 ```
 
 `--apply` without `--approved` is refused. Show the dry-run output to the user and get
@@ -102,10 +115,12 @@ Two things that break silently:
 
 ## Concurrency
 
-Updates carry a version number. The script re-reads the page immediately before the
-`PUT` and writes `current + 1`, so a concurrent edit surfaces as a conflict instead of
-being overwritten. If a conflict happens, re-read the page, re-apply the intended change
-to the new body, and try again — never force the write.
+Updates require `--expected-version`: the version returned when you read the original
+body used to prepare the replacement. Use the same value and unchanged reviewed body
+for dry run and apply. The script refuses a different current version, then submits
+`expected + 1`; Confluence rejects a race after that check. Do not obtain a fresh
+version just to attach it to a stale body. On conflict, re-read, rebase the change,
+and review the new body before retrying. JSON request previews are printed in full.
 
 ## Endpoints and credentials
 

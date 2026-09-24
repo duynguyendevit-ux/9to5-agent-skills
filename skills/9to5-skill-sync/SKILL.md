@@ -4,10 +4,28 @@ description: Keep an edited 9to5 skill consistent across its canonical directory
 license: MIT
 compatibility: Requires bash, rsync, python3, and a checkout of the skills repository. Reads paths from config/paths.json.
 metadata:
-  version: "1.0.0"
+  version: "1.0.1"
 ---
 
 # Skill Sync
+
+## Example output
+
+Illustrative successful parity check; digests here are placeholders.
+
+```text
+skill           canonical  .agents   .claude   .codex    repo
+9to5-example    <digest>   <digest>  <digest>  <digest>  OK
+all locations match canonical
+```
+
+For a failed check, report the affected destination and nonzero status, for example:
+
+```text
+orphan skill (not removed): /example/mirror/9to5-retired/
+1 unresolved difference(s) or leak(s)
+Exit status: 1
+```
 
 A skill exists in five places. Only one is edited by hand.
 
@@ -32,6 +50,11 @@ Three things must never reach the repository:
 | `debug/artifacts/*` | investigation evidence; only `.gitkeep` is tracked |
 
 The comparison therefore applies the repo exclusions to the canonical side too — otherwise every skill that has an `endpoints.json` would report permanent false drift.
+
+Mirrors receive all canonical files except `exclude_always`, including local endpoint
+files (with their permissions), caches, and debug artifacts. They are local working
+copies, not publishable exports. Only the repository copy applies `exclude_from_repo`.
+Copy rules and hash comparisons use the same policy for each destination.
 
 ## Workflow
 
@@ -70,6 +93,10 @@ The `--check` output shows `missing` for a location that does not have the skill
 ## Rules
 
 - Edit the canonical copy only. Editing a mirror or the repo copy directly guarantees drift on the next apply.
+- Manage only real `9to5-*` directories. Other prefixes are outside this collection.
+- Reject empty, option-valued, or invalid `--skill` selectors before any copy occurs.
+- Report orphan `9to5-*` destination directories without deleting them. Both check and
+  apply exit nonzero if drift, orphans, or a requested leak scan remains unresolved.
 - A symlinked entry in the canonical directory is not a skill this script owns — it is a working
   tree or a package install, and its contents change without notice. It is skipped and reported,
   never mirrored and never committed.

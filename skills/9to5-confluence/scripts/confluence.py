@@ -206,8 +206,7 @@ def gate(args, method: str, path: str, summary: list[str], payload=None,
     for line in summary:
         print(f"  {line}")
     if payload is not None:
-        preview = json.dumps(payload, ensure_ascii=False)
-        print(f"  payload: {preview[:300]}{'…' if len(preview) > 300 else ''}")
+        print("  payload: " + json.dumps(payload, ensure_ascii=False, indent=2))
     if raw is not None:
         print(f"  body: {len(raw)} bytes (multipart)")
     if not args.apply:
@@ -315,13 +314,16 @@ def cmd_create(args):
 
 def cmd_update(args):
     page = resolve_page(args.base, args.token, args.page, "version")
+    if page["version"]["number"] != args.expected_version:
+        sys.exit(f"page changed: expected version {args.expected_version}, found "
+                 f"{page['version']['number']}; re-read, rebase and review the body before retrying")
     text = read_body_file(args.body_file)
     title = args.title or page.get("title")
     payload = {
         "id": page["id"],
         "type": "page",
         "title": title,
-        "version": {"number": page["version"]["number"] + 1},
+        "version": {"number": args.expected_version + 1},
         "body": body_payload(text, args.format),
     }
     summary = [f"title: {title} (was {page.get('title')})",
@@ -454,6 +456,8 @@ def main():
 
     p = add("update", "replace a page body (dry run by default)")
     p.add_argument("--page", required=True)
+    p.add_argument("--expected-version", type=int, required=True,
+                   help="version of the page body used to prepare the reviewed replacement")
     p.add_argument("--title")
     p.add_argument("--body-file", required=True)
     p.add_argument("--format", choices=("storage", "wiki"), default="storage")

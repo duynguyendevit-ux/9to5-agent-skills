@@ -4,10 +4,25 @@ description: Debug OTS/C7 services running on Kubernetes — locate a pod by app
 license: MIT
 compatibility: Requires kubectl, a kubeconfig exposing the cluster contexts recorded in config/k8s-env.json, and the shell helpers from ~/Documents/k8slog/rancher-log-alias.sh sourced in the interactive shell. Cluster access is dev only.
 metadata:
-  version: "1.0.0"
+  version: "1.0.1"
 ---
 
 # K8s Service Debug
+
+## Example output
+
+Illustrative investigation report; distinguish observations from hypotheses.
+
+```text
+Target: example-worker / dev-c7 / example-worker-abc
+Symptom: retries are increasing while completed jobs remain flat.
+Evidence: repeated connection timeout to the downstream API in filtered logs.
+Config: retry setting exists; secret values not retrieved.
+Hypothesis: downstream connectivity is blocking completion.
+Unverified: deployed image commit has not yet been matched to the checkout.
+Artifacts: debug/artifacts/20260924-example-worker-timeouts/session.md
+Next action: verify downstream reachability from the affected namespace.
+```
 
 Diagnose a running OTS service from the cluster before reading code. The cluster is the source of truth for what is deployed; logs and bound SQL are the primary evidence.
 
@@ -30,8 +45,9 @@ Before relying on the helper snapshot, check it has not drifted from the live fi
 
 Default posture is read-only: `get`, `logs`, `describe`, `exec` for inspection.
 
-- `kubectl get pods|deploy|svc|configmap|secret -o yaml`, `logs`, `describe` — proceed.
-- `exec` that only reads (printenv, cat config, `ls`) — proceed, but never print secret values to the transcript; report key names and whether a value is set.
+- Read resource names and selected metadata; filter sensitive fields at source before tool output. Full Secret YAML exposes base64-encoded credentials, and deployment/configmap/env output may contain plaintext credentials too.
+- List Secret names with `kubectl -n <ns> get secrets -o name`. List a Secret's key names without values with `kubectl -n <ns> get secret <name> -o go-template='{{range $key, $value := .data}}{{printf "%s\n" $key}}{{end}}'`.
+- Read-only `exec` is permitted, but never run raw `printenv` or `cat` on potentially secret-bearing configuration. Report key names and presence; filter inside the container before returning output.
 - `kubectl delete|scale|rollout restart|edit|apply|patch`, port-forward to a datastore, or any write — stop and get explicit confirmation first. State the exact namespace, target, and blast radius.
 - Never copy kubeconfig content, bearer tokens, or secret values into notes or `debug/`.
 
@@ -41,7 +57,7 @@ Default posture is read-only: `get`, `logs`, `describe`, `exec` for inspection.
 2. **Check current errors first.** `kerror <app> <ns>` before reading raw logs. A crash loop or repeated exception is visible immediately; a wide unfiltered tail is noise.
 3. **Read logs with intent.** `klog <app> <ns>` for the timeline, `kfind <app> '<pattern>' <ns>` for a specific request id, device code, event id, or coroutine. Pass a specific namespace — cross-namespace pod matching is slow and can select the wrong deployment.
 4. **Reconstruct SQL when the failure is data-shaped.** `ksql <app> <ns>` pipes the log tail through `_hibernate_bind_sql_stream`, which walks `Hibernate: <sql>` lines, binds `binding parameter [n] as [TYPE] - [value]` in order, and emits runnable Oracle statements tagged with an inferred business flow. Use it to reproduce the exact query the service ran.
-5. **Inspect runtime config.** `kubectl -n <ns> exec <pod> -- printenv` (key names only), then compare with `ots-env-custom/service-configs/<env>/<service>/` — hand off to `9to5-env-config-sync` if the deployed value is wrong.
+5. **Inspect runtime config.** If Python is installed in the container, list names with `kubectl -n <ns> exec <pod> -- python3 -c 'import os; print("\n".join(sorted(os.environ)))'`. Otherwise enumerate environment keys using an available runtime inside the container; never fall back to raw `printenv`. Inspect only explicitly selected non-secret values, then compare with `ots-env-custom/service-configs/<env>/<service>/` — hand off to `9to5-env-config-sync` if the deployed value is wrong.
 6. **Correlate to code.** Read the local repo resolved in step 1 and check its git remote matches the deployed service before claiming a match. Grep for the logged class, method, error code, or SQL fragment. Confirm the branch/commit matches the deployed image before claiming the fix.
 7. **Write up and persist.** Record the session under `debug/` and update the service's flow note (below).
 

@@ -199,12 +199,30 @@ def cmd_set(args, checkouts, libraries) -> int:
     if args.property not in libraries["libraries"] and args.property not in libraries["not_local"]:
         print(f"warning: {args.property} is not in config/libraries.json; proceeding anyway", file=sys.stderr)
     targets = sorted(c for c, d in checkouts.items() if args.property in d["versions"])
-    if args.only:
+    if args.only is not None:
         wanted = {x.strip() for x in args.only.split(",") if x.strip()}
-        targets = [t for t in targets if t.name in wanted]
-        missing = wanted - {t.name for t in targets}
-        if missing:
-            sys.exit(f"no checkout matched: {', '.join(sorted(missing))}")
+        if not wanted:
+            sys.exit("--only requires at least one checkout name or path")
+        selected = set()
+        for selector in sorted(wanted):
+            matches = [t for t in targets if (
+                t.resolve() == expand(selector).resolve() if "/" in selector
+                else t.name == selector)]
+            if not matches:
+                sys.exit(f"no checkout matched: {selector}")
+            if len(matches) > 1:
+                sys.exit(f"ambiguous checkout '{selector}'; select an absolute path:\n"
+                         + "\n".join(str(p) for p in matches))
+            selected.update(matches)
+        targets = sorted(selected)
+    else:
+        by_name = defaultdict(list)
+        for target in targets:
+            by_name[target.name].append(target)
+        ambiguous = [str(p) for paths in by_name.values() if len(paths) > 1 for p in paths]
+        if ambiguous:
+            sys.exit("duplicate checkout names; use --only with explicit paths before writing:\n"
+                     + "\n".join(ambiguous))
     if not targets:
         sys.exit(f"no checkout defines {args.property}")
 
@@ -250,7 +268,7 @@ def main() -> int:
     p = sub.add_parser("set", help="write a version into every checkout that defines the property")
     p.add_argument("--property", required=True)
     p.add_argument("--version", required=True)
-    p.add_argument("--only", help="comma-separated checkout directory names to limit the change")
+    p.add_argument("--only", help="comma-separated unique checkout names or explicit directory paths")
     p.add_argument("--apply", action="store_true", help="write the change (default: dry run)")
 
     args = ap.parse_args()

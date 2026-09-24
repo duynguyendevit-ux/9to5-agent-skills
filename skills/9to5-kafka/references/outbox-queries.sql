@@ -11,14 +11,23 @@
 
 -- 1. Backlog by status — the first query to run. A growing PENDING count with a flat
 --    PUBLISHED count means the publish worker is not draining.
-SELECT status,
-       COUNT(*)            AS rows_count,
-       MIN(created_at)     AS oldest,
-       MAX(created_at)     AS newest,
-       ROUND((SYSTIMESTAMP - MIN(created_at)) * 24 * 60, 1) AS oldest_age_minutes
-FROM   outbox_record
-WHERE  producer = '&producer'
-GROUP  BY status
+-- created_at is TIMESTAMP without a timezone, populated from SYSTIMESTAMP by the
+-- reference DDL. Compare the same server wall-clock representation. If a deployment
+-- stores UTC instead, use a UTC timestamp here. Convert interval fields to NUMBER.
+WITH backlog AS (
+    SELECT status, COUNT(*) AS rows_count,
+           MIN(created_at) AS oldest, MAX(created_at) AS newest,
+           CAST(SYSTIMESTAMP AS TIMESTAMP) - MIN(created_at) AS age
+    FROM   outbox_record
+    WHERE  producer = '&producer'
+    GROUP  BY status
+)
+SELECT status, rows_count, oldest, newest,
+       ROUND(EXTRACT(DAY FROM age) * 1440
+           + EXTRACT(HOUR FROM age) * 60
+           + EXTRACT(MINUTE FROM age)
+           + EXTRACT(SECOND FROM age) / 60, 1) AS oldest_age_minutes
+FROM   backlog
 ORDER  BY status;
 
 -- 2. Stuck records — retried repeatedly without acknowledgement. attempt_count is the

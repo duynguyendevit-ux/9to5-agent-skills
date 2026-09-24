@@ -4,10 +4,27 @@ description: Sync a project's daily Confluence release page — create it when m
 license: MIT
 compatibility: Requires the zjira CLI and Confluence credentials in ~/.config/zjira/config.yaml; GitLab SSH access for tag discovery. Reads non-secret endpoints from config/endpoints.json.
 metadata:
-  version: "1.0.0"
+  version: "1.0.1"
 ---
 
 # Release Sync
+
+## Example output
+
+Illustrative preview; tags and page version must come from the actual run.
+
+```text
+Project: example-project
+Page: Example daily release (ID 12345, version 7)
+Mode: dry run
+| No | Service | Tag | Status |
+| 1 | example-api | example-v1.0.1 | update: release, docker |
+| 2 | example-worker | example-v1.0.0 | up-to-date |
+1 row to sync; 0 highlights to clear. No remote write.
+```
+
+If the page changes before PUT, report the version conflict and request a new review
+of the recomputed changes instead of claiming an applied result.
 
 One engine for every project. Project settings live in a registry file instead of
 per-skill hardcoding.
@@ -186,8 +203,9 @@ Flags:
   `alleyway-portal`, `ttch-migration`) are marked `skip: ambiguous` and left alone.
 - Cache: `cache.json` next to this skill stores service->repo and tag lists per
   group; stale entries refresh in parallel with a 15s SSH connect timeout.
-- The PUT re-reads the page version immediately before writing; a concurrent edit
-  surfaces as a conflict instead of a silent overwrite.
+- Before PUT, the script checks that the page version still equals the version of the
+  body it edited. It submits that original version plus one; changes before the check
+  abort locally and changes after it conflict at Confluence. Re-run and review on conflict.
 - After every apply the page is re-read and highlights are verified.
 
 ## Output

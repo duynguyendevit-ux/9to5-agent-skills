@@ -466,6 +466,21 @@ def paint_open_tag(open_tag, color=HL_COLOR):
     return open_tag
 
 
+def update_page(base, token, page, body):
+    """Compare against the version the replacement body was built from."""
+    expected = page["version"]["number"]
+    path = f"/rest/api/content/{page['id']}"
+    fresh = api(base, token, "GET", path + "?expand=version")
+    if fresh["version"]["number"] != expected:
+        sys.exit(f"page changed since read (expected v{expected}, found "
+                 f"v{fresh['version']['number']}); rerun the dry run and review again")
+    return api(base, token, "PUT", path, {
+        "id": page["id"], "type": "page", "title": page["title"],
+        "version": {"number": expected + 1},
+        "body": {"storage": {"value": body, "representation": "storage"}},
+    })
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--page", help="explicit page URL or ID (skips today lookup)")
@@ -859,15 +874,7 @@ def main():
             row = row.replace(open_tag, clear_open_tag(open_tag), 1)
         updated = updated.replace(r["row"], row, 1)
 
-    fresh = api(base, token, "GET", f"/rest/api/content/{page['id']}?expand=version")
-    payload = {
-        "id": page["id"],
-        "type": "page",
-        "title": page["title"],
-        "version": {"number": fresh["version"]["number"] + 1},
-        "body": {"storage": {"value": updated, "representation": "storage"}},
-    }
-    res = api(base, token, "PUT", f"/rest/api/content/{page['id']}", payload)
+    res = update_page(base, token, page, updated)
     updated_rows = [c for c in to_apply if c["fields"]]
     painted_rows = [c for c in to_apply if not c["fields"]]
     if updated_rows:

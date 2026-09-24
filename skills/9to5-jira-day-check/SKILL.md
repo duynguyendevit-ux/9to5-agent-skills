@@ -3,10 +3,33 @@ name: 9to5-jira-day-check
 description: Daily Jira check — current sprint issues assigned to me, worklogs missing this week (zjira weekstatus), and release rows still pending tag sync. Use when the user asks "what's left today", "check my sprint", "weekly status", "morning summary", "standup", or wants a combined view of tickets, hours, and releases.
 license: MIT
 metadata:
-  version: "1.0.0"
+  version: "1.0.1"
 ---
 
 # Jira Day Check
+
+## Example output
+
+Illustrative daily summary; a skipped source is not an empty result.
+
+```markdown
+## Sprint
+| Key | Summary | Status |
+|---|---|---|
+| DEMO-123 | Retry report exports | In Progress |
+
+## Worklogs (week of 2026-09-21)
+| Day | Logged | Missing |
+|---|---|---|
+| Monday | 8h | 0h |
+| Tuesday | 6h | 2h |
+| Wednesday | 8h | 0h |
+| Thursday | 4h | 4h |
+| Friday | 0h | Future day |
+
+## Releases pending
+Skipped: release endpoint unavailable; pending status is unknown.
+```
 
 Read-only summary. Do not log work, transition issues, or write Confluence from this skill.
 

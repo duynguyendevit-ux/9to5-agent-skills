@@ -1,186 +1,85 @@
-# Index design
+# Oracle index design
 
-## Entries are a sorted list
+## Sorted composite entries
 
-An index is a sorted list of **entries**. Each entry holds the indexed column values
-plus a pointer to the row. In Oracle the pointer is the `ROWID`; in InnoDB it is the
-primary key. The list is structured as a B-tree for lookup, but at the leaf level it
-is a contiguous sequence in key order.
+An Oracle heap B-tree entry contains indexed values and ROWID. Entries are logically
+ordered; leaf blocks need not be physically contiguous. For `(shop_id, created_at)`,
+`shop_id = :id` identifies a contiguous key range, and a time predicate can narrow it.
+For a time predicate alone, Oracle may consider a skip scan, full/fast-full index scan,
+or table scan. Missing a leading predicate does not make the index universally unusable.
 
-From that list the engine does exactly two things:
+Start candidate design with equality columns, then the important range/order column,
+then trailing columns useful for filtering or covering. Weigh prefix reuse, selectivity,
+correlation and sort avoidance. Multiple ranges and IN lists need actual plan inspection;
+do not assume every column after the first range is always only a filter. IN may become
+multiple probes, which do not necessarily preserve the final requested ordering.
 
-| Operation | Meaning | Cost |
-|---|---|---|
-| **Seek** | Jump to a point and read a contiguous run of entries | Cheap |
-| **Filter** | Read every entry in turn, compare, keep or discard | Expensive — you pay for the discarded rows too |
+## Filtering and covering
 
-Seek is possible only while the rows you need are **adjacent**. Index `(shop_id,
-created_at)` with `WHERE shop_id = 7`:
+Predicates on indexed values may be evaluated before a table lookup. Other heap column
+values generally require table access unless another covering/index-join path supplies
+them. Wide indexes trade fewer lookups for extra space and DML work.
 
-```
-(6, 2026-01-05)
-(6, 2026-02-11)
-(7, 2026-01-01)  ┐
-(7, 2026-01-02)  │  adjacent -> seek to the first entry, read the run, stop
-(7, 2026-01-03)  │
-(7, 2026-01-05)  ┘
-(8, 2026-01-02)
-```
+Conventional B-tree indexes omit entries where every indexed column is null. Therefore
+`IS NULL` and index-only COUNT(*) require attention to nullability and row coverage.
+A composite index with a guaranteed non-null component can retain otherwise-null keys.
 
-The same index with `WHERE created_at = '2026-01-02'`:
+Oracle skip scan treats distinct leading values as logical subindexes. Low leading
+cardinality often makes it attractive, but cost determines selection. It does **not**
+require a covering index: a skip scan may be followed by TABLE ACCESS BY INDEX ROWID.
+High cardinality increases work; it does not mechanically become INDEX FULL SCAN.
 
-```
-(6, 2026-01-05)
-(7, 2026-01-01)
-(7, 2026-01-02)  <- match
-(7, 2026-01-03)
-(8, 2026-01-02)  <- match
-(9, 2026-01-02)  <- match     matches are scattered -> no single entry point
-```
+## Ordering and top-N
 
-Reading the whole **index** is still cheaper than reading the whole **table**, because
-an entry is tens of bytes while a row is hundreds. The index does not become useless;
-it drops from *seek* to *scan*. The gap between those two is where multi-second list
-screens come from.
-
-Oracle plan names for the three levels:
-
-| Level | Plan operation |
-|---|---|
-| Seek | `INDEX UNIQUE SCAN`, `INDEX RANGE SCAN` |
-| Scan the index only | `INDEX FULL SCAN`, `INDEX FAST FULL SCAN` |
-| Scan the table | `TABLE ACCESS FULL` |
-
-## Reading a query from left to right
-
-For the proposed index, walk the query and write down where adjacency stops:
-
-> Reading the index left to right, at which column do I lose adjacency?
-
-- Everything up to that column is an **access predicate** (seek).
-- Everything after it is a **filter predicate** — still useful if the column is part
-  of the index, because the filter is then evaluated without touching the table.
-- Any predicate on a **non-key** column forces `TABLE ACCESS BY INDEX ROWID` for each
-  candidate row.
-
-`DBMS_XPLAN` prints both lists when asked (`+PREDICATE`): `access(...)` and `filter(...)`.
-
-## Column order
-
-1. **Equality columns first**, in an order that maximizes prefix reuse across the
-   queries that share this table. Reuse beats per-column selectivity: an index whose
-   leading column only one query filters on is dead weight for the rest.
-2. **Then one range or ordering column.** A range bound stops the seek. Columns after
-   it cannot bound the scan; they filter.
-3. **Then presence-only columns** — those needed so the query can be answered from the
-   index alone (multi-column locators: `IN` lists, equality plus `IN`, etc.).
-
-Two facts that surprise people:
-
-- **Only one range column can bound the scan.** `WHERE a = 1 AND b > 5 AND c > 3` on
-  `(a, b, c)`: `a` and `b` seek, `c` filters.
-- **`IN` expands, `BETWEEN`/`>`, `<` bound.** An `IN` list is evaluated as several
-  equality probes (`INLIST ITERATOR`), so it behaves like equality for access, not
-  like a range.
-
-## Ordering
-
-An index whose key order matches `ORDER BY` and whose scan is a range scan gives the
-rows in order — the plan shows no `SORT ORDER BY`. That is worth more than it looks:
-combined with a row limit, the engine can stop after collecting the first batch
-instead of sorting the whole match set.
-
-When the `ORDER BY` columns and the `WHERE` columns disagree, choose:
-
-- **Sort-serving index** (`WHERE` column later in the key): stops early, but walks every
-  non-matching entry in order.
-- **Filter-serving index** (`WHERE` column first): seeks, then sorts the match set.
-
-Which wins depends on match density. A sparse predicate in front of a sort-serving
-index is the classic slow screen: the engine walks a huge ordered run to collect a
-small batch. Measure both; do not assume.
-
-## Index-only access
-
-If every column the query references is in the index, Oracle answers it from the index
-and the plan contains **no** `TABLE ACCESS BY INDEX ROWID` step. This is a relation
-between an index and one query, not a property of the index:
-
-- Add one column to the `SELECT` list and the benefit disappears.
-- `SELECT *` on a wide table forfeits it permanently. Selecting only the needed columns
-  is part of the index design, not a style preference.
-
-The two-step rewrite that keeps the benefit while still returning whole rows:
+A compatible ordered index scan can avoid SORT ORDER BY and stop after enough qualifying
+rows. Sparse eligibility predicates may still require many candidate reads. A filter-first
+index followed by a sort may be cheaper than walking a large order-serving index.
+ROWNUM/FETCH FIRST can change cardinality estimates, transformations and plan selection.
 
 ```sql
 SELECT t.*
-FROM   big_table t
-JOIN  (SELECT rowid AS rid
-       FROM   big_table
-       WHERE  tenant_id = :t
-         AND  created_at >= :from
-       ORDER  BY created_at
-       FETCH FIRST 200 ROWS ONLY) k
-  ON   k.rid = t.ROWID;
+FROM big_table t
+JOIN (
+    SELECT ROWID AS rid, created_at, id
+    FROM big_table
+    WHERE tenant_id = :tenant_id AND created_at >= :from_time
+    ORDER BY created_at, id
+    FETCH FIRST 200 ROWS ONLY
+) k ON k.rid = t.ROWID
+ORDER BY k.created_at, k.id;
 ```
 
-The inner query can run entirely inside the index; the outer performs 200 lookups by
-`ROWID`. `FETCH FIRST` is available from 12c; `ROWNUM <= 200` works everywhere.
+An index on `(tenant_id, created_at, id)` is a candidate for the inner query. The outer
+query still needs table lookups and may sort; only its ORDER BY guarantees final order.
+Use a unique tie-breaker for deterministic top-N. On older versions, place ORDER BY
+inside an inline view and apply ROWNUM outside it; a same-block ROWNUM filter followed
+by ORDER BY is not equivalent. Verify transformations in the real plan.
 
-## Query killers
+## Predicate pitfalls
 
-| Killer | Effect | Fix |
-|---|---|---|
-| `TRUNC(col)`, `UPPER(col)`, any function on the column | Index on `col` is unusable | Rewrite as a range, or create a function-based index on the same expression |
-| `VARCHAR2` column compared to a number | Column is converted, index unusable | Compare to a string literal |
-| `LIKE '%text%'` | No fixed prefix, no seek | Prefix `LIKE 'text%'`; otherwise a text index or another store |
-| `OR` across different columns | May become `CONCATENATION` of two scans, or a full scan | Two queries with `UNION ALL`, or an index per branch |
-| `NOT`, `<>`, `IS NOT NULL` | Usually no access path | Range on the opposite condition if it exists |
-| Stale statistics | Optimizer misprices plans it could get right | `DBMS_STATS.GATHER_TABLE_STATS(USER, 'T', CASCADE => TRUE)` |
-
-On `IS NULL`: Oracle B-tree indexes can serve it, unlike some other engines. Confirm in
-the plan instead of reasoning about it.
-
-## Skip scan and other second-best paths
-
-`INDEX SKIP SCAN` lets Oracle use an index whose leading column is missing from the
-predicate, by iterating the distinct values of that leading column. It is a workaround,
-not a design:
-
-- It needs the leading column to have few distinct values. With high cardinality it
-  degenerates to `INDEX FULL SCAN`.
-- It needs the query's reference set to be satisfiable from the index.
-- It is not a reason to accept the wrong column order in a new index.
-
-## Indexes are paid on write
-
-Each secondary index adds an entry on every insert and on every update of the indexed
-columns (delete + insert). A table with a claim index and a cleanup index pays three
-entries per insert and two entries per status transition. Before adding an index,
-count the existing ones and say what the write path pays — a list screen that gets
-faster while the ingest path gets slower is a trade, not a win.
-
-## Coming from MySQL
-
-The mechanics are the same; the names and tooling are not.
-
-| MySQL 8.0 | Oracle 12c |
+| Shape | Investigation |
 |---|---|
-| `type: ALL` | `TABLE ACCESS FULL` |
-| `ref` / `range` | `INDEX RANGE SCAN`, `INDEX UNIQUE SCAN` |
-| `Using index` (covering) | no `TABLE ACCESS BY INDEX ROWID` step in the plan |
-| skip scan | `INDEX SKIP SCAN` |
-| `optimizer_trace` | `DBMS_XPLAN.DISPLAY_CURSOR`, `V$SQL_PLAN` |
-| `FORCE INDEX` / `USE INDEX` | `/*+ INDEX(t idx) */`, `NO_INDEX`, `FULL(t)` |
-| `ANALYZE TABLE` | `DBMS_STATS.GATHER_TABLE_STATS` |
-| `LIMIT` | `ROWNUM <= n` / `FETCH FIRST n ROWS ONLY` |
+| TRUNC(timestamp) = :day | Half-open timestamp range or a matching function-based index; check timezone semantics. |
+| UPPER(code) = :value | Match a function-based index and collation semantics if case-insensitive access is required. |
+| VARCHAR2 compared to NUMBER | Inspect implicit column conversion; bind the intended datatype. |
+| LIKE '%text%' | No fixed leading prefix for the usual range probe; evaluate text search or a scan. |
+| OR across columns | Oracle may OR-expand; manual UNION ALL needs duplicate semantics preserved. |
+| IS NULL / IS NOT NULL / <> | Check null coverage and selectivity; these are not universal index prohibitions. |
 
-Two differences worth remembering:
+## Write trade-offs
 
-- **Index condition pushdown has no Oracle 12c equivalent.** MySQL can evaluate
-  non-key predicates inside the index scan; Oracle needs the table for a non-key
-  predicate. If a MySQL article relies on ICP, the Oracle answer is to move the column
-  into the index.
-- **Oracle's `INDEX` hint is not a cost override.** It selects among paths that exist
-  and is ignored when none does, so the end state matches MySQL's `FORCE INDEX` on an
-  impossible path, without MySQL's "make the full scan expensive" mechanism.
+Count relevant PK/unique/secondary indexes and which keys each DML changes. Insert,
+delete and indexed-column updates maintain index entries; all-null key omission and
+unchanged key values matter. More indexes can slow ingestion. Sequential and random
+keys have different locality/contention trade-offs: measure workload waits and reads.
+
+## MySQL comparisons
+
+MySQL ICP evaluates eligible predicates using columns present in an index before fetching
+the full row. It cannot read arbitrary non-indexed column values out of the index.
+Oracle index filtering can similarly avoid some heap lookups. Do not transfer MySQL
+EXPLAIN labels, hint behavior or InnoDB clustered-PK storage rules directly to Oracle.
+
+Sources:
+- https://docs.oracle.com/en/database/oracle/oracle-database/19/tgsql/optimizer-access-paths.html
+- https://dev.mysql.com/doc/refman/8.0/en/index-condition-pushdown-optimization.html

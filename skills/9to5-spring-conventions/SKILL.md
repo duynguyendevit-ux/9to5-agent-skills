@@ -3,10 +3,22 @@ name: 9to5-spring-conventions
 description: Review Java/Spring changes against the house conventions — Objects.isNull/nonNull for null checks, CollectionUtils/StringUtils for emptiness and presence, explicit imports, no unused imports, and no new test files unless requested. Use when the user asks to review an MR or diff, check coding conventions or style, or asks whether a Java/Spring change follows the project standards.
 license: MIT
 metadata:
-  version: "1.0.0"
+  version: "1.0.1"
 ---
 
 # Spring Conventions Review
+
+## Example output
+
+Illustrative review of changed lines, with project helpers already verified:
+
+```text
+[Medium] src/main/java/example/OrderService.java:88 — new null check uses order != null; use Objects.nonNull(order) to match the repository convention.
+[Low] src/main/java/example/OrderMapper.java:12 — newly added java.util.List import is unused; remove it.
+Scope: current diff only. Existing tests were not run for this read-only review.
+```
+
+When no violation is found: `No house-convention violations found in the reviewed diff.`
 
 Review only changed code. Read the surrounding file for context before judging a line.
 

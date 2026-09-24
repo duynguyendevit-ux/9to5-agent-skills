@@ -116,7 +116,8 @@ class TableParser(HTMLParser):
         elif tag in ("th", "td") and self.row is not None:
             self.cell = {"text": [], "links": []}
         elif tag == "a" and self.cell is not None:
-            self.link = attrs.get("href")
+            if attrs.get("href"):
+                self.cell["links"].append(attrs["href"])
 
     def handle_data(self, data):
         if self.cell is not None:
@@ -126,8 +127,6 @@ class TableParser(HTMLParser):
         if tag == "a":
             self.link = None
         elif tag in ("th", "td") and self.cell is not None:
-            if self.link:
-                self.cell["links"].append(self.link)
             self.cell["text"] = " ".join("".join(self.cell["text"]).split())
             self.row.append(self.cell)
             self.cell = None
@@ -176,7 +175,10 @@ def extract_services(body):
         raise SystemExit("no service table found; expected a Service column in the page")
     result = {}
     for item in rows:
-        result[item.pop("service")] = item
+        service = item.pop("service")
+        if service in result:
+            raise SystemExit(f"duplicate service row '{service}'; disambiguate rows before taking a snapshot")
+        result[service] = item
     return result
 
 
@@ -233,8 +235,15 @@ def compare(before, current):
         if diffs:
             print(f"RECORDED_CHANGE | {service} | " + "; ".join(diffs))
             changed += 1
+        elif not any(str(value).strip() for value in new[service].values()):
+            print(f"UNKNOWN | {service} | release cells are empty")
         else:
             print(f"UNCHANGED_RECORD | {service}")
+    old_source, new_source = before.get("source", {}), current.get("source", {})
+    for key in ("page_id", "page_version"):
+        if old_source.get(key) != new_source.get(key):
+            print(f"SOURCE_CHANGE | {key}: {old_source.get(key)} -> {new_source.get(key)}")
+            changed += 1
     print(f"\nConfluence record comparison: {'CHANGED' if changed else 'UNCHANGED'}")
     print("This result describes the release page record; it does not verify a running deployment.")
 

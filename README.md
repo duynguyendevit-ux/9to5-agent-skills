@@ -25,22 +25,22 @@ cd 9to5-agent-skills
 
 | Skill | Version | Purpose |
 |-------|---------|---------|
-| `9to5-jira` | 2.1.0 | Fetch a Jira issue and linked Confluence spec, explore the repo, write an implementation plan to `.kit/plans/`. |
-| `9to5-logwork` | 1.4.0 | Log Jira worklogs via conversation (day, week, month flows) with Vietnamese descriptions, agent-activity sync from local session history, and a Jira REST fallback when zjira AI drafting is unavailable. |
-| `9to5-jira-day-check` | 1.0.0 | Daily read-only summary: sprint issues, missing worklogs, releases still pending tag sync. |
-| `9to5-release-confluence-sync` | 1.0.0 | Create or update the daily Confluence release page and refresh version, Release Tag, and Docker image cells. |
-| `9to5-release-audit` | 1.0.0 | Read-only Confluence release-record snapshots and comparisons; distinguishes recorded release state from actual deployment. |
-| `9to5-confluence-doc` | 1.0.0 | Draft and publish Vietnamese technical design pages with the OTS structure. |
-| `9to5-confluence` | 1.0.0 | General Confluence work: CQL search, reading, hierarchy, labels, then create/update/comment/attach behind a dry-run and approval gate. |
-| `9to5-sql-migration` | 1.0.0 | Write and review Oracle migration scripts (`admin/sql/oracle`, Flyway-style naming). |
-| `9to5-oracle-index` | 1.0.0 | Decide and verify an Oracle index for a query shape: access vs filter, column order, plan reading, write cost, DDL handoff. |
-| `9to5-id-design` | 1.0.0 | Choose and review primary-key strategy: identity vs UUID/ULID/UUIDv7/Snowflake, storage width, generator lifetime, exposure. |
-| `9to5-env-config-sync` | 1.0.0 | Compare and align service env configs across environments; keep secrets out. |
-| `9to5-spring-conventions` | 1.0.0 | Review Java/Spring changes against house conventions. |
-| `9to5-k8s-service-debug` | 1.0.0 | Debug cluster services: locate pods, tail and filter logs, reconstruct Hibernate SQL, correlate to the local repo. |
-| `9to5-kafka` | 1.1.0 | Kafka contracts and outbox diagnosis; long-running jobs, durable handoff, timeout and offset semantics, and Kafka 4.2 share-group trade-offs. |
-| `9to5-lib-bump` | 1.0.0 | Bump a shared library version across the services that consume it: drift audit, DEBUG flag check, version resolution, per-service build. |
-| `9to5-skill-sync` | 1.0.0 | Keep an edited skill consistent across the canonical directory, the three mirrors, and this repository copy. |
+| `9to5-jira` | 2.1.1 | Fetch a Jira issue and linked Confluence spec, explore the repo, write an implementation plan to `.kit/plans/`. |
+| `9to5-logwork` | 1.4.1 | Log Jira worklogs via conversation, normalize duration to seconds, and derive date-filtered agent activity. |
+| `9to5-jira-day-check` | 1.0.1 | Daily read-only summary: sprint issues, missing worklogs, releases still pending tag sync. |
+| `9to5-release-confluence-sync` | 1.0.1 | Create or update daily release pages, refresh tags, and reject stale-body updates. |
+| `9to5-release-audit` | 1.0.1 | Read-only release-record comparisons; rejects duplicate service rows and reports empty records and source changes. |
+| `9to5-confluence-doc` | 1.0.1 | Draft and publish Vietnamese technical design pages with the OTS structure. |
+| `9to5-confluence` | 1.1.0 | General Confluence operations; updates require the reviewed base version and explicit approval. |
+| `9to5-sql-migration` | 1.0.1 | Write and review Oracle migration scripts (`admin/sql/oracle`, Flyway-style naming). |
+| `9to5-oracle-index` | 1.0.1 | Oracle-specific index candidates, actual-plan verification, null coverage, top-N and write trade-offs. |
+| `9to5-id-design` | 1.0.1 | Identity, explicit sequences and application IDs: Oracle storage, allocation, concurrency and exposure. |
+| `9to5-env-config-sync` | 1.0.1 | Compare and align service env configs across environments; keep secrets out. |
+| `9to5-spring-conventions` | 1.0.1 | Review Java/Spring changes against house conventions. |
+| `9to5-k8s-service-debug` | 1.0.1 | Debug cluster services with source-filtered configuration inspection and local evidence. |
+| `9to5-kafka` | 1.1.1 | Kafka contracts, corrected Oracle outbox diagnosis, long-running jobs and share-group trade-offs. |
+| `9to5-lib-bump` | 1.0.1 | Audit and bump shared libraries; reject ambiguous checkout names and allow explicit paths. |
+| `9to5-skill-sync` | 1.0.1 | Synchronize only 9to5 skills, preserve local mirror config, filter repository exports and detect unresolved drift. |
 
 ## Structure
 
@@ -57,6 +57,24 @@ skills/<name>/
 `SKILL.md` frontmatter `description` is the trigger contract: it states what the skill does and when to use it. The body stays under ~500 lines; detail lives in `references/` and `scripts/`.
 
 ## Conventions
+
+Every skill includes an **Example output** section with illustrative, non-secret data.
+These examples define presentation expectations, not evidence of executed operations.
+
+## Validation
+
+```bash
+python3 -m unittest discover -s tests -v
+python3 -m unittest discover -s skills/9to5-jira/scripts/tests -v
+```
+
+The regression suite uses temporary directories and mocked remote APIs. It covers
+version conflicts, write gates, duplicate rows/checkouts, worklog durations, resumed
+session dates, sync scope and mirror/export policy. Set `SKILLS_ROOT` to validate a
+canonical collection before regeneration. Oracle guidance is documentation- and
+schema-reviewed, not validated by running these Python tests against Oracle.
+
+## Authoring conventions
 
 - Skills are imperative and explain the reasoning, not just the rule.
 - Registries record verified facts; unknown values are `null` or `TODO(unverified)`, never a plausible guess.

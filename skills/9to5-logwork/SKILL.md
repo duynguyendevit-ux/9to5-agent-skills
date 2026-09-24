@@ -4,10 +4,25 @@ description: "Log Jira worklogs via conversation: scan assigned issues, accept t
 license: MIT
 compatibility: Requires the zjira CLI on PATH and Jira credentials in ~/.config/zjira/config.yaml. Agent-activity sync reads local session stores of opencode/codex/claude (read-only, optional).
 metadata:
-  version: "1.4.0"
+  version: "1.4.1"
 ---
 
 Prefix your first line with `🥷` inline. Be direct: show the issue list immediately, no preamble.
+
+## Example output
+
+Illustrative confirmation table, before any submission:
+
+```text
+Date        Issue      Duration  Seconds  Description
+2026-09-24  DEMO-123   1h30m     5400     Kiểm tra luồng retry và xử lý lỗi tạm thời của worker.
+2026-09-24  DEMO-124   2h        7200     Rà soát cấu hình theo môi trường và xác nhận các biến còn thiếu.
+Total: 3h30m / 12600 seconds
+Status: awaiting approval — no worklog created
+```
+
+After submission, replace the status with each actual worklog ID or failure; never
+invent IDs or claim success from the confirmation table alone.
 
 <role>
 Act as a Jira worklog assistant. Scan assigned issues, conduct a structured conversation to gather
@@ -125,7 +140,7 @@ Sources read (never written):
 | Agent | Location | Extracted |
 |-------|----------|-----------|
 | opencode | `~/.local/share/opencode/opencode.db` — `session_v2` + `session_message` (falls back to legacy `session`/`message`/`part`) | session titles, user prompts, edited file names |
-| codex | `~/.codex/sessions/YYYY/MM/DD/*.jsonl` | cwd, user prompts, tool names |
+| codex | `~/.codex/sessions/**/*.jsonl` | cwd, user prompts, tool names; filter each record by local date, including resumed sessions |
 | claude | `~/.claude/projects/<slug>/*.jsonl` | cwd, user prompts, edited file names |
 
 Sessions whose cwd is under `/tmp` are filtered out (they are zjira's internal `claude` drafting
@@ -256,8 +271,10 @@ Do not retry zjira. Submit the same approved entries through Jira REST API v2 in
 ```bash
 JIRA=$(sed -n 's/^jira_url:[[:space:]]*//p' ~/.config/zjira/config.yaml)
 TOKEN=$(sed -n 's/^token:[[:space:]]*//p' ~/.config/zjira/config.yaml | tr -d '"')
+# DURATION accepts 8, 1.5h, 1h30m or 90m. Abort on invalid input before POST.
+SECONDS_TO_LOG=$(python3 <skill-dir>/scripts/duration_seconds.py "$DURATION") || exit 1
 payload=$(jq -n --arg c "$DESCRIPTION" --arg s "${DATE}T09:00:00.000+0700" \
-  --argjson t $((HOURS * 60)) '{comment: $c, started: $s, timeSpentSeconds: $t}')
+  --argjson t "$SECONDS_TO_LOG" '{comment: $c, started: $s, timeSpentSeconds: $t}')
 code=$(curl -sS -o /tmp/opencode/_resp.json -w '%{http_code}' \
   -X POST "$JIRA/rest/api/2/issue/$KEY/worklog" \
   -H "Authorization: Bearer $TOKEN" -H 'Content-Type: application/json' \
