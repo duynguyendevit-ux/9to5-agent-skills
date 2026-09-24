@@ -37,6 +37,7 @@ cd 9to5-agent-skills
 | `9to5-id-design` | 1.0.1 | Identity, explicit sequences and application IDs: Oracle storage, allocation, concurrency and exposure. |
 | `9to5-env-config-sync` | 1.0.1 | Compare and align service env configs across environments; keep secrets out. |
 | `9to5-spring-conventions` | 1.0.1 | Review Java/Spring changes against house conventions. |
+| `9to5-spring-core` | 1.0.0 | Source-backed starter coding guide and Java 17 service init template: core API contracts, JPA routing, auditing, context cleanup and environment configuration. |
 | `9to5-k8s-service-debug` | 1.0.1 | Debug cluster services with source-filtered configuration inspection and local evidence. |
 | `9to5-kafka` | 1.1.1 | Kafka contracts, corrected Oracle outbox diagnosis, long-running jobs and share-group trade-offs. |
 | `9to5-lib-bump` | 1.0.1 | Audit and bump shared libraries; reject ambiguous checkout names and allow explicit paths. |

@@ -1,0 +1,55 @@
+spring:
+  application:
+    name: __SERVICE_NAME__
+  jpa:
+    open-in-view: false
+    show-sql: false
+    hibernate:
+      ddl-auto: none
+  datasource:
+    hikari:
+      maximum-pool-size: ${DB_POOL_MAX:10}
+      minimum-idle: ${DB_POOL_MIN:2}
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT:6379}
+  cloud:
+    openfeign:
+      httpclient:
+        disable-ssl-validation: false
+database:
+  writer:
+    url: ${DB_WRITER_URL}
+    username: ${DB_WRITER_USERNAME}
+    password: ${DB_WRITER_PASSWORD}
+  reader:
+    url: ${DB_READER_URL}
+    username: ${DB_READER_USERNAME}
+    password: ${DB_READER_PASSWORD}
+  encryption:
+    key: ${DB_ENCRYPTION_KEY}
+jwt:
+  public-key: ${JWT_PUBLIC_KEY}
+  private-key: ${JWT_PRIVATE_KEY}
+  jwk-set-uri: ${JWT_JWK_SET_URI:}
+app:
+  mock:
+    enabled: false
+  grpc:
+    client:
+      enabled: false
+  module:
+    mqtt:
+      enabled: false
+    email:
+      enabled: false
+logging:
+  level:
+    com.zaxxer.hikari: INFO
+    com.zaxxer.hikari.HikariConfig: INFO
+    com.zaxxer.hikari.HikariDataSource: INFO
+sentry:
+  enabled: false
+  debug: false
+  send-default-pii: false
