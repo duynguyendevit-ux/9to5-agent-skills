@@ -4,7 +4,7 @@ description: Sync a project's daily Confluence release page — create it when m
 license: MIT
 compatibility: Requires the zjira CLI and Confluence credentials in ~/.config/zjira/config.yaml; GitLab SSH access for tag discovery. Reads non-secret endpoints from config/endpoints.json.
 metadata:
-  version: "1.0.2"
+  version: "1.0.3"
 ---
 
 # Release Sync
@@ -193,7 +193,11 @@ Flags:
   chính dòng đó, tag series, Release Tag, Docker image, version/current version.
   Dùng `--scan --no-cache` để lấy tag mới từ remote cho lần kiểm tra này.
 - Khi tạo trang mới từ ngày trước, script xóa highlight trên các ô của dòng service
-  có số thứ tự; giữ nguyên tag, link và định dạng header. Tag copy là baseline,
+  có số thứ tự. Trước đó, nếu `Release Tag` khác `Current version` (kể cả Current
+  version trống), chép nội dung Release Tag cùng link sang Current version. Thực hiện
+  cả khi remote chưa có tag mới. Release Tag trống/không đọc được thì không ghi đè
+  Current version. Giữ ô Release Tag làm baseline cho lần kiểm tra tag mới và giữ
+  định dạng header. Đây là chuyển tiếp bản ghi, không xác minh deployment. Tag copy là baseline,
   không phải bằng chứng service cần release hôm nay. Chỉ tô lại dòng có cập nhật
   đã kiểm tra hoặc được yêu cầu `--paint` rõ ràng.
 - Với trang đã tồn tại, đọc trang release trước đó trong cùng project/hierarchy.

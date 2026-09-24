@@ -82,6 +82,18 @@ class ConfluenceTests(unittest.TestCase):
 
 
 class ReleaseSyncTests(unittest.TestCase):
+    def test_clone_rolls_release_into_current_including_link(self):
+        module = load("9to5-release-confluence-sync", "sync_release_tags.py")
+        header = '<tr><th>No</th><th>Service</th><th>Current version</th><th>Release Tag</th></tr>'
+        release = '<a href="https://example.invalid/repo/-/tags/v1.2.3">v1.2.3</a>'
+        for current in ('v1.2.2', ''):
+            body = '<table>' + header + '<tr><td>1</td><td>api</td><td>' + current + '</td><td>' + release + '</td></tr></table>'
+            actual = module.prepare_copied_release(body)
+            self.assertEqual(actual.count(release), 2)
+            self.assertEqual(module.prepare_copied_release(actual), actual)
+        body = '<table>' + header + '<tr><td>1</td><td>api</td><td>v1.2.2</td><td></td></tr></table>'
+        self.assertEqual(module.prepare_copied_release(body), body)
+
     def test_clone_resets_service_highlights_preserving_tags_and_headers(self):
         module = load("9to5-release-confluence-sync", "sync_release_tags.py")
         header = '<tr><th class="highlight-#abc">No</th><th>Service</th></tr>'

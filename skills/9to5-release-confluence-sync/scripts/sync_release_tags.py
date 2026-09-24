@@ -217,7 +217,7 @@ def create_page(base, token, space, plan):
         "space": {"key": space},
         "body": {
             "storage": {
-                "value": reset_copied_highlights(tpl["body"]["storage"]["value"]),
+                "value": prepare_copied_release(tpl["body"]["storage"]["value"]),
                 "representation": "storage",
             }
         },
@@ -305,6 +305,28 @@ def reset_copied_highlights(html):
             return row
         return re.sub(r"<td\b[^>]*>", lambda cell: clear_open_tag(cell.group(0)), row)
     return re.sub(r"<tr\b[^>]*>.*?</tr>", reset, html, flags=re.S)
+
+
+def prepare_copied_release(html):
+    """Carry the previous release into current version before discovering new tags."""
+    _, current_idx, release_idx, _ = cell_indices(html)
+
+    def rollover(match):
+        row = match.group(0)
+        cells = list(re.finditer(r"(<t[dh]\b[^>]*>)(.*?)(</t[dh]>)", row, re.S))
+        if len(cells) <= max(current_idx, release_idx):
+            return row
+        if not plain(cells[0].group(2)).isdigit():
+            return row
+        release = cells[release_idx].group(2)
+        current = cells[current_idx]
+        release_tag = tag_from_cell(release)
+        if release_tag and release_tag != tag_from_cell(current.group(2)):
+            # Copy the full source cell body so the label and href stay together.
+            row = row[:current.start(2)] + release + row[current.end(2):]
+        return row
+
+    return reset_copied_highlights(re.sub(r"<tr\b[^>]*>.*?</tr>", rollover, html, flags=re.S))
 
 
 def load_cache():
@@ -594,6 +616,7 @@ def main():
         sys.exit("no --group given, no matching project, and cannot derive a group from the current repository")
 
     day = datetime.date.fromisoformat(args.date) if args.date else datetime.date.today()
+    cloned_page = False
 
     if args.page:
         page = resolve_page(base, token, args.page)
@@ -615,11 +638,13 @@ def main():
             if not args.apply:
                 print(f"dry run: no page for {day}. Would create '{plan['title']}' "
                       f"(parent {plan['parent']}) cloned from '{tpl_title}'. Re-run with --apply.")
-                print("Copied service-row highlights will be cleared; only verified updates "
+                print("Previous Release Tag will roll into Current version when different "
+                      "(including its link). Copied service-row highlights will be cleared; only verified updates "
                       "or explicitly requested --paint rows will be highlighted again.")
                 print("This is a creation preview, not a completed per-service tag check.")
                 return
             page = create_page(base, token, space, plan)
+            cloned_page = True
             print(f"created page '{page['title']}' (id {page['id']}) from '{tpl_title}'")
             print(f"link: {page_url(page, base)}")
         else:
@@ -790,7 +815,7 @@ def main():
                 vm = TAG_RE.match(c["version_tag"]) if c["version_tag"] else None
                 if vm and vm.group(1) == c["prefix"] and c["version_tag"] != newest:
                     fields.append("version")
-                    if c["current_tag"] and c["current_tag"] != c["version_tag"]:
+                    if not cloned_page and c["current_tag"] and c["current_tag"] != c["version_tag"]:
                         fields.append("current")
                 if c["release_tag"] and c["release_tag"] != newest:
                     fields.append("release")
