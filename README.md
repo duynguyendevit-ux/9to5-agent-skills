@@ -38,7 +38,7 @@ cd 9to5-agent-skills
 | `9to5-env-config-sync` | 1.0.0 | Compare and align service env configs across environments; keep secrets out. |
 | `9to5-spring-conventions` | 1.0.0 | Review Java/Spring changes against house conventions. |
 | `9to5-k8s-service-debug` | 1.0.0 | Debug cluster services: locate pods, tail and filter logs, reconstruct Hibernate SQL, correlate to the local repo. |
-| `9to5-kafka` | 1.0.0 | Kafka event contracts and the transactional outbox: catalog and bindings, topic placeholders, partition keys, outbox backlog and retry diagnosis. |
+| `9to5-kafka` | 1.1.0 | Kafka contracts and outbox diagnosis; long-running jobs, durable handoff, timeout and offset semantics, and Kafka 4.2 share-group trade-offs. |
 | `9to5-lib-bump` | 1.0.0 | Bump a shared library version across the services that consume it: drift audit, DEBUG flag check, version resolution, per-service build. |
 | `9to5-skill-sync` | 1.0.0 | Keep an edited skill consistent across the canonical directory, the three mirrors, and this repository copy. |
 

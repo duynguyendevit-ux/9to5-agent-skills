@@ -1,13 +1,13 @@
 ---
 name: 9to5-kafka
-description: Work on OTS/C7 Kafka event contracts and the transactional outbox — add or change an event type in the kafka starter catalog, fix Spring Cloud Stream bindings, topic placeholders, consumer groups and partition keys, wire a service onto common-outbox, and diagnose stuck or lagging outbox records (PENDING backlog, retry exhaustion, payload template misses, cleanup not running). Use when the user mentions a Kafka topic, event contract, producer/consumer binding, partition key, consumer group, protobuf event, transactional outbox, outbox_record, payload_template, outbox publish lag, or an event that was written but never published.
+description: Work on OTS/C7 Kafka contracts, transactional outbox, and Kafka-versus-work-queue design. Add events and bindings, diagnose outbox backlog, and review long-running consumers, poll timeouts, offset commits, duplicate handling, and Kafka share groups. Use for Kafka topics, partition keys, consumer groups, protobuf events, outbox_record, payload_template, unpublished events, Kafka-backed import/export jobs, rebalance loops, max.poll.interval.ms, or Kafka 4.2 share-group adoption.
 license: MIT
 compatibility: Requires git checkouts of the kafka starter and common-outbox, JDK 17, and read access to the service Oracle schema for diagnosis (directly or through the 9to5-k8s-service-debug helper).
 metadata:
-  version: "1.0.0"
+  version: "1.1.0"
 ---
 
-# Kafka Contracts and Outbox
+# Kafka Contracts, Outbox, and Work Queues
 
 Two layers. Decide which one you are in before editing anything.
 
@@ -18,6 +18,7 @@ Two layers. Decide which one you are in before editing anything.
 
 - `references/topics.md` — catalog layout, binding conventions, how to add an event type, contract failure signatures.
 - `references/outbox-queries.sql` — read-only Oracle diagnosis queries for `outbox_record` and `payload_template`.
+- `references/work-queues.md` — read before designing Kafka-backed jobs, diagnosing long-running consumers, or adopting share groups; includes verified corrections to the linked Kafka queue article.
 - Library setup (dependency, config block, DDL, `append(...)` forms) is documented in `common-outbox/README.md`. Read it rather than re-deriving it; do not duplicate it here.
 
 ## Contract work
@@ -30,6 +31,16 @@ Two layers. Decide which one you are in before editing anything.
 6. Build both sides before claiming done: `JAVA_HOME=~/.jdks/corretto-17.0.19 ./gradlew build` in the starter and in each affected service.
 
 Details and the annotation table (`@IncludeEventsProducer`, `@ExcludeEventsConsumer`) are in `references/topics.md`.
+
+## Long-running consumers and work queues
+
+1. Establish broker/client versions, group protocol, Spring binder/container acknowledgement mode, and the actual poll/worker threading model before proposing changes.
+2. Separate transport acknowledgement from job completion. For durable handoff, register a deduplicated job in a database transaction, then acknowledge Kafka after that transaction succeeds. Workers manage execution, leases, progress, and retries.
+3. Distinguish heartbeat failure (session timeout) from stalled polling (`max.poll.interval.ms`). Raising the poll interval does not make a dead pod undetectable for that duration.
+4. Treat partition count as the active-consumer assignment ceiling in a traditional group, not an absolute worker-thread ceiling. Concurrent processing needs bounded capacity and safe offset tracking.
+5. For Kafka 4.2 share groups, check explicit acknowledgement, acquisition-lock renewal, continued polling, acknowledgement errors, and framework support. An API change alone does not make ten-minute jobs safe.
+
+Use `references/work-queues.md` for trade-offs, failure examples, and version-pinned sources. Keep idempotency and stale-worker protection explicit regardless of broker choice.
 
 ## Outbox diagnosis
 
