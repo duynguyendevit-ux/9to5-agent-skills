@@ -28,7 +28,7 @@ cd 9to5-agent-skills
 | `9to5-jira` | 2.1.1 | Fetch a Jira issue and linked Confluence spec, explore the repo, write an implementation plan to `.kit/plans/`. |
 | `9to5-logwork` | 1.4.1 | Log Jira worklogs via conversation, normalize duration to seconds, and derive date-filtered agent activity. |
 | `9to5-jira-day-check` | 1.0.1 | Daily read-only summary: sprint issues, missing worklogs, releases still pending tag sync. |
-| `9to5-release-confluence-sync` | 1.0.1 | Create or update daily release pages, refresh tags, and reject stale-body updates. |
+| `9to5-release-confluence-sync` | 1.0.2 | Verify service tags, reset inherited highlights on cloned pages, and reject stale-body updates. |
 | `9to5-release-audit` | 1.0.1 | Read-only release-record comparisons; rejects duplicate service rows and reports empty records and source changes. |
 | `9to5-confluence-doc` | 1.0.1 | Draft and publish Vietnamese technical design pages with the OTS structure. |
 | `9to5-confluence` | 1.1.0 | General Confluence operations; updates require the reviewed base version and explicit approval. |

@@ -82,6 +82,26 @@ class ConfluenceTests(unittest.TestCase):
 
 
 class ReleaseSyncTests(unittest.TestCase):
+    def test_clone_resets_service_highlights_preserving_tags_and_headers(self):
+        module = load("9to5-release-confluence-sync", "sync_release_tags.py")
+        header = '<tr><th class="highlight-#abc">No</th><th>Service</th></tr>'
+        row = ('<tr data-row="1"><td class="other highlight-#abc" data-highlight-colour="#abc">4</td>'
+               '<td class="highlight-#abc">example-api</td>'
+               '<td data-highlight-colour="#abc"><a href="/repo/-/tags/v1.2.3">v1.2.3</a></td></tr>')
+        body = '<table>' + header + row + '</table>'
+        cleaned = module.reset_copied_highlights(body)
+        self.assertIn(header, cleaned)
+        self.assertIn('class="other"', cleaned)
+        self.assertIn('<a href="/repo/-/tags/v1.2.3">v1.2.3</a>', cleaned)
+        self.assertNotIn('data-highlight-colour', cleaned)
+        self.assertEqual(cleaned.count('highlight-'), 1)
+        self.assertEqual(module.reset_copied_highlights(cleaned), cleaned)
+        plan = {'template': {'body': {'storage': {'value': body}}}, 'title': 'new', 'parent': '10'}
+        with patch.object(module, 'api', side_effect=[{'id': '20'}, {'id': '20'}]) as api:
+            module.create_page('https://example.invalid', 'fixture', 'SPACE', plan)
+        self.assertEqual(api.call_args_list[0].args[4]['body']['storage']['value'], cleaned)
+        self.assertEqual(plan['template']['body']['storage']['value'], body)
+
     def test_stale_page_refuses_put(self):
         module = load("9to5-release-confluence-sync", "sync_release_tags.py")
         page = {"id": "123", "title": "Fixture", "version": {"number": 1}}

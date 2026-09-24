@@ -217,7 +217,7 @@ def create_page(base, token, space, plan):
         "space": {"key": space},
         "body": {
             "storage": {
-                "value": tpl["body"]["storage"]["value"],
+                "value": reset_copied_highlights(tpl["body"]["storage"]["value"]),
                 "representation": "storage",
             }
         },
@@ -290,6 +290,21 @@ def clear_open_tag(open_tag):
                 start -= 1
             open_tag = open_tag[:start] + open_tag[end:]
     return re.sub(r'\s*data-highlight-colour="[^"]*"', "", open_tag)
+
+
+def reset_copied_highlights(html):
+    """A cloned service row is a baseline, not evidence of a new release.
+
+    Preserve header/section formatting and all cell contents, including tag links.
+    Only numbered service rows have inherited cell highlights removed.
+    """
+    def reset(match):
+        row = match.group(0)
+        cells = re.findall(r"(<t[dh]\b[^>]*>)(.*?)(</t[dh]>)", row, re.S)
+        if len(cells) < 2 or not plain(cells[0][1]).isdigit() or not plain(cells[1][1]):
+            return row
+        return re.sub(r"<td\b[^>]*>", lambda cell: clear_open_tag(cell.group(0)), row)
+    return re.sub(r"<tr\b[^>]*>.*?</tr>", reset, html, flags=re.S)
 
 
 def load_cache():
@@ -600,6 +615,9 @@ def main():
             if not args.apply:
                 print(f"dry run: no page for {day}. Would create '{plan['title']}' "
                       f"(parent {plan['parent']}) cloned from '{tpl_title}'. Re-run with --apply.")
+                print("Copied service-row highlights will be cleared; only verified updates "
+                      "or explicitly requested --paint rows will be highlighted again.")
+                print("This is a creation preview, not a completed per-service tag check.")
                 return
             page = create_page(base, token, space, plan)
             print(f"created page '{page['title']}' (id {page['id']}) from '{tpl_title}'")
