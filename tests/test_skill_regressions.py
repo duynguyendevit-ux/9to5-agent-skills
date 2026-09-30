@@ -286,5 +286,155 @@ class SkillSyncTests(unittest.TestCase):
         self.assertTrue(orphan.exists())
 
 
+class FeaturePrototypeTests(unittest.TestCase):
+    def setUp(self):
+        self.module = load("9to5-feature-prototype", "detect_structure.py")
+        self.temp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temp.cleanup)
+        self.root = Path(self.temp.name)
+
+    def test_gradle_modules_layers_and_event_migration_paths(self):
+        (self.root / "settings.gradle").write_text("include ':api', ':jobs:worker'\n")
+        java = self.root / "api/src/main/java/tech/app"
+        (java / "controller/v2").mkdir(parents=True)
+        (java / "usecase").mkdir()
+        (self.root / "api/admin/sql/oracle").mkdir(parents=True)
+        (self.root / "jobs/worker/src/main/resources/events/export").mkdir(parents=True)
+        result = self.module.inventory(self.root)
+        self.assertEqual(result["modules"], ["api", "jobs/worker"])
+        self.assertEqual(result["evidence"], ["settings.gradle"])
+        self.assertIn("api/src/main/java/tech/app/controller", result["layers"])
+        self.assertIn("tech.app", result["package_roots"])
+        self.assertEqual(result["migrations"], ["api/admin/sql/oracle"])
+        self.assertEqual(result["events"], ["jobs/worker/src/main/resources/events"])
+
+    def test_maven_modules_and_no_symlink_traversal(self):
+        (self.root / "pom.xml").write_text('<project xmlns="http://maven.apache.org/POM/4.0.0">'
+                                              '<modules><module>core</module><module>../outside</module>'
+                                              '</modules></project>')
+        (self.root / "core/src/main/kotlin/example/service").mkdir(parents=True)
+        with tempfile.TemporaryDirectory() as external:
+            outside = Path(external) / "src/main/java/secret/controller"
+            outside.mkdir(parents=True)
+            (self.root / "linked").symlink_to(Path(external), target_is_directory=True)
+            (self.root / "settings.gradle.kts").write_text('include(":linked")\n')
+            result = self.module.inventory(self.root)
+        self.assertEqual(result["modules"], ["core"])
+        self.assertIn("core/src/main/kotlin/example/service", result["layers"])
+        self.assertTrue(all("secret" not in path for path in result["layers"]))
+
+
+class SqlForensicsTests(unittest.TestCase):
+    def setUp(self):
+        self.module = load("9to5-sql-forensics", "sql_forensics.py")
+        self.temp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temp.cleanup)
+        self.root = Path(self.temp.name)
+        self.log = self.root / "hibernate.log"
+        self.log.write_text(
+            "2026-09-28 09:00:01.123 INFO [x] Hibernate: select o.id from outbox_record o "
+            "where o.producer=? and o.status=?\n"
+            "2026-09-28 09:00:01.124 TRACE [x] binding parameter [1] as [VARCHAR] - [notification-service]\n"
+            "2026-09-28 09:00:01.124 TRACE [x] binding parameter [2] as [VARCHAR] - [PENDING]\n"
+            "2026-09-28 09:00:02.000 TRACE [x] binding parameter [3] as [TIMESTAMP] - [null]\n"
+            "2026-09-28 09:01:03.000 INFO [x] Hibernate: update outbox_record set status=? where id=?\n"
+            "2026-09-28 09:01:03.001 TRACE [x] binding parameter [1] as [VARCHAR] - [O'Brien]\n"
+            "2026-09-28 09:01:03.001 TRACE [x] binding parameter [2] as [BIGINT] - [918273645]\n"
+            "2026-09-28 09:02:00.100 INFO [x] Hibernate: select o.id from outbox_record where retry_at < ?\n"
+            "2026-09-28 09:02:00.101 TRACE [x] binding parameter [1] as [TIMESTAMP] - [2026-09-28 11:00:00.0]\n"
+        )
+
+    def test_literal_rendering_by_jdbc_type(self):
+        self.assertEqual(self.module.literal("918273645", "BIGINT"), "918273645")
+        self.assertEqual(self.module.literal("O'Brien", "VARCHAR"), "'O''Brien'")
+        self.assertEqual(self.module.literal(None, "TIMESTAMP"), "NULL")
+        self.assertEqual(self.module.literal("2026-09-28 08:59:00.0", "TIMESTAMP"),
+                         "TIMESTAMP '2026-09-28 08:59:00.0'")
+        self.assertIn("VARBINARY", self.module.literal("ab", "VARBINARY"))
+
+    def test_parse_substitutes_binds_and_ignores_extra_binding(self):
+        statements = self.module.parse(self.log.read_text())
+        self.assertEqual(len(statements), 3)
+        first = self.module.substitute(statements[0])
+        self.assertIn("o.producer='notification-service'", first)
+        self.assertIn("o.status='PENDING'", first)
+        second = self.module.substitute(statements[1])
+        self.assertIn("status='O''Brien'", second)
+        self.assertIn("id=918273645", second)
+        third = self.module.substitute(statements[2])
+        self.assertIn("TIMESTAMP '2026-09-28 11:00:00.0'", third)
+
+    def test_group_normalizes_repeated_shapes(self):
+        text = ("Hibernate: select id from t where x=?\n"
+                "Hibernate: select id from t where x=?\n"
+                "Hibernate: select id from t where x=?\n")
+        groups = self.module.group(self.module.parse(text))
+        self.assertEqual(len(groups), 1)
+        self.assertEqual(groups[0]["count"], 3)
+
+    def test_cli_writes_report_and_runnable_sql(self):
+        out = self.root / "packet"
+        result = subprocess.run(
+            ["python3", str(ROOT / "9to5-sql-forensics/scripts/sql_forensics.py"),
+             "--service", "fixture", "--file", str(self.log), "--out", str(out)],
+            capture_output=True, text=True)
+        self.assertEqual(result.returncode, 0)
+        self.assertIn("TIMESTAMP '", (out / "report.md").read_text())
+        self.assertIn("update outbox_record", (out / "queries.sql").read_text())
+
+
+class HeapTriageTests(unittest.TestCase):
+    def setUp(self):
+        self.temp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temp.cleanup)
+        self.root = Path(self.temp.name)
+        self.dumps = self.root / "dumps"
+        self.dumps.mkdir()
+        self.reports = self.root / "reports"
+        self.reports.mkdir()
+        self.script = ROOT / "9to5-heap-triage/scripts/hprof-autopilot.sh"
+        self.env = dict(os.environ, HPROF_AUTOPILOT_CONF=str(self.root / "missing.conf"),
+                        DUMP_DIRS=str(self.dumps), REPORT_DIR=str(self.reports),
+                        PURGE_RETENTION_DAYS="7")
+
+    def run_cmd(self, *args, **overrides):
+        env = dict(self.env)
+        env.update(overrides)
+        return subprocess.run(["bash", str(self.script), *args],
+                              capture_output=True, text=True, env=env)
+
+    def make_dump(self, name, age_days):
+        path = self.dumps / name
+        path.write_bytes(b"hprof")
+        stamp = time.time() - age_days * 86400
+        os.utime(path, (stamp, stamp))
+        return path
+
+    def test_scan_lists_dumps_with_age(self):
+        dump = self.make_dump("java_pid1.hprof", 3)
+        result = self.run_cmd("scan")
+        self.assertEqual(result.returncode, 0)
+        self.assertIn(str(dump), result.stdout)
+        self.assertIn("3d old", result.stdout)
+
+    def test_purge_needs_report_and_retention(self):
+        old_with_report = self.make_dump("old_with.hprof", 10)
+        (self.reports / "old_with_Leak_Suspects.zip").write_text("zip")
+        old_without_report = self.make_dump("old_without.hprof", 10)
+        fresh_with_report = self.make_dump("fresh_with.hprof", 2)
+        (self.reports / "fresh_with_Leak_Suspects.zip").write_text("zip")
+        result = self.run_cmd("purge")
+        self.assertEqual(result.returncode, 0)
+        self.assertFalse(old_with_report.exists())
+        self.assertTrue(old_without_report.exists())
+        self.assertTrue(fresh_with_report.exists())
+
+    def test_analyze_without_mat_fails_clearly(self):
+        dump = self.make_dump("x.hprof", 1)
+        result = self.run_cmd("analyze", str(dump), MAT_HOME=str(self.root / "no-mat"))
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("MAT not found", result.stderr)
+
+
 if __name__ == "__main__":
     unittest.main()
