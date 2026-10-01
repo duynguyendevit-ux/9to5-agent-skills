@@ -35,15 +35,20 @@ cd 9to5-agent-skills
 | `9to5-sql-migration` | 1.0.1 | Write and review Oracle migration scripts (`admin/sql/oracle`, Flyway-style naming). |
 | `9to5-oracle-index` | 1.0.1 | Oracle-specific index candidates, actual-plan verification, null coverage, top-N and write trade-offs. |
 | `9to5-sql-forensics` | 1.0.0 | Reconstruct runnable Oracle SQL from Hibernate logs; packet feeds index review and migration. |
+| `9to5-oracle-locking` | 1.0.0 | Claim-query and lock-contention review: SKIP LOCKED semantics, deadlock traces, transaction hygiene. |
 | `9to5-id-design` | 1.0.1 | Identity, explicit sequences and application IDs: Oracle storage, allocation, concurrency and exposure. |
 | `9to5-env-config-sync` | 1.0.1 | Compare and align service env configs across environments; keep secrets out. |
 | `9to5-spring-conventions` | 1.0.1 | Review Java/Spring changes against house conventions. |
 | `9to5-spring-core` | 1.0.0 | Source-backed starter coding guide and Java 17 service init template: core API contracts, JPA routing, auditing, context cleanup and environment configuration. |
 | `9to5-feature-prototype` | 1.0.0 | Explain a proposed feature in the current repository's real structure with a Mermaid diagram; design only, no application-code edits. |
+| `9to5-mydevtools` | 1.0.0 | Use the browser-first developer utilities (plan visual, log analyzer, SQL extractor, decoders) instead of one-off scripts. |
 | `9to5-k8s-service-debug` | 1.0.1 | Debug cluster services with source-filtered configuration inspection and local evidence. |
 | `9to5-heap-triage` | 1.0.0 | Triage JVM heap dumps with MAT headless; suspect patterns, dominator evidence, capture loop. |
+| `9to5-redis-design` | 1.0.0 | Redis key namespacing, TTL policy, cache consistency and guarded writes for OTS services. |
+| `9to5-scheduled-jobs` | 1.0.0 | Scheduled workers and milestone pipelines: DB polling vs ZSET, mode switches, catch-up, replica safety. |
 | `9to5-kafka` | 1.1.1 | Kafka contracts, corrected Oracle outbox diagnosis, long-running jobs and share-group trade-offs. |
 | `9to5-lib-bump` | 1.0.1 | Audit and bump shared libraries; reject ambiguous checkout names and allow explicit paths. |
+| `9to5-container-build` | 1.0.0 | Two-stage service images, internal registry bases, CI template wiring, JVM flags and dump paths. |
 | `9to5-skill-sync` | 1.0.1 | Synchronize only 9to5 skills, preserve local mirror config, filter repository exports and detect unresolved drift. |
 
 ## Structure
