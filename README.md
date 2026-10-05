@@ -31,7 +31,7 @@ cd 9to5-agent-skills
 | `9to5-release-confluence-sync` | 1.0.4 | Roll previous release tags into current version, verify service tags, and reset inherited highlights on cloned pages. |
 | `9to5-release-audit` | 1.0.1 | Read-only release-record comparisons; rejects duplicate service rows and reports empty records and source changes. |
 | `9to5-confluence-doc` | 1.0.1 | Draft and publish Vietnamese technical design pages with the OTS structure. |
-| `9to5-confluence` | 1.1.0 | General Confluence operations; updates require the reviewed base version and explicit approval. |
+| `9to5-confluence` | 1.1.1 | General Confluence operations; updates require the reviewed base version and explicit approval. |
 | `9to5-sql-migration` | 1.0.1 | Write and review Oracle migration scripts (`admin/sql/oracle`, Flyway-style naming). |
 | `9to5-oracle-index` | 1.0.1 | Oracle-specific index candidates, actual-plan verification, null coverage, top-N and write trade-offs. |
 | `9to5-sql-forensics` | 1.0.0 | Reconstruct runnable Oracle SQL from Hibernate logs; packet feeds index review and migration. |

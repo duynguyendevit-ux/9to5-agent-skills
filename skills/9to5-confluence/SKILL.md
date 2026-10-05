@@ -4,7 +4,7 @@ description: Work with Confluence pages generally — find a page with CQL when 
 license: MIT
 compatibility: Requires the zjira CLI and Confluence credentials in ~/.config/zjira/config.yaml. Reads non-secret endpoints from config/endpoints.json. Writes require --apply --approved.
 metadata:
-  version: "1.1.0"
+  version: "1.1.1"
 ---
 
 # Confluence
@@ -43,7 +43,7 @@ zjira confluence get 141395368                     # by page ID
 zjira confluence get 'https://<confluence>/display/C7GSAFEDA/268.+22.09.2026'
 zjira confluence get <ref> --md                    # markdown, skip the picker
 zjira confluence get <ref> --json                  # raw JSON for parsing
-zjira confluence search 'release' --limit 50       # plain search
+zjira confluence search 'release' --limit 50       # plain search; without a TTY this lists matches instead of opening the picker
 zjira confluence search 'prod' --json              # structured results
 ```
 
