@@ -4,7 +4,7 @@ description: Sync a project's daily Confluence release page — create it when m
 license: MIT
 compatibility: Requires the zjira CLI and Confluence credentials in ~/.config/zjira/config.yaml; GitLab SSH access for tag discovery. Reads non-secret endpoints from config/endpoints.json.
 metadata:
-  version: "1.0.3"
+  version: "1.0.4"
 ---
 
 # Release Sync
@@ -126,6 +126,36 @@ Never print the token; write the file with the user's pasted value, then
 `chmod 600`. Prefer `zjira init` when the user already uses the zjira CLI.
 After storing, verify with a dry run (`--project <name>`) before any `--apply`.
 
+## Nexus images and STG releases
+
+- Treat the deployment environment, Git release tag and Docker image tag as separate
+  facts. An STG release does not imply that its image tag starts with `stg-`.
+  For TTDVKH, use the verified `c7-ttdvkh-*` image series unless Nexus confirms
+  a different requested tag. Do not add or strip `stg-` to invent an image tag.
+- Store Nexus API/UI URL, Docker repository name and pull registry authority in
+  local `config/endpoints.json` as `nexus_url`, `nexus_docker_repository` and
+  `docker_registry`. The Nexus UI/API port and Docker connector port differ;
+  do not use the UI URL as a Docker pull prefix. Discover the registry from
+  deployment or CI configuration, and the image path from the service's own
+  configuration. Repository basename may differ from runtime service name.
+- For `full nexus images`, first read the configured Nexus REST API. List Docker
+  repositories with `GET /service/rest/v1/repositories`, then verify each exact
+  image/tag using `GET /service/rest/v1/search` with URL-encoded query parameters:
+  `repository=<docker repository>`, `docker.imageName=<image path>` and
+  `docker.imageTag=<tag>`. Confirm returned component `name` and `version` match;
+  follow `continuationToken` if needed. An empty result is not a verified image.
+  Authentication or network failure means unverified, not absent. Never print credentials.
+- Output `Service | Git tag | Full Docker image | Nexus verification`. Distinguish
+  Git-only tags, Nexus-confirmed images and images currently deployed. Never claim
+  that the highest Git tag is deployed or that it exists in Nexus without checking.
+- If Confluence is unavailable, still provide a read-only service/tag/image list
+  from Git and Nexus. Do not create tags, push images or write release pages as part
+  of this fallback. Honor the requested service subset before scanning all services.
+- The current sync engine copies the chosen Git tag into the Docker cell; it does
+  not resolve a separate image tag or verify Nexus. If Git and Docker tags differ,
+  do not apply that automatic Docker-cell update: prepare an explicit verified
+  page diff and obtain approval. Preserve the Git release tag separately.
+
 ## Write safety
 
 Every remote write (page creation, tag/paint/clear updates) requires a dry run and
@@ -177,6 +207,7 @@ Flags:
 | `--set-endpoint KEY=VALUE` | Persist an internal endpoint to `config/endpoints.json` and exit |
 | `--service NAME` | Restrict to rows whose service name contains this string |
 | `--paint N,N` | Force the purple highlight on the given row numbers |
+| `--fill-empty-tag` | With `--service`, fill an empty Release Tag cell with the newest tag (never runs without `--service`) |
 | `--clear-highlight [N,N]` | Remove highlights: all highlighted rows, or the listed numbers |
 | `--scan` | Refresh every repo from git and report new services/tags (ignores the cache) |
 | `--no-cache` | Do not read or write the repo/tag cache |
@@ -213,7 +244,7 @@ Flags:
   đã kiểm tra. Không tự tô/xóa màu cho dòng chưa xác minh.
 - Preview tạo trang hiện chỉ báo kế hoạch clone/reset màu, chưa kiểm tra tag từng
   service. Đọc template và hoàn thành đối chiếu remote trước khi xin duyệt tạo trang.
-- Báo bảng `Service | Repo | Tag ngày trước | Tag hiện tại | Tag remote | Hành động màu | Lý do`,
+- Báo các dòng liên quan với nhãn cột tiếng Anh của trang release (xem **Chat report format**),
   rồi dry-run danh sách clear/update cụ thể và lấy approval trước remote write.
   Sau apply đọc lại trang để xác nhận tag mới có màu, tag chỉ copy không còn màu.
 
@@ -242,7 +273,7 @@ Ví dụ minh họa: `example-api | example/repo | v1.2.3 | v1.2.3 | v1.2.3 | cl
 
 ## Output
 
-Dry run first, then:
+The CLI prints a full diagnostic table for a dry run:
 
 ```
 | No | Service | Tag | Status |
@@ -259,7 +290,34 @@ and `release page: <url>`, then `=== VERIFY HIGHLIGHT ===`
 `=== RELEASE PAGE ===` (`| No | Service | Tag | Highlight |` for every service on
 the page) prints after every run.
 
+## Chat report format
+
+- Write the release report in English. Use the page's exact field names and casing
+  for page values: `No`, `Service`, `version`, `current version`, `Release Tag`,
+  `Docker image`, `Status`. Do not rename `Release Tag` to "Git tag" or `Docker image`
+  to "Dev image": they describe different facts. Other page fields (for example
+  `Branch`, `Release Note`, `Test`) are included only when relevant and read.
+- Lead with the project, the linked daily page (title/ID and version when known),
+  and `Dry run` or `Applied`. Show only requested, changed, highlighted, or
+  unverified rows rather than pasting the CLI's entire `=== RELEASE PAGE ===` table.
+  If no tag changed, say so instead of implying a fresh release from a copied tag.
+- For page updates, use `| No | Service | version | current version | Release Tag |
+  Docker image | Action |` as the compact table. Each page-field value must come
+  from that row; `Action` is the proposed/applied change (including paint/clear),
+  not the page's `Status` field. Omit unchanged columns only when the user asks for
+  a narrower comparison. Before approval, state exactly which rows and fields
+  will change; after approval, verify the affected rows by re-reading the page.
+- When comparing with Git or a dev deployment, add separate, explicitly sourced
+  columns `Latest Git tag` and `Dev image (observed)`, or a short comparison table
+  with those headings. Compare the tag's commit to the deployed image digest/tag
+  only when verified; a matching commit does not prove a Nexus release-tag image
+  exists or that STG is deployed. Never replace page values with observed values
+  without an approved page update.
+- Report missing repositories, ambiguous tags, and unverified images separately
+  as `Unverified`. Retain the Nexus-specific `Service | Git tag | Full Docker image |
+  Nexus verification` format when the user explicitly requests full Nexus images.
+
 ## Report back
 
-Show the project used, the page created/used with its link, the dry-run table,
-the applied/released rows, and the verification result (including `MISMATCH`).
+Use the compact chat format above: identify the page and mode, show affected rows
+and their verified sources, and state the re-read result (including `MISMATCH`).

@@ -3,5 +3,8 @@
   "confluence_url": "https://confluence.example.invalid",
   "jira_url": "https://jira.example.invalid",
   "gitlab_url": "https://gitlab.example.invalid",
-  "git_ssh_base": "ssh://git@gitlab.example.invalid:22"
+  "git_ssh_base": "ssh://git@gitlab.example.invalid:22",
+  "nexus_url": "https://nexus.example.invalid",
+  "nexus_docker_repository": "docker-hosted",
+  "docker_registry": "registry.example.invalid:8082"
 }

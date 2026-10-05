@@ -16,7 +16,9 @@
   "exclude_from_repo": [
     "cache.json",
     "endpoints.json",
-    "debug/artifacts/*"
+    "debug/artifacts/*",
+    "references/release-services.json",
+    "references/release-services-ttdvkh.json"
   ],
   "keep_empty_dirs": [
     "debug/artifacts/.gitkeep"

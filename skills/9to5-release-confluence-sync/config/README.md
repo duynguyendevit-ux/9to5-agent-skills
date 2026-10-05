@@ -15,6 +15,13 @@ Internal endpoints for this skill. Not committed with real values.
 | `confluence_space` | Space key when neither `--space` nor the project registry provides one |
 | `git_ssh_base` | `git ls-remote` tag discovery when the cwd repo has no usable remote |
 | `jira_url` | reserved; zjira uses its own config |
+| `nexus_url` | Agent's read-only Nexus REST verification; UI/API base URL, not pull registry |
+| `nexus_docker_repository` | Nexus repository filter for exact image/tag searches |
+| `docker_registry` | Docker pull authority (`host:port`), verified from deployment/CI |
+
+The three Nexus keys are used by the agent workflow, not by the current sync
+engine. Persist them in the local JSON file; do not assume `--set-endpoint`
+supports them. Never derive the registry port from the Nexus UI port.
 
 ## Resolution order
 

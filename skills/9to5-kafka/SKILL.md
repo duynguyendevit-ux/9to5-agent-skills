@@ -4,7 +4,7 @@ description: Work on OTS/C7 Kafka contracts, transactional outbox, and Kafka-ver
 license: MIT
 compatibility: Requires git checkouts of the kafka starter and common-outbox, JDK 17, and read access to the service Oracle schema for diagnosis (directly or through the 9to5-k8s-service-debug helper).
 metadata:
-  version: "1.1.1"
+  version: "1.1.2"
 ---
 
 # Kafka Contracts, Outbox, and Work Queues
@@ -42,7 +42,7 @@ Two layers. Decide which one you are in before editing anything.
 3. `destination` is always a `${topic.<...>}` placeholder. The literal topic belongs in the environment config (`ots-env-custom/service-configs/<env>/<service>/`), so a new topic needs an entry there too — otherwise the service fails at startup, not at publish time.
 4. Set and verify the partition-key header expected by the binding. A missing header may fail expression validation or invoke binder/partitioner-specific behavior; do not assume a fixed partition. A constant key concentrates traffic. Verify actual routing before claiming per-entity ordering.
 5. Consumer group defaults to `spring.application.name`. Services with the same group that subscribe to the same topic load-balance its partitions rather than each receiving every event. Use separate groups for independent subscribers.
-6. Build both sides before claiming done: `JAVA_HOME=~/.jdks/corretto-17.0.19 ./gradlew build` in the starter and in each affected service.
+6. Build both sides before claiming done: `./gradlew build` in the starter and in each affected service (Gradle picks JDK 17 from `~/.gradle/gradle.properties`; override with `JAVA_HOME` only if needed).
 
 Details and the annotation table (`@IncludeEventsProducer`, `@ExcludeEventsConsumer`) are in `references/topics.md`.
 
@@ -68,7 +68,7 @@ Order that gets to a cause fastest:
 4. **Stuck records** (query 2) — high `attempt_count` with a recent `next_attempt_at` means the worker is alive and the publish keeps failing.
 5. **Templates** (query 8) when `payload_template_code` is set: a `MISSING` or `INACTIVE` template row fails every event that uses it.
 6. **Cleanup** (query 9) when the table grows without bound: a large candidate count with cleanup enabled means the cron is not running.
-7. **Ordering** (query 6) when downstream reports out-of-order effects: `aggregate_id` is the Kafka key, so a published row that precedes a still-pending row for the same aggregate is the signature of a retry overtaking the original.
+7. **Ordering** (query 6) when downstream reports out-of-order effects: the Kafka key is the aggregate type, not the aggregate id, and retries/concurrent sends do not guarantee commit order — treat a published row preceding a still-pending row for the same aggregate as a canary for the relevant contract, not automatic proof of a bug.
 
 ### Outbox configuration surface
 

@@ -451,6 +451,25 @@ def update_release_cell(cell, old, new):
     return cell.replace(old, new, 1)
 
 
+def fill_release_cell(row, release_idx, new):
+    """Fill an empty Release Tag cell with `new`, reusing the row's tags-link shape.
+
+    Returns the updated row, or None when the release cell is not empty or the row
+    carries no `/-/tags/` link to derive the URL prefix from.
+    """
+    cells = list(re.finditer(r"(<t[dh]\b[^>]*>)(.*?)(</t[dh]>)", row, re.S))
+    if len(cells) <= release_idx:
+        return None
+    inner = cells[release_idx].group(2)
+    if re.sub(r"<[^>]+>", "", inner).strip():
+        return None
+    link = re.search(r'<a[^>]*href="([^"]*/-/tags/)[^"]*"', row)
+    if not link:
+        return None
+    filled = f'<a href="{link.group(1)}{new}" title="">{new}</a>'
+    return row[: cells[release_idx].start(2)] + filled + row[cells[release_idx].end(2):]
+
+
 def update_docker_cell(cell, prefix, new):
     return re.sub(r":(" + re.escape(prefix) + r"\d+(?:\.\d+)*)", f":{new}", cell, count=1)
 
@@ -538,6 +557,8 @@ def main():
     ap.add_argument("--git-base", default=None, help="ssh base URL; default: cwd repo remote or config/endpoints.json")
     ap.add_argument("--service", help="only rows whose service name contains this string")
     ap.add_argument("--paint", help="comma-separated row numbers to highlight purple, e.g. 1,2,4")
+    ap.add_argument("--fill-empty-tag", action="store_true",
+                    help="also fill an empty Release Tag cell with the newest tag (requires --service)")
     ap.add_argument("--clear-highlight", nargs="?", const="all",
                     help="remove highlight colors: all highlighted rows, or comma-separated row numbers")
     ap.add_argument("--scan", action="store_true",
@@ -553,6 +574,9 @@ def main():
     ap.add_argument("--set-endpoint", metavar="KEY=VALUE",
                     help=f"persist an internal endpoint to {ENDPOINTS_PATH} and exit; keys: {', '.join(ENDPOINT_KEYS)}")
     args = ap.parse_args()
+
+    if args.fill_empty_tag and not args.service:
+        ap.error("--fill-empty-tag requires --service NAME (refusing to fill every empty Release Tag cell)")
 
     if args.set_endpoint:
         if "=" not in args.set_endpoint:
@@ -819,6 +843,8 @@ def main():
                         fields.append("current")
                 if c["release_tag"] and c["release_tag"] != newest:
                     fields.append("release")
+                elif args.fill_empty_tag and not c["release_tag"]:
+                    fields.append("release")
                 if c["docker_tag"] and c["docker_tag"] != newest:
                     fields.append("docker")
                 action = "UPDATE" if fields else ("paint" if paint else "up-to-date")
@@ -870,6 +896,8 @@ def main():
     for c in changes:
         if c["action"] == "UPDATE":
             old = c["current"] if {"release", "docker"} & set(c["fields"]) else c["version_tag"]
+            if "release" in c["fields"] and not c["release_tag"]:
+                old = "(empty)"
             tag, status = f"{old} -> {c['newest']}", "update: " + ", ".join(c["fields"])
         elif c["action"] == "up-to-date":
             tag, status = c["newest"], "up-to-date"
@@ -904,7 +932,15 @@ def main():
         if "current" in c["fields"]:
             row = row.replace(c["current_cell"], update_release_cell(c["current_cell"], c["current_tag"], c["version_tag"]), 1)
         if "release" in c["fields"]:
-            row = row.replace(c["release_cell"], update_release_cell(c["release_cell"], c["release_tag"], c["newest"]), 1)
+            if c["release_tag"]:
+                row = row.replace(c["release_cell"], update_release_cell(c["release_cell"], c["release_tag"], c["newest"]), 1)
+            else:
+                filled = fill_release_cell(row, release_idx, c["newest"])
+                if filled is None:
+                    print(f"warning: cannot fill empty Release Tag for {c['service']} "
+                          "(no tags link in the row to reuse); row skipped")
+                else:
+                    row = filled
         if "docker" in c["fields"]:
             row = row.replace(c["docker_cell"], update_docker_cell(c["docker_cell"], c["prefix"], c["newest"]), 1)
         for open_tag in c["cell_tags"]:

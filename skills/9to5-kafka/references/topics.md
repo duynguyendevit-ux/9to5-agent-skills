@@ -67,15 +67,19 @@ A service that consumes some events and not others uses `@ExcludeEventsConsumer`
 2. Add the Java package with the function definition and the payload type; keep the package path aligned with the resource path.
 3. Add the `${topic.<...>}` entry to every environment's service config (`ots-env-custom/service-configs/<env>/<service>/values.yaml` or `.env`) — a missing placeholder fails at startup, not at publish time.
 4. Set the partition-key header required by the expression. Verify missing-key behavior for the deployed binder/client; it may reject the message or use another routing path. Constant keys cause hot partitions; a missing header does not universally mean partition zero.
-5. Verify both sides: `JAVA_HOME=~/.jdks/corretto-17.0.19 ./gradlew build` in the starter (it versioning) and in each consumer.
+5. Verify both sides: `./gradlew build` in the starter (it versioning) and in each consumer
+   (Gradle picks JDK 17 from `~/.gradle/gradle.properties`; override with `JAVA_HOME` only if needed).
 
 ## Topics in the outbox path
 
 When a service publishes through the outbox instead of a direct producer binding:
 
-- The outbox row stores the resolved topic. `outbox.topic` is the fallback; a blank resolved topic is rejected before the row is written.
-- `aggregate_id` becomes the Kafka key, so per-entity ordering depends on it being stable and non-blank.
-- The topic name in the row is what the publisher uses; changing `outbox.topic` does not rewrite existing rows.
+- The outbox row stores the resolved topic. A null or blank topic falls back to `outbox.topic`, then to
+  `app.messaging.events.prefix` + `outbox.event`; it is never rejected.
+- `aggregateType` becomes the Kafka record key (UTF-8 bytes), so all events of one aggregate type share
+  a partition; concurrent sends and retries do not guarantee business commit order.
+- The stored topic is metadata; routing comes from the binding destination (`outboxEventProducer-out-0`),
+  so configure the destination for the service rather than relying on the row's topic.
 
 Contract naming and delivery retry are independent: a topic typo shows up as publish failures with `last_error`, not as a contract error.
 

@@ -25,10 +25,10 @@ cd 9to5-agent-skills
 
 | Skill | Version | Purpose |
 |-------|---------|---------|
-| `9to5-jira` | 2.1.1 | Fetch a Jira issue and linked Confluence spec, explore the repo, write an implementation plan to `.kit/plans/`. |
+| `9to5-jira` | 2.1.2 | Fetch a Jira issue and linked Confluence spec, explore the repo, write an implementation plan to `.kit/plans/`. |
 | `9to5-logwork` | 1.4.1 | Log Jira worklogs via conversation, normalize duration to seconds, and derive date-filtered agent activity. |
 | `9to5-jira-day-check` | 1.0.1 | Daily read-only summary: sprint issues, missing worklogs, releases still pending tag sync. |
-| `9to5-release-confluence-sync` | 1.0.3 | Roll previous release tags into current version, verify service tags, and reset inherited highlights on cloned pages. |
+| `9to5-release-confluence-sync` | 1.0.4 | Roll previous release tags into current version, verify service tags, and reset inherited highlights on cloned pages. |
 | `9to5-release-audit` | 1.0.1 | Read-only release-record comparisons; rejects duplicate service rows and reports empty records and source changes. |
 | `9to5-confluence-doc` | 1.0.1 | Draft and publish Vietnamese technical design pages with the OTS structure. |
 | `9to5-confluence` | 1.1.0 | General Confluence operations; updates require the reviewed base version and explicit approval. |
@@ -46,10 +46,13 @@ cd 9to5-agent-skills
 | `9to5-heap-triage` | 1.0.0 | Triage JVM heap dumps with MAT headless; suspect patterns, dominator evidence, capture loop. |
 | `9to5-redis-design` | 1.0.0 | Redis key namespacing, TTL policy, cache consistency and guarded writes for OTS services. |
 | `9to5-scheduled-jobs` | 1.0.0 | Scheduled workers and milestone pipelines: DB polling vs ZSET, mode switches, catch-up, replica safety. |
-| `9to5-kafka` | 1.1.1 | Kafka contracts, corrected Oracle outbox diagnosis, long-running jobs and share-group trade-offs. |
+| `9to5-kafka` | 1.1.2 | Kafka contracts, corrected Oracle outbox diagnosis, long-running jobs and share-group trade-offs. |
+| `9to5-mqtt-notifications` | 1.0.0 | MQTT refresh delivery and the merchant gateway pattern; QoS choice and channel decisions. |
+| `9to5-grpc-contracts` | 1.0.0 | Proto3 layout, wire compatibility, artifact version flow and server/client patterns. |
+| `9to5-device-availability` | 1.0.0 | Device availability math, error taxonomy, daily-index queries and export surfaces. |
 | `9to5-lib-bump` | 1.0.1 | Audit and bump shared libraries; reject ambiguous checkout names and allow explicit paths. |
 | `9to5-container-build` | 1.0.0 | Two-stage service images, internal registry bases, CI template wiring, JVM flags and dump paths. |
-| `9to5-skill-sync` | 1.0.1 | Synchronize only 9to5 skills, preserve local mirror config, filter repository exports and detect unresolved drift. |
+| `9to5-skill-sync` | 1.0.2 | Synchronize only 9to5 skills, preserve local mirror config, filter repository exports and detect unresolved drift. |
 
 ## Structure
 

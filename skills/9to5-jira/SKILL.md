@@ -4,10 +4,10 @@ description: Work with local Jira and Confluence through the zjira CLI — fetch
 license: MIT
 compatibility: Requires the zjira CLI on PATH, Jira/Confluence credentials in ~/.config/zjira/config.yaml, git access to the service repositories, and network access to the Jira/Confluence host.
 metadata:
-  version: "2.1.1"
+  version: "2.1.2"
 ---
 
-Prefix your first line with 🥷 inline. Get to work immediately — no preamble.
+Get to work immediately — no preamble.
 
 ## Example output
 
@@ -195,7 +195,7 @@ Based on what you learned from the ticket + Confluence, grep and read files to u
 
 1. **Entry points**: find files related to the feature area named in the ticket summary
    ```bash
-   grep -r "KEYWORD" --include="*.go" -l | head -20
+   rg -l "KEYWORD" --type java | head -20
    ```
    Use 2-3 keywords extracted from the ticket summary/description.
 
@@ -203,7 +203,7 @@ Based on what you learned from the ticket + Confluence, grep and read files to u
 
 3. **Types/interfaces**: if the ticket involves a new entity or modifies an existing one, find where related types are defined.
    ```bash
-   grep -rn "type RelatedType\|RelatedType struct" --include="*.go" | head -10
+   rg -n "class RelatedType|interface RelatedType|record RelatedType" --type java | head -10
    ```
 
 4. **Test patterns**: find 1 existing test file in the relevant package to understand how tests are written.

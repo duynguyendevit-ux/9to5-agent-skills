@@ -73,9 +73,11 @@ AND    published_at > SYSTIMESTAMP - INTERVAL '6' HOUR
 GROUP  BY TRUNC(published_at, 'HH24') + (FLOOR(TO_CHAR(published_at, 'MI') / 15) * 15) / 1440
 ORDER  BY bucket;
 
--- 6. Ordering check — aggregate_id is the Kafka partition key, so events of one entity
---    must publish in created_at order. A published row that precedes a still-pending row
---    for the same aggregate is the signature of a retry overtaking the original.
+-- 6. Ordering check — the Kafka record key is the aggregate type, not the aggregate id.
+--    All events of one aggregate type share a partition, and concurrent sends/retries do
+--    not guarantee business commit order, so this query is a canary, not proof of a bug:
+--    a published row preceding a still-pending row for the same aggregate id deserves a look
+--    when the contract requires per-aggregate order.
 SELECT p.aggregate_id,
        p.created_at      AS published_created,
        p.published_at,
@@ -91,8 +93,9 @@ AND    p.status = 'PUBLISHED'
 AND    p.created_at < n.created_at
 FETCH FIRST 20 ROWS ONLY;
 
--- 7. Malformed rows — a blank aggregate_id or topic breaks the partition key or the
---    publish target. The writer rejects a blank topic, so this should return nothing.
+-- 7. Malformed rows — a blank aggregate_id or topic. The writer re-resolves a blank topic
+--    (it is never rejected) and validates the aggregate at append time, so stored rows
+--    should always have both populated; any hit here is direct-SQL or corruption.
 SELECT outbox_id, aggregate_type, event_type, topic, aggregate_id, status, created_at
 FROM   outbox_record
 WHERE  producer = '&producer'

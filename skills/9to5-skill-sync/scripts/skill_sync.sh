@@ -203,7 +203,9 @@ for f in canonical.glob("*/config/endpoints.json"):
             continue
         raw = value if "://" in value else "//" + value
         host = urllib.parse.urlparse(raw).hostname
-        if host and host not in {"localhost", "127.0.0.1"}:
+        # Require a dot: repository names such as "docker-hosted" parse as a hostname
+        # when prefixed with "//", but they are not hosts and must not become patterns.
+        if host and "." in host and host not in {"localhost", "127.0.0.1"}:
             hosts.add(host)
 for h in sorted(hosts):
     print(h)

@@ -4,7 +4,7 @@ description: Keep an edited 9to5 skill consistent across its canonical directory
 license: MIT
 compatibility: Requires bash, rsync, python3, and a checkout of the skills repository. Reads paths from config/paths.json.
 metadata:
-  version: "1.0.1"
+  version: "1.0.2"
 ---
 
 # Skill Sync
