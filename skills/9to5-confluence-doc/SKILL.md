@@ -1,9 +1,9 @@
 ---
 name: 9to5-confluence-doc
-description: Draft and publish Vietnamese technical design pages on Confluence with the OTS structure (bối cảnh, phạm vi, thiết kế, mô hình dữ liệu, API, rollout) using the zjira CLI. Use when the user asks to write or update a Confluence design/spec page (viết tài liệu, tạo page, cập nhật spec), document a feature for review, or pastes content to add to a Confluence page — always dry-run and get explicit approval before writing. Not for release tables — use 9to5-release-confluence-sync for those.
+description: Draft source-backed Vietnamese API/flow notes and technical design pages for local review and approved Confluence publication. Use when asked to document a feature or service flow for review, write/update a Confluence design/spec page, or publish reviewed Markdown — dry-run and explicit approval before remote writes. Not for release tables — use 9to5-release-confluence-sync.
 license: MIT
 metadata:
-  version: "1.0.1"
+  version: "1.1.0"
 ---
 
 # Confluence Design Doc
@@ -42,6 +42,22 @@ Use these headings, in Vietnamese, unless the user asks otherwise:
 Rules: read the existing page before editing, keep untouched sections byte-identical,
 do not fabricate — mark unknowns as `Cần xác nhận`.
 
+The user's requested sections and removals take precedence over this template. Keep
+API references and focused flow notes focused; do not restore deleted examples,
+scope, rollout or processing prose just because the default template lists them.
+
+## Source-backed notes and local review
+
+For documentation derived from code, follow
+[`references/source-backed-review.md`](references/source-backed-review.md).
+It covers observable API behavior, asynchronous handoffs, cache/Web configuration,
+safe config inspection, and inline diagrams.
+
+When a review folder is requested, save the Markdown there before presenting the
+review link. That file becomes the publication source; temporary storage HTML and
+rendered images are derived artifacts. Further edits belong in the review file,
+not in a second draft. Local edits do not authorize remote writes.
+
 ## Read and search
 
 ```bash
@@ -53,13 +69,26 @@ $ZJIRA confluence search "<title>" --json  # title URLs without a page ID
 
 ## Write safety
 
-Every write is dry-run first, approval second, verify last:
+Use `9to5-confluence` for REST commands, attachments and concurrency handling.
+Every remote write uses a dry-run plan, content-bound approval, and verification:
 
 1. Resolve exactly one page; GET `body.storage`, `version`, `title`, `space`.
-2. Compose the new storage body, preserving everything not being changed.
-3. Show the diff/summary to the user and ask for explicit approval.
-4. PUT once with version `current + 1` — never retry against stale content.
-5. GET the page again and verify the new version and content.
+2. Generate storage from the latest review file, preserving untouched page sections.
+   Record the source/body/attachment hashes and original page version. Validate
+   XHTML and inline diagram references before generating the dry run.
+3. Show the proposed content/diff and attachment plan; get explicit approval.
+   Approval of an older draft does not cover edits made afterward. If the user
+   reviews the latest local file and says `ok push`, regenerate the transport
+   dry run from that exact file and show its summary; reuse that approval only
+   when conversion preserves the reviewed content and the previously reviewed
+   attachment scope, destination and base version are unchanged.
+4. Check the hashes and original page version again. Upload approved attachments,
+   then PUT once using `--expected-version <original-version> --apply --approved`.
+   On a conflict, re-read, rebase and review; never substitute a fresh version
+   onto a stale body. Report partial uploads if publication stops.
+5. GET the page again. Verify version, title/parent, normalized text, table counts,
+   image references and attachment names; explicitly check the last user-requested
+   additions. Storage checks establish saved content, not live browser rendering.
 
 Secrets: read `confluence_url` / `confluence_token` from
 `~/.config/zjira/config.yaml` (or the overlay `~/.config/opencode/release-sync.json`);

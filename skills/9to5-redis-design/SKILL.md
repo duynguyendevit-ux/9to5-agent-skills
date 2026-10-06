@@ -59,6 +59,10 @@ Unverified: eviction policy on the deployed instance — confirm with ops before
    rolling deploys. When the instance policy is unknown, mark it unverified and ask ops.
 8. **Report** with the collection's proof labels and one next action.
 
+When the design is still open, ask about the read path (cache-first, filter-then-hydrate, or
+cached response) and the write path (enrich entries at save vs hydrate on read) as two
+separate questions — one combined question conflates two independent decisions.
+
 ## Rules worth enforcing
 
 | Rule | Reason |
