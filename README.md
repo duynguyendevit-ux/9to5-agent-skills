@@ -1,8 +1,6 @@
 # 9to5 Agent Skills
 
-Agent skills for OpenCode v2, used for day-to-day work on the OTS/C7 platform (Jira, release pages, Oracle migrations, Kubernetes debugging, Spring conventions).
-
-> **Internal.** These skills reference internal hostnames, service names, namespaces, and repository paths. Keep the repository private.
+Agent skills for OpenCode v2, used for day-to-day development work (Jira, release pages, Oracle migrations, Kubernetes debugging, Spring conventions).
 
 ## Install
 
@@ -30,7 +28,7 @@ cd 9to5-agent-skills
 | `9to5-jira-day-check` | 1.0.1 | Daily read-only summary: sprint issues, missing worklogs, releases still pending tag sync. |
 | `9to5-release-confluence-sync` | 1.0.4 | Roll previous release tags into current version, verify service tags, and reset inherited highlights on cloned pages. |
 | `9to5-release-audit` | 1.0.1 | Read-only release-record comparisons; rejects duplicate service rows and reports empty records and source changes. |
-| `9to5-confluence-doc` | 1.0.1 | Draft and publish Vietnamese technical design pages with the OTS structure. |
+| `9to5-confluence-doc` | 1.0.1 | Draft and publish Vietnamese technical design pages with a standard structure. |
 | `9to5-confluence` | 1.1.1 | General Confluence operations; updates require the reviewed base version and explicit approval. |
 | `9to5-sql-migration` | 1.0.1 | Write and review Oracle migration scripts (`admin/sql/oracle`, Flyway-style naming). |
 | `9to5-oracle-index` | 1.0.1 | Oracle-specific index candidates, actual-plan verification, null coverage, top-N and write trade-offs. |
@@ -44,7 +42,7 @@ cd 9to5-agent-skills
 | `9to5-mydevtools` | 1.0.0 | Use the browser-first developer utilities (plan visual, log analyzer, SQL extractor, decoders) instead of one-off scripts. |
 | `9to5-k8s-service-debug` | 1.0.1 | Debug cluster services with source-filtered configuration inspection and local evidence. |
 | `9to5-heap-triage` | 1.0.0 | Triage JVM heap dumps with MAT headless; suspect patterns, dominator evidence, capture loop. |
-| `9to5-redis-design` | 1.0.0 | Redis key namespacing, TTL policy, cache consistency and guarded writes for OTS services. |
+| `9to5-redis-design` | 1.0.0 | Redis key namespacing, TTL policy, cache consistency and guarded writes. |
 | `9to5-scheduled-jobs` | 1.0.0 | Scheduled workers and milestone pipelines: DB polling vs ZSET, mode switches, catch-up, replica safety. |
 | `9to5-kafka` | 1.1.2 | Kafka contracts, corrected Oracle outbox diagnosis, long-running jobs and share-group trade-offs. |
 | `9to5-mqtt-notifications` | 1.0.0 | MQTT refresh delivery and the merchant gateway pattern; QoS choice and channel decisions. |
