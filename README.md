@@ -2,22 +2,103 @@
 
 Agent skills for OpenCode v2, used for day-to-day development work (Jira, release pages, Oracle migrations, Kubernetes debugging, Spring conventions).
 
-## Install
+## Download and install
 
-Skills are discovered from these directories (identical copies):
+### Install with the Skills CLI
+
+Requires Git, Node.js and npm (`npx`). List the available skills without installing:
+
+```bash
+npx skills add duynguyendevit-ux/9to5-agent-skills --list
+```
+
+#### Global — available across all repositories
+
+Install the collection for OpenCode, Claude Code and Codex in your user directories:
+
+```bash
+npx skills add duynguyendevit-ux/9to5-agent-skills \
+  --skill '*' --agent opencode claude-code codex --global
+```
+
+#### Repository — available in one project
+
+Run from the repository where the skills should be installed. Without `--global`,
+the CLI installs into that project's skill directories:
+
+```bash
+cd /path/to/your/repository
+npx skills add duynguyendevit-ux/9to5-agent-skills \
+  --skill '*' --agent opencode claude-code codex
+```
+
+Project skills go into `.agents/skills/` for OpenCode/Codex and `.claude/skills/`
+for Claude Code. Review the generated files before committing them to your repository.
+
+In either command, replace `--skill '*'` with `--skill 9to5-git-publish` to select
+one skill. For Confluence documentation, select the cooperating set with
+`--skill 9to5-confluence-doc 9to5-confluence 9to5-confluence-auth`.
+The CLI prompts for confirmation and installation method; review the destination
+before accepting. See the [Skills CLI documentation](https://github.com/vercel-labs/skills#install-a-skill).
+
+### Download the repository and install everything
+
+Requires Git and Bash (Linux, macOS or WSL). HTTPS cloning a public repository does
+not require a GitHub account or SSH key:
+
+```bash
+git clone https://github.com/duynguyendevit-ux/9to5-agent-skills.git
+cd 9to5-agent-skills
+./install.sh --dry-run
+./install.sh
+```
+
+Alternatively, [download the ZIP](https://github.com/duynguyendevit-ux/9to5-agent-skills/archive/refs/heads/main.zip),
+extract it, and run the installer from the extracted directory.
+
+`install.sh` installs every skill globally into all four directories:
 
 - `~/.config/opencode/skills/` — OpenCode
 - `~/.agents/skills/` — agent-agnostic
 - `~/.claude/skills/` — Claude Code
 - `~/.codex/skills/` — Codex
 
+The default is a symlink to the checkout; keep that directory in place. For an
+initial installation using independent copies, run `./install.sh --copy` instead.
+Existing entries not already linked to this checkout are moved to timestamped
+`.bak.*` paths before replacement. Use the dry run to inspect those changes first.
+
+### Update and verify
+
+For Skills CLI installations:
+
 ```bash
-git clone git@github.com:<account>/9to5-agent-skills.git
-cd 9to5-agent-skills
+npx skills list --global
+npx skills update 9to5-git-publish --global
+```
+
+For repository-level installs, run from that repository: use `npx skills list` to
+inspect installed skills and `npx skills update 9to5-git-publish --project` to update
+only the project copy.
+
+For Git checkouts, run from the downloaded repository:
+
+```bash
+git pull --ff-only
+./install.sh --dry-run
 ./install.sh
 ```
 
-`install.sh` links or copies every directory under `skills/` into the four locations above. Pass `--copy` to copy instead of symlinking.
+Existing symlinks reflect pulled changes; re-running the installer adds newly
+introduced skills. For copy-based installs, use `./install.sh --copy` to refresh
+the copies. ZIP downloads have no Git history; download/extract the latest ZIP to
+update them. Do not discard local edits if a pull refuses to proceed.
+
+Restart the agent after installation or updates. Confirm the selected skill has
+a `SKILL.md` in the agent's skill directory. Installing skills does not install
+their external tools or credentials: check each skill's prerequisites. Confluence
+helpers need Python 3, PyYAML and the `zjira` CLI; local endpoint/auth files are not
+included in the public download.
 
 ## Skills
 
