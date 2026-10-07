@@ -1,12 +1,12 @@
 ---
 name: 9to5-confluence-doc
-description: Draft source-backed Vietnamese API/flow notes and technical design pages for local review and approved Confluence publication. Use when asked to document a feature or service flow for review, write/update a Confluence design/spec page, or publish reviewed Markdown — dry-run and explicit approval before remote writes. Not for release tables — use 9to5-release-confluence-sync.
+description: Draft source-backed Vietnamese API/flow notes and technical pages for local review and approved Confluence publication, with dotfile auth preflight and missing-login handling. Use when asked to document a feature/flow, write or update a Confluence page, or publish reviewed Markdown. Authentication and drafting do not authorize remote writes; release tables belong to 9to5-release-confluence-sync.
 license: MIT
 metadata:
-  version: "1.1.0"
+  version: "1.2.0"
 ---
 
-# Confluence Design Doc
+# Confluence Documentation Workflow
 
 ## Example output
 
@@ -60,9 +60,15 @@ not in a second draft. Local edits do not authorize remote writes.
 
 ## Read and search
 
+Resolve/check credentials with `9to5-confluence-auth` before fetching existing
+pages or planning publication. Its helper loads dotfiles and checks Confluence,
+not merely Jira. If the user authorized login when auth is missing, use its
+`--check --login-if-needed` path; non-interactive shells report the verified
+`zjira init` command instead of prompting for a PAT in chat. Valid auth stays intact.
+
 ```bash
 ZJIRA=$(command -v zjira || echo "$HOME/.local/bin/zjira")
-$ZJIRA whoami --json                       # auth check
+$ZJIRA whoami --json                       # Jira auth only; not Confluence proof
 $ZJIRA confluence get <pageId|url> --md
 $ZJIRA confluence search "<title>" --json  # title URLs without a page ID
 ```
@@ -92,5 +98,6 @@ Every remote write uses a dry-run plan, content-bound approval, and verification
 
 Secrets: read `confluence_url` / `confluence_token` from
 `~/.config/zjira/config.yaml` (or the overlay `~/.config/opencode/release-sync.json`);
-never print or hardcode the token. For release-table edits prefer the
+the shared auth skill owns precedence and missing-login behavior. Never print or
+hardcode the token. For release-table edits prefer the
 `9to5-jira` release script and its `--dry-run` / `--approved` flow.

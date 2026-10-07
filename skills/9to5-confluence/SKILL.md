@@ -2,9 +2,9 @@
 name: 9to5-confluence
 description: Work with Confluence pages generally — find a page with CQL when you only know part of its title, read it as markdown, walk its hierarchy, then create, update, comment on, label, or attach files to it. Reads go through the zjira CLI; writes go through the Confluence REST API with the same dry-run and explicit-approval gate as the other skills. Use when asked to find, read, create, edit, move, comment on, or attach something to a Confluence page, or when you need a page's children or labels.
 license: MIT
-compatibility: Requires the zjira CLI and Confluence credentials in ~/.config/zjira/config.yaml. Reads non-secret endpoints from config/endpoints.json. Writes require --apply --approved.
+compatibility: Requires Python 3, PyYAML, sibling 9to5-confluence-auth, the zjira CLI and Confluence PAT credentials. Reads non-secret endpoints from config/endpoints.json. Writes require --apply --approved.
 metadata:
-  version: "1.1.1"
+  version: "1.2.0"
 ---
 
 # Confluence
@@ -124,6 +124,17 @@ and review the new body before retrying. JSON request previews are printed in fu
 
 ## Endpoints and credentials
 
+Use `9to5-confluence-auth` before service reads/publication and whenever auth is
+missing. It loads dotfiles without printing secrets, checks Confluence itself,
+and uses the verified `zjira init` entry point for authorized interactive login.
+`zjira whoami` checks Jira only. The REST helper shares this credential resolver;
+malformed YAML/JSON is a blocker rather than a silently ignored override.
+
+```bash
+python3 ~/.config/opencode/skills/9to5-confluence-auth/scripts/auth.py --check \
+  --endpoints ~/.config/opencode/skills/9to5-confluence/config/endpoints.json
+```
+
 Internal hostnames never live in this skill. They come from `config/endpoints.json`
 (gitignored; the repository ships `config/endpoints.example.json`) or the zjira config.
 
@@ -138,6 +149,8 @@ python3 "$S" --set-endpoint confluence_space=<KEY>
 The token is read from `~/.config/zjira/config.yaml`, or from
 `~/.config/opencode/release-sync.json` if you already keep it there. Never print it, never
 write it into a page, a snapshot, or this repository.
+
+These paths honor `$XDG_CONFIG_HOME` when set. PyYAML is required for YAML parsing.
 
 ## Safety
 

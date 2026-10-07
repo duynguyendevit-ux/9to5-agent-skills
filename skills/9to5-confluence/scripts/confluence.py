@@ -19,6 +19,7 @@ or the zjira config; there is no hardcoded fallback.
 from __future__ import annotations
 
 import argparse
+import importlib.util
 import json
 import mimetypes
 import os
@@ -32,8 +33,13 @@ from pathlib import Path
 
 SKILL_DIR = Path(__file__).resolve().parent.parent
 ENDPOINTS_PATH = SKILL_DIR / "config" / "endpoints.json"
-ZJIRA_CONFIG = Path.home() / ".config" / "zjira" / "config.yaml"
-SECRETS_PATH = Path.home() / ".config" / "opencode" / "release-sync.json"
+AUTH_PATH = SKILL_DIR.parent / "9to5-confluence-auth" / "scripts" / "auth.py"
+if not AUTH_PATH.is_file():
+    sys.exit("Missing sibling skill 9to5-confluence-auth; install it alongside 9to5-confluence")
+_auth_spec = importlib.util.spec_from_file_location("confluence_auth", AUTH_PATH)
+AUTH = importlib.util.module_from_spec(_auth_spec)
+_auth_spec.loader.exec_module(AUTH)
+ZJIRA_CONFIG, SECRETS_PATH = AUTH.default_paths()
 ENDPOINT_KEYS = ("confluence_url", "confluence_space")
 EXPAND = "body.storage,version,space,ancestors,metadata.labels"
 
@@ -41,16 +47,11 @@ EXPAND = "body.storage,version,space,ancestors,metadata.labels"
 # ---------------------------------------------------------------- configuration
 
 def load_endpoints() -> dict:
-    if not ENDPOINTS_PATH.exists():
-        return {}
     try:
-        data = json.loads(ENDPOINTS_PATH.read_text(encoding="utf-8"))
-    except Exception as exc:
-        sys.exit(f"{ENDPOINTS_PATH} is not valid JSON: {exc}")
-    if not isinstance(data, dict):
-        sys.exit(f"{ENDPOINTS_PATH} must contain a JSON object")
-    return {k: v.strip() for k, v in data.items()
-            if isinstance(v, str) and v.strip() and not k.startswith("_")}
+        return {k: v for k, v in AUTH.read_mapping(ENDPOINTS_PATH, "json").items()
+                if not k.startswith("_")}
+    except AUTH.ConfigError as exc:
+        sys.exit(str(exc))
 
 
 def save_endpoint(key: str, value: str) -> Path:
@@ -65,33 +66,19 @@ def save_endpoint(key: str, value: str) -> Path:
 
 
 def zjira_config() -> dict:
-    result = {}
-    if ZJIRA_CONFIG.exists():
-        for line in ZJIRA_CONFIG.read_text(encoding="utf-8").splitlines():
-            match = re.match(r"^([A-Za-z_]+):\s*(.*)$", line)
-            if match and match.group(2).strip():
-                result[match.group(1)] = match.group(2).strip().strip('"').strip("'")
-    if SECRETS_PATH.exists():
-        try:
-            overlay = json.loads(SECRETS_PATH.read_text(encoding="utf-8"))
-        except Exception:
-            overlay = {}
-        if isinstance(overlay, dict):
-            result.update({k: v for k, v in overlay.items()
-                           if isinstance(v, str) and v})
-    return result
+    try:
+        return AUTH.read_dotfiles(ZJIRA_CONFIG, SECRETS_PATH)[0]
+    except AUTH.ConfigError as exc:
+        sys.exit(str(exc))
 
 
 def resolve_url(cli_value: str | None) -> str:
-    if cli_value:
-        return cli_value.rstrip("/")
-    for var in ("CONFLUENCE_URL",):
-        if os.environ.get(var):
-            return os.environ[var].strip().rstrip("/")
-    if load_endpoints().get("confluence_url"):
-        return load_endpoints()["confluence_url"].rstrip("/")
-    if zjira_config().get("confluence_url"):
-        return zjira_config()["confluence_url"].rstrip("/")
+    try:
+        url, _, _ = AUTH.resolve(ZJIRA_CONFIG, SECRETS_PATH, ENDPOINTS_PATH, cli_value)
+    except AUTH.ConfigError as exc:
+        sys.exit(str(exc))
+    if url:
+        return url
     sys.exit("missing confluence_url: ask the user for the internal URL, then persist it with\n"
              f"  {Path(__file__).name} --set-endpoint confluence_url=<url>")
 
@@ -109,14 +96,14 @@ def resolve_space(cli_value: str | None) -> str:
              f"{Path(__file__).name} --set-endpoint confluence_space=<KEY>")
 
 
-def resolve_token() -> str:
-    cfg = zjira_config()
-    token = cfg.get("confluence_token") or cfg.get("token")
-    if not token and os.environ.get("CONFLUENCE_TOKEN"):
-        token = os.environ["CONFLUENCE_TOKEN"].strip()
+def resolve_token(cli_value: str | None = None) -> str:
+    try:
+        _, token, _ = AUTH.resolve(ZJIRA_CONFIG, SECRETS_PATH, ENDPOINTS_PATH, cli_value)
+    except AUTH.ConfigError as exc:
+        sys.exit(str(exc))
     if not token:
-        sys.exit("missing Confluence token in ~/.config/zjira/config.yaml "
-                 "or ~/.config/opencode/release-sync.json")
+        sys.exit("missing Confluence PAT; use 9to5-confluence-auth to check config "
+                 "and run authorized interactive zjira init if needed")
     return token
 
 
@@ -134,14 +121,16 @@ def api(base: str, token: str, method: str, path: str, payload=None,
     request = urllib.request.Request(base + path, method=method, data=data,
                                      headers=request_headers)
     try:
-        with urllib.request.urlopen(request, timeout=120) as response:
+        with AUTH.opener().open(request, timeout=120) as response:
             body = response.read()
             return json.loads(body) if body else {}
     except urllib.error.HTTPError as exc:
-        detail = exc.read().decode("utf-8", "replace")[:400]
-        sys.exit(f"{method} {path} failed: HTTP {exc.code} {exc.reason}\n{detail}")
+        exc.close()
+        sys.exit(f"{method} failed: HTTP {exc.code}; response withheld. "
+                 "Check 9to5-confluence-auth for missing/401 credentials; "
+                 "redirects are blocked.")
     except Exception as exc:
-        sys.exit(f"{method} {path} failed: {exc}")
+        sys.exit(f"{method} failed: {type(exc).__name__}; details withheld")
 
 
 def page_url(page: dict, base: str) -> str:
@@ -498,7 +487,7 @@ def main():
         parser.error("a command is required; see --help")
 
     args.base = resolve_url(args.confluence_url)
-    args.token = resolve_token()
+    args.token = resolve_token(args.confluence_url)
     args.func(args)
 
 

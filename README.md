@@ -34,8 +34,9 @@ cd 9to5-agent-skills
 | `9to5-jira-day-check` | 1.0.1 | Daily read-only summary: sprint issues, missing worklogs, releases still pending tag sync. |
 | `9to5-release-confluence-sync` | 1.0.4 | Roll previous release tags into current version, verify service tags, and reset inherited highlights on cloned pages. |
 | `9to5-release-audit` | 1.0.1 | Read-only release-record comparisons; rejects duplicate service rows and reports empty records and source changes. |
-| `9to5-confluence-doc` | 1.1.0 | Draft source-backed Vietnamese technical notes with local review and approved publication. |
-| `9to5-confluence` | 1.1.1 | General Confluence operations; updates require the reviewed base version and explicit approval. |
+| `9to5-confluence-auth` | 1.0.0 | Load dotfile PAT config safely, verify Confluence independently of Jira, and initialize the CLI only when auth is missing. |
+| `9to5-confluence-doc` | 1.2.0 | Source-backed Vietnamese technical notes with auth preflight, local review and approved publication. |
+| `9to5-confluence` | 1.2.0 | General Confluence operations with shared auth; updates require the reviewed base version and explicit approval. |
 | `9to5-sql-migration` | 1.0.1 | Write and review Oracle migration scripts (`admin/sql/oracle`, Flyway-style naming). |
 | `9to5-oracle-index` | 1.0.1 | Oracle-specific index candidates, actual-plan verification, null coverage, top-N and write trade-offs. |
 | `9to5-sql-forensics` | 1.0.0 | Reconstruct runnable Oracle SQL from Hibernate logs; packet feeds index review and migration. |
@@ -89,6 +90,12 @@ version conflicts, write gates, duplicate rows/checkouts, worklog durations, res
 session dates, sync scope and mirror/export policy. Set `SKILLS_ROOT` to validate a
 canonical collection before regeneration. Oracle guidance is documentation- and
 schema-reviewed, not validated by running these Python tests against Oracle.
+
+Confluence helpers require Python 3 and PyYAML, and `9to5-confluence` depends on
+the sibling `9to5-confluence-auth` skill (the installer includes both). They target
+Confluence Server/Data Center Bearer PAT auth. Auth tests use local fixtures and
+mocked HTTP/CLI calls; they cover credential precedence, safe diagnostics, redirect
+blocking and conditional initialization, not live interactive login or page edits.
 
 The daily coding and Git/GitHub skills include offline review prompts in `evals/evals.json`.
 Their cases exercise repository scope, staged user work, failed checks, paginated
