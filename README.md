@@ -23,12 +23,18 @@ cd 9to5-agent-skills
 
 | Skill | Version | Purpose |
 |-------|---------|---------|
+| `9to5-debug-loop` | 1.0.0 | Symptom-specific reproduction, falsifiable hypotheses and measured bug-fix verification. |
+| `9to5-code-review` | 1.0.0 | Read-only, pinned-diff review with separate Standards and Spec findings. |
+| `9to5-handoff` | 1.0.0 | Explicit-request coding-session handoff; automatic advertising disabled in OpenCode V2. |
+| `9to5-git-publish` | 1.0.0 | Commit/push the requested repo only; scoped staging, validation and remote-SHA verification. |
+| `9to5-github-audit` | 1.0.0 | Read-only paginated repo inventory and commit-specific, per-workflow Actions evidence. |
+| `9to5-github-settings` | 1.0.0 | Scoped visibility/description changes, preserved exceptions and read-back verification. |
 | `9to5-jira` | 2.1.2 | Fetch a Jira issue and linked Confluence spec, explore the repo, write an implementation plan to `.kit/plans/`. |
 | `9to5-logwork` | 1.4.1 | Log Jira worklogs via conversation, normalize duration to seconds, and derive date-filtered agent activity. |
 | `9to5-jira-day-check` | 1.0.1 | Daily read-only summary: sprint issues, missing worklogs, releases still pending tag sync. |
 | `9to5-release-confluence-sync` | 1.0.4 | Roll previous release tags into current version, verify service tags, and reset inherited highlights on cloned pages. |
 | `9to5-release-audit` | 1.0.1 | Read-only release-record comparisons; rejects duplicate service rows and reports empty records and source changes. |
-| `9to5-confluence-doc` | 1.0.1 | Draft and publish Vietnamese technical design pages with a standard structure. |
+| `9to5-confluence-doc` | 1.1.0 | Draft source-backed Vietnamese technical notes with local review and approved publication. |
 | `9to5-confluence` | 1.1.1 | General Confluence operations; updates require the reviewed base version and explicit approval. |
 | `9to5-sql-migration` | 1.0.1 | Write and review Oracle migration scripts (`admin/sql/oracle`, Flyway-style naming). |
 | `9to5-oracle-index` | 1.0.1 | Oracle-specific index candidates, actual-plan verification, null coverage, top-N and write trade-offs. |
@@ -83,6 +89,19 @@ version conflicts, write gates, duplicate rows/checkouts, worklog durations, res
 session dates, sync scope and mirror/export policy. Set `SKILLS_ROOT` to validate a
 canonical collection before regeneration. Oracle guidance is documentation- and
 schema-reviewed, not validated by running these Python tests against Oracle.
+
+The daily coding and Git/GitHub skills include offline review prompts in `evals/evals.json`.
+Their cases exercise repository scope, staged user work, failed checks, paginated
+counts, commit-specific CI, preserved visibility exceptions and concurrent edits.
+The contract tests validate their metadata and fixtures; simulated agent outputs
+are separate evidence and do not establish live GitHub integration coverage.
+
+## Design reference
+
+The daily coding skills draw on Matt Pocock's small, composable workflows:
+reproduce before fixing, separate Standards from Spec, and link existing evidence
+in handoffs. They are local adaptations, not installations or bundled copies of
+his collection. See [design notes and pinned sources](docs/daily-skill-design.md).
 
 ## Authoring conventions
 

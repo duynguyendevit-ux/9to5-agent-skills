@@ -1,0 +1,29 @@
+{
+  "skill_name": "9to5-github-audit",
+  "evals": [
+    {
+      "id": 1,
+      "name": "paginated-inventory-counts",
+      "prompt": "Offline simulation only; do not run commands. User: 'check repos trên github của example'. Supplied fixture: GraphQL page 1 contains 100 distinct repos: 60 PUBLIC, 40 PRIVATE; pageInfo.hasNextPage=true. Page 2 contains 5 further distinct repos: 2 PUBLIC, 3 PRIVATE; hasNextPage=false. Two private repos are archived and one public repo is a fork, all already included. Give the accurate inventory totals, scope and whether you would change any settings.",
+      "expected_output": "105 visible repos: 62 public, 43 private; archived/fork are overlapping attributes not extra repos. Read-only inventory, not a security or code audit.",
+      "files": [],
+      "expectations": [
+        "Reports 105 total visible repos, 62 PUBLIC and 43 PRIVATE.",
+        "Does not count archived repos or the fork as additional repositories.",
+        "Keeps the audit read-only and limits conclusions to visible metadata."
+      ]
+    },
+    {
+      "id": 2,
+      "name": "multiple-workflows-and-old-success",
+      "prompt": "Offline simulation only; do not run commands. User asks whether example/tools and example/site pass CI now. tools main HEAD is aaaaaaa; runs for that SHA: Test=failure and newest-by-time Deploy=in_progress. A successful Dependabot run targets bbbbbbb. site main HEAD is ccccccc; its latest Pages run succeeded for ddddddd and no run for ccccccc is observed. Report statuses and what more evidence would be needed; do not repair or rerun anything.",
+      "expected_output": "tools has failed Test and pending Deploy for HEAD, not overall success. site current HEAD is unverified despite older Pages success. No observed run does not mean no configured CI.",
+      "files": [],
+      "expectations": [
+        "Reports Test failure and Deploy pending for tools HEAD aaaaaaa.",
+        "Does not treat Dependabot success or Pages success for older SHAs as proof current HEAD passes.",
+        "Reports site HEAD ccccccc as unverified and does not infer absence of configured CI."
+      ]
+    }
+  ]
+}

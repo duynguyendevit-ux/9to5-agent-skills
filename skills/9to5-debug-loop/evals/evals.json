@@ -1,0 +1,29 @@
+{
+  "skill_name": "9to5-debug-loop",
+  "evals": [
+    {
+      "id": 1,
+      "name": "wrong-repro-is-not-root-cause",
+      "prompt": "Offline simulation only; do not run commands. User requests diagnosis only of duplicate orders after retry. Existing unit tests pass. A replay script cannot start because the database driver is missing. An agent thinks a random request ID is the root cause based only on source. What evidence is established, what should happen next, and which writes are authorized?",
+      "expected_output": "Missing-driver failure is not reproduction of duplicates; root cause remains a hypothesis. Establish symptom-specific replay or report missing access/dependency; no code fix or production write is authorized.",
+      "files": [],
+      "expectations": [
+        "Does not treat the missing database driver as reproduction of duplicate orders.",
+        "Labels random request ID as an unconfirmed hypothesis and seeks a symptom-specific signal.",
+        "Keeps diagnosis-only scope: no fix, permanent test or production writes."
+      ]
+    },
+    {
+      "id": 2,
+      "name": "flaky-loop-and-test-authorization",
+      "prompt": "Offline simulation only; do not run commands. User permits a local bug fix. The existing retry replay fails 5 times out of 100 with a fixed input. After a candidate change, one replay passes. Repository instructions prohibit new test files unless explicitly requested, and none were requested. How do you verify and report this change?",
+      "expected_output": "One green run does not establish a flaky fix. Repeat matched trials, record rates/conditions and run original case plus authorized existing checks. Respect the no-new-test-file rule and report uncertainty rather than asserting resolution.",
+      "files": [],
+      "expectations": [
+        "Does not claim the flaky bug is fixed from a single passing replay.",
+        "Uses repeated comparable trials and reports failure rates/conditions and original-scenario results.",
+        "Does not create new permanent test files against repository instructions."
+      ]
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "skill_name": "9to5-github-settings",
+  "evals": [
+    {
+      "id": 1,
+      "name": "preserve-exceptions-and-partial-failure",
+      "prompt": "Offline simulation only; do not run commands. User: 'giữ alpha và beta, còn lại chuyển private'. Snapshot: example/alpha PRIVATE, example/beta PUBLIC, example/gamma PUBLIC, example/delta PRIVATE, example/epsilon PUBLIC. All relevant reads match the snapshot. Simulated approved edits: gamma succeeds; epsilon fails with a permissions error. State intended values and the final result, with verified changed/already-private/preserved/failure counts. No deletion or workaround.",
+      "expected_output": "Preserve alpha PRIVATE and beta PUBLIC; gamma becomes PRIVATE, delta stays PRIVATE, epsilon remains PUBLIC with failure. Changed 1, already private 1 in the target set, preserved 2, failed 1; report partial success.",
+      "files": [],
+      "expectations": [
+        "Preserves alpha PRIVATE and beta PUBLIC rather than forcing both public.",
+        "Reports changed 1, already-private target 1, preserved 2 and failed 1.",
+        "Reports epsilon still PUBLIC and partial failure without deletion or a workaround."
+      ]
+    },
+    {
+      "id": 2,
+      "name": "description-only-and-race",
+      "prompt": "Offline simulation only; do not run commands. User requests only the GitHub About description for example/daily-tools: 'Personal agent skills for everyday coding.' Snapshot description was 'Old description'. Immediately before applying, current description is 'Edited by another maintainer'. README also contains old company-specific wording. Explain your next action and what you must not claim or change.",
+      "expected_output": "Stop the conflicting description write and report the changed snapshot. Leave README, visibility, code, history and remote branches untouched; no claim that branding cleanup was completed.",
+      "files": [],
+      "expectations": [
+        "Stops the description write because current value differs from the snapshot.",
+        "Leaves README, visibility, code, history and remote branches untouched.",
+        "Does not claim the description update or branding cleanup succeeded."
+      ]
+    }
+  ]
+}

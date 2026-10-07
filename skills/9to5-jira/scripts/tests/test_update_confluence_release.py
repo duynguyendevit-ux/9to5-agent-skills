@@ -147,7 +147,11 @@ class ReleaseScriptTest(unittest.TestCase):
                 self.requests.append((args, kwargs))
                 raise AssertionError("dry-run must not call request/PUT")
 
-        with patch.object(MODULE, "ConfluenceClient", Client), patch.object(MODULE, "read_token", return_value="redacted"), redirect_stdout(io.StringIO()):
+        # Public exports exclude machine-local registries; use an offline fixture.
+        with patch.object(MODULE, "ConfluenceClient", Client), \
+                patch.object(MODULE, "read_token", return_value="redacted"), \
+                patch.object(MODULE, "load_registry", return_value={"svc": {}}), \
+                redirect_stdout(io.StringIO()):
             result = MODULE.main(
                 [
                     "--page-id",

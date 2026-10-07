@@ -1,0 +1,29 @@
+{
+  "skill_name": "9to5-code-review",
+  "evals": [
+    {
+      "id": 1,
+      "name": "style-pass-does-not-mask-spec-failure",
+      "prompt": "Offline simulation only; do not run commands. User asks for a read-only committed branch review. Comparison base and HEAD are pinned. Documented style rules and existing tests pass. Supplied spec requires cache invalidation after transaction commit, but src/cache.py line 48 invalidates before the transaction and rollback leaves stale reads. An unrelated notes/private.env is untracked. Report findings and scope.",
+      "expected_output": "Standards has no actionable violation; Spec has a concrete transaction-order finding with file/line and rollback impact. Style/tests do not imply approval. Exclude unrelated untracked file and make no fixes or Git writes.",
+      "files": [],
+      "expectations": [
+        "Keeps Standards and Spec separate and identifies before-commit invalidation as a Spec failure.",
+        "Cites src/cache.py:48 and explains the rollback/stale-read consequence.",
+        "Leaves code and Git untouched and excludes the unrelated untracked private.env from the committed review."
+      ]
+    },
+    {
+      "id": 2,
+      "name": "invalid-base-and-missing-spec",
+      "prompt": "Offline simulation only; do not run commands. User requests review since tag v-next. Evidence: v-next does not resolve to a Git ref. HEAD is valid, there are unstaged changes, and no originating spec is available. Can you review main instead, include the unstaged files, or report Spec pass? State the correct next action.",
+      "expected_output": "Stop on unresolved requested base; do not substitute main or broaden into unstaged changes. Missing spec is unverified/skipped, not pass. Report inputs needed for a scoped review.",
+      "files": [],
+      "expectations": [
+        "Stops because v-next cannot resolve rather than silently substituting main.",
+        "Does not broaden the requested comparison to unstaged changes.",
+        "Does not report Spec pass when no spec is available."
+      ]
+    }
+  ]
+}
