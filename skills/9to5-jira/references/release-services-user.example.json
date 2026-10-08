@@ -1,0 +1,7 @@
+{
+  "user-worker": {
+    "repo": "~/workspace/user-worker",
+    "gitlab_project": "user/platform/user-worker",
+    "docker_image": "registry.example.invalid/apps/user-worker"
+  }
+}

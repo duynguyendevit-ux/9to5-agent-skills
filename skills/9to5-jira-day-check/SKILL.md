@@ -58,8 +58,8 @@ Read-only summary. Do not log work, transition issues, or write Confluence from 
 4. Pending releases (dry run only):
    ```bash
    S=~/.config/opencode/skills/9to5-release-confluence-sync/scripts/sync_release_tags.py
-   python3 "$S" --project dev-c7
-   python3 "$S" --project dev-c7-ttdvkh
+   python3 "$S" --project dev-product
+   python3 "$S" --project dev-user
    ```
    Collect rows with `update:` status. Skip this step if the tooling or project
    configs are unavailable, and note the skip.

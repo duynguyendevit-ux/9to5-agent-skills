@@ -33,14 +33,14 @@ without a dry run and explicit approval.**
 | Create, update, comment, label, attach | `scripts/confluence.py` (dry run first) |
 
 Sibling skills own the specialised page shapes: `9to5-confluence-doc` writes Vietnamese
-OTS design pages, `9to5-release-confluence-sync` owns release tables,
+Platform design pages, `9to5-release-confluence-sync` owns release tables,
 `9to5-release-audit` snapshots release records, `9to5-jira` reads ticket specs.
 
 ## Reading with zjira
 
 ```bash
-zjira confluence get 141395368                     # by page ID
-zjira confluence get 'https://<confluence>/display/C7GSAFEDA/268.+22.09.2026'
+zjira confluence get 12003                     # by page ID
+zjira confluence get 'https://<confluence>/display/DEMO/268.+22.09.2026'
 zjira confluence get <ref> --md                    # markdown, skip the picker
 zjira confluence get <ref> --json                  # raw JSON for parsing
 zjira confluence search 'release' --limit 50       # plain search; without a TTY this lists matches instead of opening the picker
@@ -59,9 +59,9 @@ zjira confluence search 'prod' --json              # structured results
 ```bash
 S=~/.config/opencode/skills/9to5-confluence/scripts/confluence.py
 
-python3 "$S" search --cql 'space = C7GSAFEDA and title ~ "release PROD"'
-python3 "$S" search --cql 'space = C7GSAFEDA and ancestor = 92610522 and type = page'
-python3 "$S" search --cql 'label = "spec" and space = C7GSAFEDA'
+python3 "$S" search --cql 'space = DEMO and title ~ "release PROD"'
+python3 "$S" search --cql 'space = DEMO and ancestor = 12004 and type = page'
+python3 "$S" search --cql 'label = "spec" and space = DEMO'
 python3 "$S" search --cql 'text ~ "outbox pattern" and lastmodified > now("-30d")'
 ```
 
@@ -76,24 +76,24 @@ CQL notes that save a round trip:
 ## Reading and writing with the script
 
 ```bash
-python3 "$S" get      --page 141395368 --body       # metadata + body
-python3 "$S" children --page 92610522               # direct children
-python3 "$S" ancestors --page 141395368             # breadcrumb
-python3 "$S" labels   --page 141395368              # current labels
+python3 "$S" get      --page 12003 --body       # metadata + body
+python3 "$S" children --page 12004               # direct children
+python3 "$S" ancestors --page 12003             # breadcrumb
+python3 "$S" labels   --page 12003              # current labels
 
 # writes: dry run first, always
-python3 "$S" create --space C7GSAFEDA --parent 92610522 \
+python3 "$S" create --space DEMO --parent 12004 \
     --title 'New page' --body-file /tmp/page.html
-python3 "$S" update --page 141395368 --expected-version <base-version> --body-file /tmp/page.html
-python3 "$S" comment --page 141395368 --text 'Reviewed, one question below.'
-python3 "$S" set-labels --page 141395368 --add spec,review
-python3 "$S" attach --page 141395368 --file /tmp/report.pdf
+python3 "$S" update --page 12003 --expected-version <base-version> --body-file /tmp/page.html
+python3 "$S" comment --page 12003 --text 'Reviewed, one question below.'
+python3 "$S" set-labels --page 12003 --add spec,review
+python3 "$S" attach --page 12003 --file /tmp/report.pdf
 ```
 
 Every write prints the exact request it would send, then stops. To actually write:
 
 ```bash
-python3 "$S" update --page 141395368 --expected-version <base-version> --body-file /tmp/page.html --apply --approved
+python3 "$S" update --page 12003 --expected-version <base-version> --body-file /tmp/page.html --apply --approved
 ```
 
 `--apply` without `--approved` is refused. Show the dry-run output to the user and get
@@ -188,5 +188,5 @@ These paths honor `$XDG_CONFIG_HOME` when set. PyYAML is required for YAML parsi
 - Never paste secrets, tokens, or internal hostnames into page content.
 - Space-wide or hierarchy-wide edits (renaming, moving, bulk labelling) are their own
   task with their own approval, not a step inside another one.
-- If the page is a release table or an OTS design document, use the sibling skill that
+- If the page is a release table or an Platform design document, use the sibling skill that
   owns its structure instead of editing it by hand.

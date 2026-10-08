@@ -1,6 +1,6 @@
 # Source map — snapshot 2026-09-24
 
-Repo: `~/Documents/microservice-spring-boot-starter`; clean checkout at
+Repo: `~/workspace/microservice-spring-boot-starter`; clean checkout at
 `bfa01dd7623dc48c2dabbe400a591036929ec44e` (commit dated 2025-06-16).
 186 Java files found under src at inspection time. Facts below come from source,
 not a running deployment. Paths are relative to the repo; Java paths below abbreviate

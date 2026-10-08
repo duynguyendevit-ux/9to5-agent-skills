@@ -45,7 +45,7 @@ change its metadata. Load only the selected branch; link-only work needs neither
 issue-list traversal nor Git-history scans.
 
 1. Resolve one project and its real Confluence hierarchy, then pass an explicit
-   `--date YYYY-MM-DD` for the requested day. A registry key such as `dev-c7-ttdvkh`
+   `--date YYYY-MM-DD` for the requested day. A registry key such as `dev-user`
    identifies the repo group/config; inspect the root title to determine the release
    environment. Do not infer DEV versus STG from the key or tag prefix.
 2. Run `9to5-confluence-auth` against this skill's endpoints before reading pages.
@@ -94,18 +94,18 @@ issue-list traversal nor Git-history scans.
 ```json
 {
   "projects": {
-    "dev-c7": {
-      "root": "92618728",
-      "group": "c7",
-      "space": "C7GSAFEDA",
+    "dev-product": {
+      "root": "12005",
+      "group": "product",
+      "space": "DEMO",
       "hl_color": "#998dd9",
       "page_link": "",
       "doc_link": ""
     },
-    "dev-c7-ttdvkh": {
-      "root": "92618730",
-      "group": "c7-ttdvkh",
-      "space": "C7GSAFEDA",
+    "dev-user": {
+      "root": "12006",
+      "group": "user",
+      "space": "DEMO",
       "hl_color": "#c0b6f2",
       "page_link": "",
       "doc_link": ""
@@ -136,10 +136,10 @@ are separate checks. Reuse working configuration without reinitializing it.
 When the target project is not in the registry, or credentials do not work, stop
 and collect the values from the user before syncing:
 
-1. **Project key** — registry name, e.g. `dev-c7-ttdvkh`.
+1. **Project key** — registry name, e.g. `dev-user`.
 2. **Release page link** — a daily release page or its monthly parent page URL.
 3. **Document link** — the space or root page that holds the release pages.
-4. **Git group** — top-level repository namespace for tag lookup (e.g. `c7`, `c7-ttdvkh`).
+4. **Git group** — top-level repository namespace for tag lookup (e.g. `product`, `user`).
 5. **Highlight color** — purple shade for rows that need release (default `#998dd9`).
 6. **Credentials** — resolve dotfiles with `9to5-confluence-auth`; initialize through
    the CLI when authorized, with PAT input in the terminal rather than chat.
@@ -169,8 +169,8 @@ Run this whenever the environment changes or the user corrects a value.
 Store non-secret project values with the registry command:
 
 ```bash
-python3 scripts/sync_release_tags.py --add-project dev-c7-ttdvkh \
-  --root 92618730 --group c7-ttdvkh --hl-color '#c0b6f2' \
+python3 scripts/sync_release_tags.py --add-project dev-user \
+  --root 12006 --group user --hl-color '#c0b6f2' \
   --page-link '<confluence-base>/display/<SPACE>/<page>' \
   --doc-link '<confluence-base>/display/<SPACE>'
 ```
@@ -199,7 +199,7 @@ auth and the release dry run before any `--apply`; preserve working credentials.
 
 - Treat the deployment environment, Git release tag and Docker image tag as separate
   facts. An STG release does not imply that its image tag starts with `stg-`.
-  For TTDVKH, use the verified `c7-ttdvkh-*` image series unless Nexus confirms
+  For User, use the verified `user-*` image series unless Nexus confirms
   a different requested tag. Do not add or strip `stg-` to invent an image tag.
 - Store Nexus API/UI URL, Docker repository name and pull registry authority in
   local `config/endpoints.json` as `nexus_url`, `nexus_docker_repository` and
@@ -250,23 +250,23 @@ Dry-run first, show the plan, then apply.
 S=~/.config/opencode/skills/9to5-release-confluence-sync/scripts/sync_release_tags.py
 
 # explicit project
-python3 "$S" --project dev-c7                         # dry run
-python3 "$S" --project dev-c7 --apply --approved      # after approval
+python3 "$S" --project dev-product                         # dry run
+python3 "$S" --project dev-product --apply --approved      # after approval
 
 # auto-detect from the cwd repo's remote group
 python3 "$S"
 python3 "$S" --apply --approved
 
 # another date / explicit page
-python3 "$S" --project dev-c7 --date 2026-09-18
-python3 "$S" --page 141395270 --project dev-c7 --apply --approved
+python3 "$S" --project dev-product --date 2030-01-10
+python3 "$S" --page 12002 --project dev-product --apply --approved
 ```
 
 Flags:
 
 | Flag | Meaning |
 |------|---------|
-| `--project NAME` | Project from the registry (`dev-c7`, `dev-c7-ttdvkh`, ...) |
+| `--project NAME` | Project from the registry (`dev-product`, `dev-user`, ...) |
 | `--config PATH` | Alternate registry file |
 | `--add-project NAME` | Register/update a project, then exit (`--root --group --space --hl-color --page-link --doc-link`) |
 | `--page URL\|ID` | Explicit page; skips the today lookup and creation |
@@ -338,15 +338,15 @@ Ví dụ minh họa: `example-api | example/repo | v1.2.3 | v1.2.3 | v1.2.3 | cl
   Branch and Release Tag links name different repositories, flag the conflict:
   verify tags from the relevant field's link and use an explicitly reviewed diff
   rather than treating a skipped or mis-mapped row as up-to-date.
-- Tag series comes from the row's current tag (`c7-ttch-v0.0.341` -> prefix
-  `c7-ttch-v0.0.`), highest `prefix + number` wins; `hotfix` tags are ignored.
+- Tag series comes from the row's current tag (`product-platform-v0.0.341` -> prefix
+  `product-platform-v0.0.`), highest `prefix + number` wins; `hotfix` tags are ignored.
 - `version` cell -> newest tag (when it already holds one); `current version` rolls
   over to the previous `version`; `Release Tag` and `Docker image` follow the newest.
 - Updated rows (service needs release) get the project highlight on every cell
   (`class="highlight-<color>"` plus `data-highlight-colour`) — Confluence renders
   from the class, so both are written.
 - Rows sharing one repository with different current tags (append-only logs such as
-  `alleyway-portal`, `ttch-migration`) are marked `skip: ambiguous` and left alone.
+  `alleyway-portal`, `platform-migration`) are marked `skip: ambiguous` and left alone.
 - Cache: `cache.json` next to this skill stores service->repo and tag lists per
   group; stale entries refresh in parallel with a 15s SSH connect timeout.
 - Before PUT, the script checks that the page version still equals the version of the

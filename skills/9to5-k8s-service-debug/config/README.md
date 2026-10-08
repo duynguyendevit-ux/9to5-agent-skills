@@ -5,18 +5,18 @@ Read-only registries for the skill. No secrets, no kubeconfig content, no tokens
 | File | Purpose |
 |------|---------|
 | `k8s-env.json` | Cluster access: kubectl path, kubeconfig path, contexts, environment -> namespace map, helper command reference, known-not-covered environments. |
-| `apps.json` | Service registry: deployed app -> namespaces and local repo path. 70 apps across `dev-c7` and `dev-c7-ttdvkh`. |
+| `apps.json` | Service registry: deployed app -> namespaces and local repo path. 70 apps across `dev-product` and `dev-user`. |
 | `helpers/rancher-log-alias.sh` | Snapshot of the shell helpers (`klog`, `kfind`, `kerror`, `ksql`, `_hibernate_bind_sql_stream`). Reference copy only; the live file is sourced from `~/.bashrc`. |
 
 ## apps.json schema
 
 ```jsonc
 {
-  "ttch-admin-service": {
-    "namespaces": ["dev-c7", "dev-c7-ttdvkh"],   // every namespace where the app is deployed
-    "repo": "/home/duynk/Documents/C777777777777/services/ttch-admin-service",
+  "platform-admin-service": {
+    "namespaces": ["dev-product", "dev-user"],   // every namespace where the app is deployed
+    "repo": "/home/example/workspace/product/services/platform-admin-service",
     "repo_confidence": "remote",                 // remote | project | inferred
-    "duplicate_repos": ["/home/duynk/Documents/service/ttch-admin-service"]
+    "duplicate_repos": ["/home/example/workspace/service/platform-admin-service"]
   }
 }
 ```
@@ -34,7 +34,7 @@ Read-only registries for the skill. No secrets, no kubeconfig content, no tokens
 Regenerate from the live cluster, never hand-edit rows.
 
 ```bash
-for ns in dev-c7 dev-c7-ttdvkh; do
+for ns in dev-product dev-user; do
   kubectl -n "$ns" get deploy -o name | sed "s|deployment.apps/|$ns |"
 done
 ```
@@ -44,7 +44,7 @@ Then re-resolve each repo with `git -C <dir> config --get remote.origin.url` and
 Helper snapshot drift check:
 
 ```bash
-diff -q config/helpers/rancher-log-alias.sh ~/Documents/k8slog/rancher-log-alias.sh
+diff -q config/helpers/rancher-log-alias.sh ~/workspace/k8slog/rancher-log-alias.sh
 ```
 
 ## Rules

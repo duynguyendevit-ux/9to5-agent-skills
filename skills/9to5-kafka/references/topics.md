@@ -1,4 +1,4 @@
-# Kafka contracts and bindings — C7/TTDVKH
+# Kafka contracts and bindings — Product/User
 
 Two layers, deliberately separate:
 
@@ -65,7 +65,7 @@ A service that consumes some events and not others uses `@ExcludeEventsConsumer`
 
 1. Add `producer.properties` and `consumer.properties` under the right `events/<domain>/` path, following an existing pair in the same domain.
 2. Add the Java package with the function definition and the payload type; keep the package path aligned with the resource path.
-3. Add the `${topic.<...>}` entry to every environment's service config (`ots-env-custom/service-configs/<env>/<service>/values.yaml` or `.env`) — a missing placeholder fails at startup, not at publish time.
+3. Add the `${topic.<...>}` entry to every environment's service config (`env-config/service-configs/<env>/<service>/values.yaml` or `.env`) — a missing placeholder fails at startup, not at publish time.
 4. Set the partition-key header required by the expression. Verify missing-key behavior for the deployed binder/client; it may reject the message or use another routing path. Constant keys cause hot partitions; a missing header does not universally mean partition zero.
 5. Verify both sides: `./gradlew build` in the starter (it versioning) and in each consumer
    (Gradle picks JDK 17 from `~/.gradle/gradle.properties`; override with `JAVA_HOME` only if needed).

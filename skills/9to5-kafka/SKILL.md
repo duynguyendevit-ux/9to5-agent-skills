@@ -1,6 +1,6 @@
 ---
 name: 9to5-kafka
-description: Work on OTS/C7 Kafka contracts, transactional outbox, and Kafka-versus-work-queue design. Add events and bindings, diagnose outbox backlog, and review long-running consumers, poll timeouts, offset commits, duplicate handling, and Kafka share groups. Use for Kafka topics, partition keys, consumer groups, protobuf events, outbox_record, payload_template, unpublished events, Kafka-backed import/export jobs, rebalance loops, max.poll.interval.ms, or Kafka 4.2 share-group adoption.
+description: Work on Platform/Product Kafka contracts, transactional outbox, and Kafka-versus-work-queue design. Add events and bindings, diagnose outbox backlog, and review long-running consumers, poll timeouts, offset commits, duplicate handling, and Kafka share groups. Use for Kafka topics, partition keys, consumer groups, protobuf events, outbox_record, payload_template, unpublished events, Kafka-backed import/export jobs, rebalance loops, max.poll.interval.ms, or Kafka 4.2 share-group adoption.
 license: MIT
 compatibility: Requires git checkouts of the kafka starter and common-outbox, JDK 17, and read access to the service Oracle schema for diagnosis (directly or through the 9to5-k8s-service-debug helper).
 metadata:
@@ -27,8 +27,8 @@ Two layers. Decide which one you are in before editing anything.
 
 | Layer | Where | Owns |
 |-------|-------|------|
-| Contract | `~/Documents/C777777777777/common/kafka-spring-boot-starter` | topic names, payload type, partition key, bindings, event catalog |
-| Delivery | `~/Documents/C777777777777/web-establishment-registration/common-outbox` | transactional write, retry, acknowledgement, cleanup |
+| Contract | `~/workspace/product/common/kafka-spring-boot-starter` | topic names, payload type, partition key, bindings, event catalog |
+| Delivery | `~/workspace/product/web-establishment-registration/common-outbox` | transactional write, retry, acknowledgement, cleanup |
 
 - `references/topics.md` — catalog layout, binding conventions, how to add an event type, contract failure signatures.
 - `references/outbox-queries.sql` — read-only Oracle diagnosis queries for `outbox_record` and `payload_template`.
@@ -39,7 +39,7 @@ Two layers. Decide which one you are in before editing anything.
 
 1. Find the domain under `src/main/resources/events/<domain>/`; match the existing `consumer.properties` / `producer.properties` pair in that domain.
 2. Keep the Java package path aligned with the resource path.
-3. `destination` is always a `${topic.<...>}` placeholder. The literal topic belongs in the environment config (`ots-env-custom/service-configs/<env>/<service>/`), so a new topic needs an entry there too — otherwise the service fails at startup, not at publish time.
+3. `destination` is always a `${topic.<...>}` placeholder. The literal topic belongs in the environment config (`env-config/service-configs/<env>/<service>/`), so a new topic needs an entry there too — otherwise the service fails at startup, not at publish time.
 4. Set and verify the partition-key header expected by the binding. A missing header may fail expression validation or invoke binder/partitioner-specific behavior; do not assume a fixed partition. A constant key concentrates traffic. Verify actual routing before claiming per-entity ordering.
 5. Consumer group defaults to `spring.application.name`. Services with the same group that subscribe to the same topic load-balance its partitions rather than each receiving every event. Use separate groups for independent subscribers.
 6. Build both sides before claiming done: `./gradlew build` in the starter and in each affected service (Gradle picks JDK 17 from `~/.gradle/gradle.properties`; override with `JAVA_HOME` only if needed).

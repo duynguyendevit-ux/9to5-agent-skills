@@ -116,8 +116,8 @@ Present the issue list as a clean markdown table:
 ```
 | Key | Summary | Status |
 |-----|---------|--------|
-| CTJ-4242 | [BE] Planning sprint... | In Progress |
-| CTJ-100  | [BE] Implement auth... | To Do |
+| DEMO-4242 | [BE] Planning sprint... | In Progress |
+| DEMO-100  | [BE] Implement auth... | To Do |
 ```
 
 Show max 20 issues. If more, note "showing top 20 — add a key manually if yours isn't listed."
@@ -149,7 +149,7 @@ calls, not real work).
 Rules:
 - **Never paste raw prompts into the worklog comment.** Synthesize a Vietnamese 2–3 câu description
   from the repo/directory, the edited files, and the intent of the prompts.
-- Map the digest's repositories to Jira keys the user named (e.g. `ttch-dashboard-service` ↔ the
+- Map the digest's repositories to Jira keys the user named (e.g. `platform-dashboard-service` ↔ the
   CTJ ticket) and mention the technical scope in the description.
 - Label these descriptions `[agent-sync]` in the parsed-entries block and the confirmation table.
 - `(no agent activity found)` for a date means no local evidence — ask the user instead of inventing.
@@ -162,15 +162,15 @@ Rules:
 
 Ask the user (plain text, not AskUserQuestion — keep it conversational):
 
-> "Bạn làm gì hôm nay? Gõ theo format: KEY Xh ghi chú — ví dụ: CTJ-4242 4h planning sprint, CTJ-100 2h review code"
+> "Bạn làm gì hôm nay? Gõ theo format: KEY Xh ghi chú — ví dụ: DEMO-4242 4h planning sprint, DEMO-100 2h review code"
 
 Parse each entry from their response:
 - Extract: `key`, `hours` (e.g. `4h`, `1h30m`, `2h`), `note` (remaining text)
 - Accept partial keys: if user types `4242`, match to the first issue key ending in `4242`
-- Accept Jira URLs: extract the key from `/browse/CTJ-XXXX` pattern
+- Accept Jira URLs: extract the key from `/browse/DEMO-XXXX` pattern
 
 **For vague entries** (note is empty OR the issue summary contains only "[BE]", "[FE]", "Implement", "Migrate" with no further context):
-Ask: "CTJ-XXXX — bạn làm gì cụ thể? (1 câu tóm tắt)"
+Ask: "DEMO-XXXX — bạn làm gì cụ thể? (1 câu tóm tắt)"
 
 ### Flow 2 — Week
 
@@ -180,7 +180,7 @@ Mon 2026-05-05 | Tue 2026-05-06 | Wed 2026-05-07 | Thu 2026-05-08 | Fri 2026-05-
 ```
 
 Ask the user:
-> "Mô tả công việc cả tuần. Ví dụ: mon-thu CTJ-4242 1h standup, fri CTJ-100 4h review + CTJ-200 4h planning"
+> "Mô tả công việc cả tuần. Ví dụ: mon-thu DEMO-4242 1h standup, fri DEMO-100 4h review + DEMO-200 4h planning"
 
 Parse their response into per-day entries:
 - Day references: `mon/monday/thứ 2` → Monday date, etc.
@@ -210,11 +210,11 @@ After parsing all entries, generate a Vietnamese description for **every** entry
 
 ```
 Parsed entries:
-  CTJ-4242 · 4h
+  DEMO-4242 · 4h
   → Mô tả: Tham gia buổi sprint planning, ước lượng story point cho các task
     trong sprint mới và thống nhất phạm vi công việc với team.
 
-  CTJ-100 · 2h  [auto-context từ CTJ-90 + Confluence "Auth Design"]
+  DEMO-100 · 2h  [auto-context từ DEMO-90 + Confluence "Auth Design"]
   → Mô tả: Triển khai API endpoint xác thực theo thiết kế đã thống nhất,
     bao gồm validate input và trả về JWT token hợp lệ.
 ```
@@ -230,15 +230,15 @@ Show before any execution. Include the Vietnamese description (from Step 2.5) be
 
 ```
 About to submit (3 entries):
-  2026-05-08  CTJ-4242  4h
+  2026-05-08  DEMO-4242  4h
     → Tham gia buổi sprint planning, ước lượng story point và thống nhất
       phạm vi công việc cho sprint mới cùng với team.
 
-  2026-05-08  CTJ-100   2h  [auto-context]
+  2026-05-08  DEMO-100   2h  [auto-context]
     → Triển khai API endpoint xác thực theo thiết kế đã thống nhất,
       bao gồm validate input và trả về JWT token hợp lệ.
 
-  2026-05-07  CTJ-4242  1h
+  2026-05-07  DEMO-4242  1h
     → Tham gia daily standup, cập nhật tiến độ và nêu blockers.
 ```
 
@@ -293,14 +293,14 @@ code=$(curl -sS -o /tmp/opencode/_resp.json -w '%{http_code}' \
 
 ```
 ✓ 3 logged:
-  CTJ-4242 / 2026-05-08 / 4h  [worklogId: 50671]
-  CTJ-100  / 2026-05-08 / 2h  [worklogId: 50672]
-  CTJ-4242 / 2026-05-07 / 1h  [worklogId: 50673]
+  DEMO-4242 / 2026-05-08 / 4h  [worklogId: 50671]
+  DEMO-100  / 2026-05-08 / 2h  [worklogId: 50672]
+  DEMO-4242 / 2026-05-07 / 1h  [worklogId: 50673]
 ```
 
 If any entry failed:
 ```
-✗ CTJ-XXX / 2026-05-08: HTTP 400: ...
+✗ DEMO-XXX / 2026-05-08: HTTP 400: ...
 ```
 
 Report partial success — do not stop on first failure.
@@ -309,7 +309,7 @@ Report partial success — do not stop on first failure.
 
 | Error | Action |
 |-------|--------|
-| `zjira` not found | Tell user: "Install with `cd ~/Lab/zjira && make install`" |
+| `zjira` not found | Tell user: "Install with `cd /path/to/zjira && make install`" |
 | Auth failure (401) | Tell user: "Run `zjira whoami` to check your token" |
 | Issue key not found in list | Warn user, ask to confirm key manually or skip |
 | `zjira logwork` fails with `claude exec` / `unrecognized_model` / balance error | zjira AI drafting is down → Step 4b REST fallback; do not retry zjira |
@@ -320,9 +320,9 @@ Report partial success — do not stop on first failure.
 
 ## Key parsing rules
 
-1. Full key match: `CTJ-4242` → use as-is
+1. Full key match: `DEMO-4242` → use as-is
 2. Partial numeric: `4242` → match to issue ending in `4242` from the scanned list
-3. Jira URL: `https://.../browse/CTJ-4242` → extract `CTJ-4242`
+3. Jira URL: `https://.../browse/DEMO-4242` → extract `DEMO-4242`
 4. Summary keyword: `planning` → match to first issue with "planning" in summary (ask user to confirm)
 5. Unknown key: warn `⚠ KEY not found in issue list — include anyway?` → AskUserQuestion yes/no
 
@@ -342,7 +342,7 @@ Report partial success — do not stop on first failure.
     rotate 3/3/2; keep whole hours unless the user asks for exact thirds)
   - "task lớn nhiều nhất N ngày" → cap the main dev task at N full days
   - "bug 1 hoặc 2h" → cap each bug entry at 1–2h
-  - per-week/per-day patterns: `tuần 1-2: CTJ-8915 8h`, `mon-thu CTJ-4243 2h`
+  - per-week/per-day patterns: `tuần 1-2: DEMO-8915 8h`, `mon-thu DEMO-4243 2h`
   - "thiếu task thì thêm KEY,KEY" → look the keys up (`$ZJIRA issue get KEY --json`) and fold them
     into the plan as buckets
 - Shared "log work" buckets are normal (e.g. `[Meeting] Log Work Meeting`, `[Support & Communication]`,
@@ -385,9 +385,9 @@ Parse the JSON array and render a markdown table:
 Tasks (Assigned, Unresolved):
 | Key     | Summary                    | Status      |
 |---------|----------------------------|-------------|
-| CTJ-100 | [FE] Auth bug fix          | In Progress |
-| CTJ-42  | [BE] API design            | To Do       |
-| CTJ-200 | [QA] Test coverage         | In Progress |
+| DEMO-100 | [FE] Auth bug fix          | In Progress |
+| DEMO-42  | [BE] API design            | To Do       |
+| DEMO-200 | [QA] Test coverage         | In Progress |
 ```
 
 Show max 30 issues. If more, note "showing top 30." Then **stop** — do not prompt for logging.

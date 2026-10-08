@@ -1,8 +1,8 @@
 ---
 name: 9to5-mydevtools
-description: Use and extend MyDevTools, the browser-first OTS developer utilities — Oracle execution-plan visual, Rancher log analyzer, SQL extractor, protobuf and Kafka decoding, environment-to-Kubernetes conversion, case and hash utilities, cron and nginx generators. Use when a task involves viewing an execution plan, pulling or filtering Rancher logs, extracting SQL from Hibernate logs, decoding Kafka payloads, or converting env configs — and before writing a new script that duplicates one of these tools.
+description: Use and extend MyDevTools, the browser-first Platform developer utilities — Oracle execution-plan visual, Rancher log analyzer, SQL extractor, protobuf and Kafka decoding, environment-to-Kubernetes conversion, case and hash utilities, cron and nginx generators. Use when a task involves viewing an execution plan, pulling or filtering Rancher logs, extracting SQL from Hibernate logs, decoding Kafka payloads, or converting env configs — and before writing a new script that duplicates one of these tools.
 license: MIT
-compatibility: Requires the MyDevTools checkout (default ~/Documents/duylab/oracle-plan-visualizer) and Node.js for local runs. The Rancher log agent is loopback-only; hosted deployments cannot reach local clusters.
+compatibility: Requires the MyDevTools checkout (default ~/workspace/tools/oracle-plan-visualizer) and Node.js for local runs. The Rancher log agent is loopback-only; hosted deployments cannot reach local clusters.
 metadata:
   version: "1.0.0"
 ---
@@ -37,7 +37,7 @@ Note: plan collection SQL still belongs to 9to5-oracle-index.
 
 ## Locate and run
 
-1. Default checkout `~/Documents/duylab/oracle-plan-visualizer` (the repo predates the
+1. Default checkout `~/workspace/tools/oracle-plan-visualizer` (the repo predates the
    MyDevTools name). Confirm identity by `package.json` and `README.md`; if missing,
    say so instead of guessing another path.
 2. Run locally:

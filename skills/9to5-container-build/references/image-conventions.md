@@ -1,14 +1,14 @@
-# Image and CI conventions for OTS services
+# Image and CI conventions for Platform services
 
-Grounded in the service repositories under the C7 workspace (Dockerfiles plus the
-`.gitlab-ci.yml` include of the shared C7 templates). Recheck a recently touched service
+Grounded in the service repositories under the Product workspace (Dockerfiles plus the
+`.gitlab-ci.yml` include of the shared Product templates). Recheck a recently touched service
 before copying any version number or flag.
 
 ## Dockerfile skeleton (two stages)
 
 ```dockerfile
 # ---- builder ----
-FROM <registry>/ots/infras/build/gradle:8.3.0-jdk17-alpine AS builder
+FROM <registry>/example/infras/build/gradle:8.3.0-jdk17-alpine AS builder
 
 WORKDIR /app
 COPY build.gradle .
@@ -21,16 +21,16 @@ COPY fonts ./fonts
 RUN gradle build -x test
 
 # ---- runtime ----
-FROM <registry>/ots/infras/images/jdk-eclipse-temurin:17.0.12_7-jre-alpine
+FROM <registry>/example/infras/images/jdk-eclipse-temurin:17.0.12_7-jre-alpine
 
 ENV TZ="UTC"
 ARG CI_TAG="dev"
 ENV APP_VERSION $CI_TAG
 
-WORKDIR /home/ots/app
+WORKDIR /home/app/app
 COPY --from=builder /app/build/libs/*-SNAPSHOT.jar application.jar
 
-USER ots
+USER app
 EXPOSE 8082
 
 CMD java \
@@ -41,7 +41,7 @@ CMD java \
     -XX:MaxMetaspaceSize=256m \
     -server \
     -XX:+HeapDumpOnOutOfMemoryError \
-    -jar /home/ots/app/application.jar
+    -jar /home/app/app/application.jar
 ```
 
 `<registry>` is the internal registry supplied by CI configuration — never write its
@@ -60,21 +60,21 @@ alpine JRE images.
 | `-XX:MaxMetaspaceSize=256m` | Metaspace bound | Too low for heavy proxy/plugin stacks; raise only with evidence (heap dumps show metaspace) |
 | `-server` | Server JIT | Keep |
 | `-XX:+HeapDumpOnOutOfMemoryError` | Dump on OOM | Without `-XX:HeapDumpPath` the dump dies with the container |
-| `USER ots` | Non-root | Keep; files must be writable by that user where needed |
+| `USER app` | Non-root | Keep; files must be writable by that user where needed |
 | `EXPOSE <port>` | Service port | Must match the Spring port and the namespace's service definition |
 
 ## CI wiring (per service)
 
 ```yaml
 include:
-  - project: '<devops group>/ots-env-custom'
+  - project: '<devops group>/env-config'
     ref: main
     file:
-      - '/templates/ci-cd/c7/java-ci.yaml'
-      - 'templates/ci-cd/c7/c7-cd.yaml'
+      - '/templates/ci-cd/product/java-ci.yaml'
+      - 'templates/ci-cd/product/product-cd.yaml'
 variables:
   CI_REGISTRY_IMAGE: "<service-name>"
-  CI_REGISTRY_PATH: "<group path, e.g. ots/apps/c7/<project>>"
+  CI_REGISTRY_PATH: "<group path, e.g. example/apps/product/<project>>"
 ```
 
 Rules: include, don't fork, the templates; keep per-service variables minimal; changing a

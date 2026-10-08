@@ -58,7 +58,7 @@ Present the Jira operation alongside the Confluence draft when both are in scope
 
 | Project | Version ID | Name | Field | Before | After | Action |
 | --- | --- | --- | --- | --- | --- | --- |
-| DEMO | 12345 | Release_08/10/2026 | releaseDate | 2026-10-07 | 2026-10-08 | proposed date correction |
+| DEMO | 12345 | Release_15/01/2030 | releaseDate | 2030-01-14 | 2030-01-15 | proposed date correction |
 
 Include `released`/`archived` preservation and issue-count warnings in the local
 review. Retain the user's title/table-only Confluence layout; do not add Jira audit

@@ -1,0 +1,7 @@
+worker:
+  timeout: ${WORKER_TIMEOUT:${DEFAULT_TIMEOUT:5000}}
+  effective-timeout: ${worker.timeout}
+  password: ${WORKER_PASSWORD:FAKE_SECRET_SENTINEL}
+---
+worker:
+  timeout: ${PROD_TIMEOUT}

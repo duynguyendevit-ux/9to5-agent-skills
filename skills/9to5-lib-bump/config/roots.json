@@ -1,37 +1,17 @@
 {
-  "_comment": "Where 9to5-lib-bump looks for real working checkouts. The exclude list matters: gitlab-download-scripts holds bulk mirrors of the same repositories, and bumping those edits dead copies.",
+  "_comment": "Illustrative roots. Inventory your real working checkouts before changing dependencies.",
   "include_roots": [
-    "~/Documents/C777777777777",
-    "~/Documents/service",
-    "~/Documents/common",
-    "~/Documents",
-    "~/duylab"
+    "~/workspace/services",
+    "~/workspace/common"
   ],
   "exclude_paths": [
-    "~/Documents/duylab/gitlab-download-scripts",
-    "~/Documents/duylab/java-design-patterns",
-    "~/Documents/duylab/daily_stock_analysis",
-    "~/Documents/duylab/event-auto",
-    "~/Documents/duylab/oracle-plan-visualizer",
-    "~/Documents/duylab/9to5-agent-skills",
-    "~/Documents/obisian"
+    "~/workspace/mirrors"
   ],
   "exclude_name_patterns": [
     "/build/",
     "/node_modules/",
     "/.git/",
-    "/temp/",
     "/.gradle/"
   ],
-  "known_duplicate_checkouts": [
-    "notification-service",
-    "export-file-service",
-    "ttch-admin-service",
-    "ttch-dashboard-service",
-    "auth-service",
-    "availability-service",
-    "common-core",
-    "kafka-spring-boot-starter",
-    "ttch-service-common-spring-boot-starter"
-  ]
+  "known_duplicate_checkouts": []
 }

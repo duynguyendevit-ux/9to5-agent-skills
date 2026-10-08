@@ -30,9 +30,9 @@ class ReleaseScriptTest(unittest.TestCase):
         ) + "</tr></table>"
 
     def test_select_latest_tag_skips_hotfix_by_default(self):
-        tags = ["hotfix-c7-ttch-v0.0.99", "c7-ttch-v0.0.10", "c7-ttch-v0.0.9"]
-        self.assertEqual("c7-ttch-v0.0.10", MODULE.select_latest_tag(tags))
-        self.assertEqual("hotfix-c7-ttch-v0.0.99", MODULE.select_latest_tag(tags, True))
+        tags = ["hotfix-product-platform-v0.0.99", "product-platform-v0.0.10", "product-platform-v0.0.9"]
+        self.assertEqual("product-platform-v0.0.10", MODULE.select_latest_tag(tags))
+        self.assertEqual("hotfix-product-platform-v0.0.99", MODULE.select_latest_tag(tags, True))
 
     def test_parse_columns(self):
         self.assertEqual({0, 1, 2, 5}, MODULE.parse_columns("0-2,5"))
@@ -46,8 +46,8 @@ class ReleaseScriptTest(unittest.TestCase):
             MODULE.parse_number_selection("4", 3)
 
     def test_increment_tag(self):
-        self.assertEqual("c7-ttdvkh-v0.0.226", MODULE.increment_tag("c7-ttdvkh-v0.0.225"))
-        self.assertEqual("c7-ttdvkh-alarm-v0.0.16", MODULE.increment_tag("c7-ttdvkh-alarm-v0.0.15"))
+        self.assertEqual("user-v0.0.226", MODULE.increment_tag("user-v0.0.225"))
+        self.assertEqual("user-alarm-v0.0.16", MODULE.increment_tag("user-alarm-v0.0.15"))
         with self.assertRaises(ValueError):
             MODULE.increment_tag("release")
 
@@ -72,10 +72,10 @@ class ReleaseScriptTest(unittest.TestCase):
             run_git.call_args_list[0].args,
         )
 
-    def test_profile_selects_ttdvkh_registry(self):
-        args = MODULE.parse_args(["--profile", "c7-ttdvkh", "--dry-run"])
+    def test_profile_selects_user_registry(self):
+        args = MODULE.parse_args(["--profile", "user", "--dry-run"])
         path = MODULE.resolve_service_config(args)
-        self.assertEqual("release-services-ttdvkh.json", path.name)
+        self.assertEqual("release-services-user.example.json", path.name)
 
     def test_interactive_profile_picker(self):
         args = MODULE.parse_args(["--dry-run"])
@@ -86,33 +86,33 @@ class ReleaseScriptTest(unittest.TestCase):
             output=output,
             interactive_terminal=True,
         )
-        self.assertEqual("c7-ttdvkh", selected)
-        self.assertIn("c7-ttch", output.getvalue())
-        self.assertIn("c7-ttdvkh", output.getvalue())
+        self.assertEqual("user", selected)
+        self.assertIn("product-platform", output.getvalue())
+        self.assertIn("user", output.getvalue())
 
     def test_tag_url_infers_profile(self):
         args = MODULE.parse_args(
             [
                 "--tag-url",
-                "http://git/c7-ttdvkh/ttch/ttch-migration/-/tags/c7-ttdvkh-v0.0.123",
+                "http://git/user/platform/platform-migration/-/tags/user-v0.0.123",
                 "--dry-run",
             ]
         )
-        self.assertEqual("c7-ttdvkh", MODULE.choose_profile(args, interactive_terminal=False))
+        self.assertEqual("user", MODULE.choose_profile(args, interactive_terminal=False))
 
     def test_release_from_tag_url(self):
         registry = {
-            "ttch-migration": {
+            "platform-migration": {
                 "repo": "/repo",
-                "gitlab_project": "c7-ttdvkh/ttch/ttch-migration",
+                "gitlab_project": "user/platform/platform-migration",
                 "docker_image": "registry/migrations-admin",
             }
         }
-        url = "http://git/c7-ttdvkh/ttch/ttch-migration/-/tags/c7-ttdvkh-v0.0.123"
+        url = "http://git/user/platform/platform-migration/-/tags/user-v0.0.123"
         release = MODULE.release_from_tag_url(url, registry)
-        self.assertEqual("ttch-migration", release.name)
-        self.assertEqual("c7-ttdvkh-v0.0.123", release.tag)
-        self.assertEqual("registry/migrations-admin:c7-ttdvkh-v0.0.123", release.docker_image)
+        self.assertEqual("platform-migration", release.name)
+        self.assertEqual("user-v0.0.123", release.tag)
+        self.assertEqual("registry/migrations-admin:user-v0.0.123", release.docker_image)
 
     def test_update_row_preserves_current_version_and_other_body(self):
         cells = "".join(f"<td>v{i}</td>" for i in range(9))
@@ -182,8 +182,8 @@ class ReleaseScriptTest(unittest.TestCase):
         client = Client()
         self.assertEqual({"id": "123"}, MODULE.resolve_page(client, "https://x/pages/viewpage.action?pageId=123", None, None, "27.07.2026", ["svc"]))
         self.assertEqual(
-            {"title": "255. 27.07.2026", "space": "C7GSAFEDA"},
-            MODULE.resolve_page(client, "https://x/display/C7GSAFEDA/255.+27.07.2026", None, None, "27.07.2026", ["svc"]),
+            {"title": "255. 27.07.2026", "space": "DEMO"},
+            MODULE.resolve_page(client, "https://x/display/DEMO/255.+27.07.2026", None, None, "27.07.2026", ["svc"]),
         )
         self.assertEqual(
             {"date": "27.07.2026", "space": None},

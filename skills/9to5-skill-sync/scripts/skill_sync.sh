@@ -56,6 +56,15 @@ done
 
 [[ -d "$CANONICAL" ]] || { echo "canonical skills dir not found: $CANONICAL" >&2; exit 1; }
 
+POLICY="$(cfg ".get('public_export_policy', '') or ''")"
+[[ -z "$POLICY" ]] || POLICY="$(expand "$POLICY")"
+[[ -z "$POLICY" || "$POLICY" == /* ]] || POLICY="$SKILL_DIR/$POLICY"
+policy_args=()
+if [[ -n "$POLICY" ]]; then
+  [[ -f "$POLICY" ]] || { echo "configured public-export policy is missing; refusing raw export" >&2; exit 1; }
+  policy_args+=( --policy "$POLICY" )
+fi
+
 # Hash a skill directory by relative path + content, so the same content in two
 # locations produces the same digest.
 skill_hash() {
@@ -102,6 +111,22 @@ for p in "${EXCL_ALWAYS[@]}"; do mirror_excludes+=( --exclude "$p" ); done
 repo_excludes=("${mirror_excludes[@]}")
 for p in "${EXCL_REPO[@]}"; do repo_excludes+=( --exclude "$p" ); done
 
+# Prepare the expected public representation before writing mirrors or the repo.
+# Canonical and mirrors remain private; only these disposable copies are sanitized.
+EXPORT_TEMP=""
+if [[ "$DO_REPO" -eq 1 ]]; then
+  temp_base="${TMPDIR:-/tmp/opencode}"
+  [[ -d "$temp_base" ]] || { echo "temporary staging directory does not exist" >&2; exit 1; }
+  EXPORT_TEMP="$(mktemp -d "$temp_base/skill-public-export.XXXXXX")"
+  trap '[[ -z "$EXPORT_TEMP" ]] || rm -rf -- "$EXPORT_TEMP"' EXIT
+  for name in "${skills[@]}"; do
+    mkdir -p "$EXPORT_TEMP/$name"
+    rsync -a "${repo_excludes[@]}" "$CANONICAL/$name/" "$EXPORT_TEMP/$name/"
+    python3 "$SKILL_DIR/scripts/public_export.py" "$EXPORT_TEMP/$name" \
+      --namespace "$name" "${policy_args[@]}" --staging
+  done
+fi
+
 if [[ "$MODE" == "apply" ]]; then
   for m in "${MIRRORS[@]}"; do
     mkdir -p "$m"
@@ -112,7 +137,7 @@ if [[ "$MODE" == "apply" ]]; then
   if [[ "$DO_REPO" -eq 1 ]]; then
     mkdir -p "$REPO/$REPO_SUB"
     for name in "${skills[@]}"; do
-      rsync -a --delete "${repo_excludes[@]}" "$CANONICAL/$name/" "$REPO/$REPO_SUB/$name/"
+      rsync -a --delete "${repo_excludes[@]}" "$EXPORT_TEMP/$name/" "$REPO/$REPO_SUB/$name/"
       # Recreate only the empty-dir keepers the canonical skill actually has, so a
       # skill without a debug/ tree does not gain one in the repository.
       while IFS= read -r keep; do
@@ -150,7 +175,8 @@ for name in "${skills[@]}"; do
   ch="$(skill_hash "$CANONICAL/$name" "${find_excl_always[@]}")"
   # The repo copy intentionally lacks cache.json / endpoints.json / debug artifacts,
   # so compare it against canonical with the same exclusions applied.
-  ch_repo="$(skill_hash "$CANONICAL/$name" "${find_excl_repo[@]}")"
+  ch_repo=""
+  [[ "$DO_REPO" -eq 0 ]] || ch_repo="$(skill_hash "$EXPORT_TEMP/$name" "${find_excl_repo[@]}")"
   printf '%-34s %-10s' "$name" "$ch"
   for m in "${MIRRORS[@]}"; do
     mh="$(skill_hash "$m/$name" "${find_excl_always[@]}")"
@@ -189,6 +215,7 @@ fi
 # Leak scan: derive the forbidden hostnames from the local (gitignored) endpoints
 # files rather than listing them here, so the repository never contains them.
 if [[ "$LEAK_CHECK" -eq 1 ]]; then
+  python3 "$SKILL_DIR/scripts/public_export.py" "$REPO" "${policy_args[@]}" --check || drift=$((drift + 1))
   mapfile -t LEAK_PATTERNS < <(python3 - "$CANONICAL" <<'PY'
 import json, sys, urllib.parse
 from pathlib import Path

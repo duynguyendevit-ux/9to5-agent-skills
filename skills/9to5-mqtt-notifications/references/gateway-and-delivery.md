@@ -1,7 +1,7 @@
 # Gateway pattern and delivery facts
 
 Grounded in the notification-service checkout and the worker refresh flows recorded in
-the vault (`TTCH Worker Service - EventHandle Cache Flows.md`). Recheck before relying on
+the vault (`PLATFORM Worker Service - EventHandle Cache Flows.md`). Recheck before relying on
 a specific destination or config key.
 
 ## Gateway pattern
@@ -47,7 +47,7 @@ public class MessageMqttGateway implements MessageGateway {
 - State changes write cache/DB at `AFTER_COMMIT` time and trigger a refresh event so open
   UIs re-fetch (diary/event-handle flows do this via `sendRefreshEventMqttV2`).
 - The refresh is additive to the durable path: the same state change also flows to
-  downstream systems over Kafka (C7 sync) with outbox guarantees. MQTT and Kafka are not
+  downstream systems over Kafka (Product sync) with outbox guarantees. MQTT and Kafka are not
   alternatives for the same guarantee level.
 
 ## QoS cheat sheet

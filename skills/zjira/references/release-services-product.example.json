@@ -1,0 +1,7 @@
+{
+  "product-api": {
+    "repo": "~/workspace/product-api",
+    "gitlab_project": "product/platform/product-api",
+    "docker_image": "registry.example.invalid/apps/product-api"
+  }
+}

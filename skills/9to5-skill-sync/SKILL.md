@@ -4,7 +4,7 @@ description: Keep an edited 9to5 skill consistent across its canonical directory
 license: MIT
 compatibility: Requires bash, rsync, python3, and a checkout of the skills repository. Reads paths from config/paths.json.
 metadata:
-  version: "1.0.3"
+  version: "1.1.0"
 ---
 
 # Skill Sync
@@ -40,7 +40,7 @@ In canonical-owned mode, a skill exists in five places. Only one is edited by ha
 | `~/.agents/skills/` | mirror |
 | `~/.claude/skills/` | mirror |
 | `~/.codex/skills/` | mirror |
-| `~/Documents/duylab/9to5-agent-skills/skills/` | generated repo copy, committed and pushed |
+| `~/9to5-agent-skills/skills/` | generated repo copy, committed and pushed |
 
 Paths and exclusion lists live in `config/paths.json`. If a location moves, change it there rather than in the script.
 
@@ -62,6 +62,12 @@ copies, not publishable exports. Only the repository copy applies `exclude_from_
 Copy rules and hash comparisons use the same policy for each destination.
 Generated Gradle cache directories are excluded from both copying and hashes;
 excluded destination caches are preserved, not deleted to make parity pass.
+
+For a public repository, use [public export policy](references/public-export.md).
+Canonical and mirrors keep the real private configuration; the repo receives only
+the validated public representation. Its hash is compared against that rendered
+representation, not against raw private files. A configured missing/invalid policy
+blocks export rather than silently publishing the unfiltered source.
 
 ## Workflow
 

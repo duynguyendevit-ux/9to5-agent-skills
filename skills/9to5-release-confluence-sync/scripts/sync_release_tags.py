@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""Sync Release Tag and Docker image cells in a C7 Confluence release page.
+"""Sync Release Tag and Docker image cells in a Product Confluence release page.
 
-Targets today's release page (`NNN. DD.MM.YYYY` in space C7GSAFEDA):
+Targets today's release page (`NNN. DD.MM.YYYY` in space DEMO):
 - updates it when it exists
 - creates it when missing (cloned from the newest daily page, numbered max+1)
 
@@ -540,7 +540,7 @@ def update_page(base, token, page, body):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--page", help="explicit page URL or ID (skips today lookup)")
-    ap.add_argument("--project", help="project name from projects.json (e.g. dev-c7, dev-c7-ttdvkh)")
+    ap.add_argument("--project", help="project name from projects.json (e.g. dev-product, dev-user)")
     ap.add_argument("--add-project", metavar="NAME",
                     help="register/update a project in the registry using --root/--group/--space/--hl-color/--page-link/--doc-link, then exit")
     ap.add_argument("--page-link", help="reference link to the project's release page (stored by --add-project)")
@@ -553,7 +553,7 @@ def main():
     ap.add_argument("--no-create", action="store_true", help="fail instead of creating a missing page")
     ap.add_argument("--hl-color", default=None,
                     help=f"cell highlight for rows that need release (default {HL_COLOR} or the project's)")
-    ap.add_argument("--group", help="git group to sync, e.g. c7/ttch (default: from cwd repo remote or the project's)")
+    ap.add_argument("--group", help="git group to sync, e.g. product/platform (default: from cwd repo remote or the project's)")
     ap.add_argument("--git-base", default=None, help="ssh base URL; default: cwd repo remote or config/endpoints.json")
     ap.add_argument("--service", help="only rows whose service name contains this string")
     ap.add_argument("--paint", help="comma-separated row numbers to highlight purple, e.g. 1,2,4")

@@ -1,10 +1,10 @@
 {
   "projects": {
-    "dev-c7": {
-      "space": "C7GSAFEDA"
+    "dev-product": {
+      "space": "DEMO"
     },
-    "dev-c7-ttdvkh": {
-      "space": "C7GSAFEDA"
+    "dev-user": {
+      "space": "DEMO"
     }
   }
 }

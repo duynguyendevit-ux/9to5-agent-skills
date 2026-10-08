@@ -1,0 +1,29 @@
+{
+  "skill_name": "9to5-spring-env-scan",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Scan biến môi trường Spring trong fixture alias. Xuất report.md và inventory.json, nối biến với property và nơi dùng trong Java. Không lộ giá trị; không giả định profile đang active.",
+      "expected_output": "Explicit variables, recursive fallback and property alias mapped to @Value, two YAML documents inventoried, comments ignored and values withheld.",
+      "files": ["evals/fixtures/alias/application.yaml", "evals/fixtures/alias/Worker.java"],
+      "assertions": [
+        "Reports WORKER_TIMEOUT, DEFAULT_TIMEOUT, WORKER_PASSWORD, PROD_TIMEOUT and REGION, not COMMENT_ONLY.",
+        "Links worker.effective-timeout to YAML timeout variables and the Java @Value consumer.",
+        "Withholds FAKE_SECRET_SENTINEL and states that profiles are not evaluated.",
+        "Keeps no-default occurrences separate from runtime-required claims."
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Scan fixture bindings: tìm env từ application.properties và @ConfigurationProperties, kể cả nested class. Xuất report.md và inventory.json; tách tên env explicit khỏi tên Spring suy luận. Không sửa code.",
+      "expected_output": "CONNECT_TIMEOUT and CLIENT_USER mapped to config bindings with exact source evidence, inferred CLIENT_CONNECTTIMEOUT separate, local/static fields excluded.",
+      "files": ["evals/fixtures/bindings/application.properties", "evals/fixtures/bindings/ClientSettings.java"],
+      "assertions": [
+        "Reports explicit CONNECT_TIMEOUT and CLIENT_USER with config-class consumer evidence.",
+        "Infers CLIENT_CONNECTTIMEOUT, not CLIENT_CONNECT_TIMEOUT.",
+        "Includes client.credentials.user-name but excludes local variables and static constants from bindings.",
+        "Withholds all default values and avoids claiming runtime-required status from missing defaults."
+      ]
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 ---
 name: 9to5-redis-design
-description: Review and design Redis usage in OTS services — key namespacing, TTL policy, cache-first reads with DB fallback, AFTER_COMMIT invalidation, Lua guards that protect partial cache entries, and runtime control keys with safe fallbacks. Use when adding or reviewing a cache, diagnosing stale or missing cache data, deciding TTL versus explicit invalidation, or putting a runtime switch into Redis.
+description: Review and design Redis usage in Platform services — key namespacing, TTL policy, cache-first reads with DB fallback, AFTER_COMMIT invalidation, Lua guards that protect partial cache entries, and runtime control keys with safe fallbacks. Use when adding or reviewing a cache, diagnosing stale or missing cache data, deciding TTL versus explicit invalidation, or putting a runtime switch into Redis.
 license: MIT
 compatibility: Read-only review; running examples need the service checkout and, for live inspection, cluster access through 9to5-k8s-service-debug. No FLUSH or KEYS commands against shared Redis instances.
 metadata:

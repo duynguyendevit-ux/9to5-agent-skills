@@ -15,14 +15,14 @@ Illustrative; sizes, classes and counts must come from the actual dump.
 
 ```text
 Dump: DB-261.24374.56_memory_15.06.2026_08.35.33.hprof (619M, 105d old)
-MAT: 1.17.0 headless, heap 8g — reports archived under ~/Documents/heap-reports
+MAT: 1.17.0 headless, heap 8g — reports archived under ~/workspace/heap-reports
 Problem Suspect 1: 37,875 java.lang.Class instances loaded by <system class loader>
   retain 10.43% of the heap through 249,225 byte[] and 247,463 String instances.
 Also present: one OutOfMemoryError[] — the snapshot was taken after an OOME.
 Hypothesis: class/metadata bloat (generated or framework classes, stale class loaders).
 Unverified: whether the classes are duplicated loaders; needs the dominator path (GUI step).
 Next action: correlate with the unload-*.hprof pair; check IDE plugin set before filing upstream.
-Artifact: ~/Documents/heap-reports/DB-261..._Leak_Suspects/index.html
+Artifact: ~/workspace/heap-reports/DB-261..._Leak_Suspects/index.html
 ```
 
 ## Scope and boundaries

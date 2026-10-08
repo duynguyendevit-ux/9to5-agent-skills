@@ -11,10 +11,10 @@ links=importlib.util.module_from_spec(spec);spec.loader.exec_module(links)
 
 class SourceLinksTests(unittest.TestCase):
     def test_one_overall_jira_version_note_without_task_links(self):
-        value=links.release_version_note('https://example.invalid/jira/','DEMO','12345','Release_08/10/2026')
+        value=links.release_version_note('https://example.invalid/jira/','DEMO','12345','Release_15/01/2030')
         self.assertEqual(value.count('<a '),1)
         self.assertIn('https://example.invalid/jira/projects/DEMO/versions/12345',value)
-        self.assertIn('>Release_08/10/2026</a>',value)
+        self.assertIn('>Release_15/01/2030</a>',value)
         self.assertNotIn('/browse/',value)
 
     def test_jira_name_escaped_and_untrusted_id_project_rejected(self):
@@ -32,8 +32,8 @@ class SourceLinksTests(unittest.TestCase):
                 links.release_version_note(base,'DEMO','12345',name)
 
     def test_develop_uses_same_nested_repository(self):
-        root,branch=links.source_urls('https://example.invalid','group/ttch/worker','develop')
-        self.assertEqual(root,'https://example.invalid/group/ttch/worker')
+        root,branch=links.source_urls('https://example.invalid','product/platform/worker','develop')
+        self.assertEqual(root,'https://example.invalid/product/platform/worker')
         self.assertEqual(branch,root+'/-/tree/develop')
 
     def test_context_path_and_branch_slash_encoding(self):

@@ -4,6 +4,7 @@ cache.json
 
 # Local-only internal endpoints (real hostnames; ship the .example.json instead)
 skills/*/config/endpoints.json
+skills/*/config/public-export.local.json
 
 # Python
 __pycache__/
@@ -18,3 +19,7 @@ skills/*/debug/artifacts/*
 .DS_Store
 .idea/
 *.swp
+
+# Private request-specific memory and release evidence belong to a working repo.
+.kit/memory/
+.kit/releases/

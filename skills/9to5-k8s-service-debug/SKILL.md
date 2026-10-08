@@ -1,8 +1,8 @@
 ---
 name: 9to5-k8s-service-debug
-description: Debug OTS/C7 services running on Kubernetes — locate a pod by app name across dev-c7 and dev-c7-ttdvkh, tail and filter logs, extract Hibernate SQL with bound parameters into runnable Oracle statements, inspect env/limits, and correlate failures back to the local repo. Use when the user asks to debug or investigate a service on the cluster, read pod logs, find an error in a pod, check why a worker did not run, inspect a service's runtime config, open SQL from logs, mentions klog/ksql/kerror/kfind, or pastes a stack trace from an OTS service. Read-only by default.
+description: Debug Platform/Product services running on Kubernetes — locate a pod by app name across dev-product and dev-user, tail and filter logs, extract Hibernate SQL with bound parameters into runnable Oracle statements, inspect env/limits, and correlate failures back to the local repo. Use when the user asks to debug or investigate a service on the cluster, read pod logs, find an error in a pod, check why a worker did not run, inspect a service's runtime config, open SQL from logs, mentions klog/ksql/kerror/kfind, or pastes a stack trace from an Platform service. Read-only by default.
 license: MIT
-compatibility: Requires kubectl, a kubeconfig exposing the cluster contexts recorded in config/k8s-env.json, and the shell helpers from ~/Documents/k8slog/rancher-log-alias.sh sourced in the interactive shell. Cluster access is dev only.
+compatibility: Requires kubectl, a kubeconfig exposing the cluster contexts recorded in config/k8s-env.json, and the shell helpers from ~/workspace/k8slog/rancher-log-alias.sh sourced in the interactive shell. Cluster access is dev only.
 metadata:
   version: "1.0.1"
 ---
@@ -14,7 +14,7 @@ metadata:
 Illustrative investigation report; distinguish observations from hypotheses.
 
 ```text
-Target: example-worker / dev-c7 / example-worker-abc
+Target: example-worker / dev-product / example-worker-abc
 Symptom: retries are increasing while completed jobs remain flat.
 Evidence: repeated connection timeout to the downstream API in filtered logs.
 Config: retry setting exists; secret values not retrieved.
@@ -24,7 +24,7 @@ Artifacts: debug/artifacts/20260924-example-worker-timeouts/session.md
 Next action: verify downstream reachability from the affected namespace.
 ```
 
-Diagnose a running OTS service from the cluster before reading code. The cluster is the source of truth for what is deployed; logs and bound SQL are the primary evidence.
+Diagnose a running Platform service from the cluster before reading code. The cluster is the source of truth for what is deployed; logs and bound SQL are the primary evidence.
 
 ## Registries
 
@@ -39,7 +39,7 @@ Read these before touching the cluster. They keep app names, namespaces, and rep
 Resolve the repo from `apps.json` rather than guessing a checkout path. An app with `"repo": null` is not checked out locally — say so instead of inventing a path. `repo_confidence` records how the path was matched: `remote` (git remote basename) and `project` (`rootProject.name`) are verified, `inferred` is basename-only. Read the remote before trusting an `inferred` path.
 
 Before relying on the helper snapshot, check it has not drifted from the live file:
-`diff -q config/helpers/rancher-log-alias.sh ~/Documents/k8slog/rancher-log-alias.sh`
+`diff -q config/helpers/rancher-log-alias.sh ~/workspace/k8slog/rancher-log-alias.sh`
 
 ## Safety
 
@@ -53,11 +53,11 @@ Default posture is read-only: `get`, `logs`, `describe`, `exec` for inspection.
 
 ## Workflow
 
-1. **Resolve the target.** Look up the app in `config/apps.json`; the namespaces come from there, not from memory. A service can run in both `dev-c7` and `dev-c7-ttdvkh` — pick the namespace under investigation and confirm the pod is running: `kpods -n <ns> | grep <app>`.
+1. **Resolve the target.** Look up the app in `config/apps.json`; the namespaces come from there, not from memory. A service can run in both `dev-product` and `dev-user` — pick the namespace under investigation and confirm the pod is running: `kpods -n <ns> | grep <app>`.
 2. **Check current errors first.** `kerror <app> <ns>` before reading raw logs. A crash loop or repeated exception is visible immediately; a wide unfiltered tail is noise.
 3. **Read logs with intent.** `klog <app> <ns>` for the timeline, `kfind <app> '<pattern>' <ns>` for a specific request id, device code, event id, or coroutine. Pass a specific namespace — cross-namespace pod matching is slow and can select the wrong deployment.
 4. **Reconstruct SQL when the failure is data-shaped.** `ksql <app> <ns>` pipes the log tail through `_hibernate_bind_sql_stream`, which walks `Hibernate: <sql>` lines, binds `binding parameter [n] as [TYPE] - [value]` in order, and emits runnable Oracle statements tagged with an inferred business flow. Use it to reproduce the exact query the service ran.
-5. **Inspect runtime config.** If Python is installed in the container, list names with `kubectl -n <ns> exec <pod> -- python3 -c 'import os; print("\n".join(sorted(os.environ)))'`. Otherwise enumerate environment keys using an available runtime inside the container; never fall back to raw `printenv`. Inspect only explicitly selected non-secret values, then compare with `ots-env-custom/service-configs/<env>/<service>/` — hand off to `9to5-env-config-sync` if the deployed value is wrong.
+5. **Inspect runtime config.** If Python is installed in the container, list names with `kubectl -n <ns> exec <pod> -- python3 -c 'import os; print("\n".join(sorted(os.environ)))'`. Otherwise enumerate environment keys using an available runtime inside the container; never fall back to raw `printenv`. Inspect only explicitly selected non-secret values, then compare with `env-config/service-configs/<env>/<service>/` — hand off to `9to5-env-config-sync` if the deployed value is wrong.
 6. **Correlate to code.** Read the local repo resolved in step 1 and check its git remote matches the deployed service before claiming a match. Grep for the logged class, method, error code, or SQL fragment. Confirm the branch/commit matches the deployed image before claiming the fix.
 7. **Write up and persist.** Record the session under `debug/` and update the service's flow note (below).
 
@@ -105,5 +105,5 @@ Update the note in the same pass whenever a debug session proves or corrects a f
 ## Escalation
 
 - Wrong environment named (uat/prod): the current kubeconfig only reaches dev. Ask for the correct kubeconfig path.
-- Manifest-level drift: the deployed state comes from `ots-env-custom`; use `9to5-env-config-sync` for the config change, this skill only for diagnosis.
+- Manifest-level drift: the deployed state comes from `env-config`; use `9to5-env-config-sync` for the config change, this skill only for diagnosis.
 - Data fix required: use `9to5-sql-migration`; this skill produces the query, it does not ship DDL/DML.

@@ -1,6 +1,6 @@
 ---
 name: 9to5-env-config-sync
-description: Compare and update OTS environment service configs in ots-env-custom/service-configs/<env>/<service>/ (values.yaml and .env) — align environment variables across dev-c7, dev-c7-ttdvkh, dev-uat-*, report drift, and keep secrets out of commits. Use when the user asks to sync env configs, add or change a service env variable, compare dev vs uat values, or investigate config drift between environments.
+description: Compare and update Platform environment service configs in env-config/service-configs/<env>/<service>/ (values.yaml and .env) — align environment variables across dev-product, dev-user, dev-uat-*, report drift, and keep secrets out of commits. Use when the user asks to sync env configs, add or change a service env variable, compare dev vs uat values, or investigate config drift between environments.
 license: MIT
 metadata:
   version: "1.0.1"
@@ -14,18 +14,18 @@ Illustrative comparison; replace values with verified non-secret configuration.
 
 ```text
 Service: example-worker
-Variable                 dev-c7   dev-uat-c7   Action
+Variable                 dev-product   dev-uat-product   Action
 WORKER_BATCH_SIZE         100      50           Intentional load difference; preserve
 WORKER_RETRY_ENABLED      true     missing      Add true to requested UAT config
 Validation: YAML parsed; git diff --check passed
-Changed: service-configs/dev-uat-c7/example-worker/values.yaml
+Changed: service-configs/dev-uat-product/example-worker/values.yaml
 ```
 
-Keep per-environment service configs consistent across the OTS environments.
+Keep per-environment service configs consistent across the Platform environments.
 
 ## Layout
 
-`~/Documents/ots-env-custom`
+`~/workspace/env-config`
 
 ```
 service-configs/<env>/<service>/
@@ -33,15 +33,15 @@ service-configs/<env>/<service>/
 └── .env          # env vars (tracked)
 ```
 
-Environments seen: `dev-c7`, `dev-c7-ttdvkh`, `dev-uat-c7`, `dev-uat-ttdvkh`,
-`dev-b01`, `ots-prod`, ... Compare like-for-like (C7 vs C7, TTDVKH vs TTDVKH).
+Environments seen: `dev-product`, `dev-user`, `dev-uat-product`, `uat-user`,
+`dev-example`, `prod-example`, ... Compare like-for-like (Product vs Product, User vs User).
 
 ## Workflow
 
 1. Find the service dirs across environments:
    `find service-configs -maxdepth 2 -type d -name '<service>'`
 2. Diff the pairs:
-   - `diff -u service-configs/dev-c7/<svc>/values.yaml service-configs/dev-uat-c7/<svc>/values.yaml`
+   - `diff -u service-configs/dev-product/<svc>/values.yaml service-configs/dev-uat-product/<svc>/values.yaml`
    - env keys: `grep -oE '^[A-Za-z_]+' <env>/.env | sort`
 3. Make the change in every environment that should match, one commit per intent.
    Keep placeholders intact: `${IMAGE_NAME}`, `${IMAGE_TAG}`, `${SERVICE_NAME}` —
@@ -51,7 +51,7 @@ Environments seen: `dev-c7`, `dev-c7-ttdvkh`, `dev-uat-c7`, `dev-uat-ttdvkh`,
 5. Report a drift table:
 
 ```
-| Variable | dev-c7 | dev-uat-c7 | Action |
+| Variable | dev-product | dev-uat-product | Action |
 ```
 
 ## Secrets

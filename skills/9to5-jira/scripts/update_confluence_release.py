@@ -196,7 +196,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     page_group.add_argument("--page-title", help="Exact page title; combine with --space-key when possible")
     parser.add_argument("--date", dest="release_date", help="Release page date in DD.MM.YYYY; defaults to today")
     parser.add_argument("--space-key")
-    parser.add_argument("--service-name", action="append", default=[], help="Service from release-services.json")
+    parser.add_argument("--service-name", action="append", default=[], help="Service from release-services-product.example.json")
     parser.add_argument("--service", action="append", default=[], metavar="NAME|REPO|GITLAB_PROJECT|DOCKER_IMAGE")
     parser.add_argument("--release", action="append", default=[], metavar="NAME|TAG|TAG_URL|DOCKER_IMAGE")
     parser.add_argument("--tag-url", action="append", default=[], help="Existing GitLab tag URL; service and image come from the selected profile")
@@ -333,16 +333,16 @@ def choose_profile(
         return args.profile
     tag_urls = " ".join(args.tag_url).lower()
     page_reference = (args.page or "").lower()
-    if "/c7-ttdvkh/" in tag_urls or "/243." in page_reference:
-        args.profile = "c7-ttdvkh"
+    if "/user/" in tag_urls or "/243." in page_reference:
+        args.profile = "user"
         return args.profile
-    if "/c7/ttch/" in tag_urls or "/255." in page_reference:
-        args.profile = "c7-ttch"
+    if "/product/platform/" in tag_urls or "/255." in page_reference:
+        args.profile = "product-platform"
         return args.profile
     interactive_request = not (args.service_name or args.service or args.release or args.tag_url)
     is_terminal = sys.stdin.isatty() if interactive_terminal is None else interactive_terminal
     if not interactive_request or not is_terminal:
-        args.profile = "c7-ttch"
+        args.profile = "product-platform"
         return args.profile
     profiles = json.loads(DEFAULT_PROFILE_CONFIG.read_text(encoding="utf-8"))
     names = list(profiles)

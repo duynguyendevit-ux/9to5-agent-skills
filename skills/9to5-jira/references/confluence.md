@@ -13,7 +13,7 @@ Jira planning.
 
 ```bash
 ZJIRA=$(command -v zjira 2>/dev/null || echo "$HOME/.local/bin/zjira")
-$ZJIRA confluence get 128244471 --md
+$ZJIRA confluence get 12001 --md
 $ZJIRA confluence search '255. 27.07.2026' --json
 ```
 
@@ -56,7 +56,7 @@ explicit `--tag SERVICE=TAG` is supplied. This avoids overwriting a conflicting
 local tag.
 
 Interactive mode is the default. When `--profile` is omitted, it first asks for
-the release project (`c7-ttch` or `c7-ttdvkh`). Without `--page`, it finds the
+the release project (`product-platform` or `user`). Without `--page`, it finds the
 unique release page whose title ends with today's `DD.MM.YYYY` date. When
 several pages share that date, it selects the unique page containing the chosen
 profile's service rows. It then lists current/latest versions, lets the operator
@@ -101,12 +101,12 @@ Use `--dry-run` to keep the same service/tag picker but disable PUT:
 python3 scripts/update_confluence_release.py --dry-run
 ```
 
-Non-interactive dry-run using `references/release-services.json`:
+Non-interactive dry-run using `references/release-services-product.example.json`:
 
 ```bash
 python3 scripts/update_confluence_release.py \
-  --service-name ttch-event-diary-service \
-  --service-name ttch-receive-service \
+  --service-name platform-event-diary-service \
+  --service-name platform-receive-service \
   --service-name export-file-service \
   --dry-run
 ```
@@ -118,29 +118,29 @@ Use `--page today` for the same behavior, or `--date 27.07.2026` to select a
 historical release page by date. Numeric IDs and full URLs remain supported for
 an explicit page override.
 
-For the TTDVKH release page, use the dedicated profile. It resolves the page
+For the User release page, use the dedicated profile. It resolves the page
 `243. DD.MM.YYYY` by matching the profile's service rows:
 
 ```bash
 python3 scripts/update_confluence_release.py \
-  --profile c7-ttdvkh \
+  --profile user \
   --page '<confluence-base>/display/<SPACE>/243.+DD.MM.YYYY' \
   --dry-run
 ```
 
-Omit `--page` to find the current TTDVKH release page automatically:
+Omit `--page` to find the current User release page automatically:
 
 ```bash
-python3 scripts/update_confluence_release.py --profile c7-ttdvkh --dry-run
+python3 scripts/update_confluence_release.py --profile user --dry-run
 ```
 
 Override one discovered tag:
 
 ```bash
 python3 scripts/update_confluence_release.py \
-  --page-id 128244471 \
-  --service-name ttch-receive-service \
-  --tag ttch-receive-service=c7-ttch-v0.0.107 \
+  --page-id 12001 \
+  --service-name platform-receive-service \
+  --tag platform-receive-service=product-platform-v0.0.107 \
   --dry-run
 ```
 
@@ -148,7 +148,7 @@ Ad-hoc service not in the registry:
 
 ```bash
 python3 scripts/update_confluence_release.py \
-  --page-id 128244471 \
+  --page-id 12001 \
   --service 'service-name|/local/repo|group/project|registry/group/project' \
   --dry-run
 ```

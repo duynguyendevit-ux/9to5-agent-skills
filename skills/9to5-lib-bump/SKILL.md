@@ -1,6 +1,6 @@
 ---
 name: 9to5-lib-bump
-description: Bump a shared OTS/C7 library version (kafka starter, common-core, ISC, ttch-service-common, microservice starter) across the services that consume it — audit drift, resolve the target version from the library repository's git state, write the gradle.properties change, build each service, and commit with the repository's convention. Use when the user asks to update libs, bump or sync a library version across services, upgrade the kafka starter or common-core, find which services are behind on a shared dependency, or check DEBUG_* flags before a release. Also use to audit version drift without changing anything.
+description: Bump a shared Platform/Product library version (kafka starter, common-core, ISC, platform-service-common, microservice starter) across the services that consume it — audit drift, resolve the target version from the library repository's git state, write the gradle.properties change, build each service, and commit with the repository's convention. Use when the user asks to update libs, bump or sync a library version across services, upgrade the kafka starter or common-core, find which services are behind on a shared dependency, or check DEBUG_* flags before a release. Also use to audit version drift without changing anything.
 license: MIT
 compatibility: Requires git checkouts of the services and the library repositories, JDK 17 at ~/.jdks/corretto-17.0.19, and network access to Nexus for dependency resolution. Dry run by default; set --apply to write.
 metadata:
@@ -30,8 +30,8 @@ Registry: `config/libraries.json` (property → library repo → artifact, DEBUG
 
 ## Two traps that cause silent wrong results
 
-1. **Bulk-download mirrors.** `~/Documents/duylab/gitlab-download-scripts/gitlab-repos/` holds ~65 cloned copies of the same services. A naive `rglob("gradle.properties")` over `~/Documents` finds them and bumps dead code. They are excluded in `config/roots.json` — keep them excluded, and if a new mirror tree appears, add it there rather than loosening the scan.
-2. **`DEBUG_*` flags.** When a flag is `true`, the build resolves that dependency from a local Gradle project instead of Nexus, so a version bump has no effect on the artifact actually used. `gradle.properties` in several services currently sits with `DEBUG_TTCH_SERVICE_COMMON=true` or `DEBUG_COMMON_CORE=true`. Always run `audit` before a bump and require those flags to be `false` in the commit.
+1. **Bulk-download mirrors.** `~/workspace/tools/gitlab-download-scripts/gitlab-repos/` holds ~65 cloned copies of the same services. A naive `rglob("gradle.properties")` over `~/workspace` finds them and bumps dead code. They are excluded in `config/roots.json` — keep them excluded, and if a new mirror tree appears, add it there rather than loosening the scan.
+2. **`DEBUG_*` flags.** When a flag is `true`, the build resolves that dependency from a local Gradle project instead of Nexus, so a version bump has no effect on the artifact actually used. `gradle.properties` in several services currently sits with `DEBUG_PLATFORM_SERVICE_COMMON=true` or `DEBUG_COMMON_CORE=true`. Always run `audit` before a bump and require those flags to be `false` in the commit.
 
 ## Versions are git-derived, not semantic
 
@@ -45,7 +45,7 @@ Prefer a released tag over a branch snapshot when one exists. If the library bra
 
 ## Workflow
 
-1. **Audit first.** `python3 scripts/lib_versions.py audit --property <PROP>` — reports enabled debug flags, duplicate checkouts, and drift for every tracked library. Read the duplicate section: `notification-service`, `export-file-service`, `ttch-admin-service`, `ttch-dashboard-service` each exist in two places with different versions, so "bump all" can mean editing a stale copy.
+1. **Audit first.** `python3 scripts/lib_versions.py audit --property <PROP>` — reports enabled debug flags, duplicate checkouts, and drift for every tracked library. Read the duplicate section: `notification-service`, `export-file-service`, `platform-admin-service`, `platform-dashboard-service` each exist in two places with different versions, so "bump all" can mean editing a stale copy.
 2. **Resolve the target.** `suggest --property <PROP>` prints the candidate, the library's git state, and which services already match. Confirm the candidate with the user when it comes from a feature branch.
 3. **Preview.** `set --property <PROP> --version <V>` (dry run) lists every file that would change. Use `--only a,b` for unique service names or comma-separated absolute checkout paths. Duplicate names are refused, including in unrestricted runs; select the intended paths explicitly.
 4. **Apply.** Re-run with `--apply`.

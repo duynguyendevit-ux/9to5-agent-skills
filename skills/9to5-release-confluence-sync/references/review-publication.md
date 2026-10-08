@@ -48,9 +48,11 @@ such as “clear nếu có yêu cầu” defines future behavior, not an immedia
 
 ## Build a reviewable artifact
 
-Save the full proposed storage body plus a compact field-level diff locally under
-`/tmp/opencode/`. Record project/date, page or parent, source ID/version, source-body
-hash, reviewed-body hash and exact row/field changes. Engine creation previews
+Save the full proposed storage body plus a compact field-level diff under the
+working repository's `.kit/releases/<request>/` (gitignored), or under
+`~/.local/state/opencode/requests/<request>/` when no working repository applies.
+Record project/date, page or parent, source ID/version, source-body hash,
+reviewed-body hash and exact row/field changes. Engine creation previews
 stop before per-service tag discovery; finish that evidence check before approval.
 
 A review artifact should show:

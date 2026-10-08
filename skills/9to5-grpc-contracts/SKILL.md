@@ -1,6 +1,6 @@
 ---
 name: 9to5-grpc-contracts
-description: Design and review gRPC/protobuf contracts for OTS services — the proto3 layout in the shared proto repository (service definitions versus domain messages, versioned packages), java_package conventions, wire-compatibility rules, artifact version flow, and server/client patterns with the lognet starter. Use when adding or changing a proto, exposing a new gRPC API, reviewing a breaking change, or bumping a proto artifact version.
+description: Design and review gRPC/protobuf contracts for Platform services — the proto3 layout in the shared proto repository (service definitions versus domain messages, versioned packages), java_package conventions, wire-compatibility rules, artifact version flow, and server/client patterns with the lognet starter. Use when adding or changing a proto, exposing a new gRPC API, reviewing a breaking change, or bumping a proto artifact version.
 license: MIT
 compatibility: Reading contracts needs the shared proto/common-core checkouts. Version bumps flow through gradle.properties and the library fan-out belongs to 9to5-lib-bump. No code generation or proto edits happen in a review.
 metadata:

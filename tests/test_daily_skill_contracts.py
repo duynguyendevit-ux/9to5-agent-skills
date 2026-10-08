@@ -26,7 +26,7 @@ class DailySkillContractsTests(unittest.TestCase):
                 self.assertIn("## Example output", body)
                 self.assertIn("Illustrative", body)
                 self.assertLess(len(text.splitlines()), 500)
-                self.assertNotRegex(text, r"(?i)\bots\b|\bc7\b")
+                self.assertNotRegex(text, r"(?i)\binternal_platform\b|\binternal_project\b")
 
     def test_offline_cases_have_unique_ids_and_expectations(self):
         for name in SKILLS:

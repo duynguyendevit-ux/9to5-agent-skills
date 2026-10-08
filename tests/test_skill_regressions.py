@@ -263,6 +263,8 @@ class SkillSyncTests(unittest.TestCase):
             (self.root / name).mkdir()
         self.script = self.root / "scripts/skill_sync.sh"
         shutil.copyfile(ROOT / "9to5-skill-sync/scripts/skill_sync.sh", self.script)
+        shutil.copyfile(ROOT / "9to5-skill-sync/scripts/public_export.py",
+                        self.root / "scripts/public_export.py")
         self.config = {"canonical": str(self.root / "canonical"), "mirrors": [str(self.root / "mirror")],
                        "repo": str(self.root / "repo"), "repo_skills_subdir": "skills",
                        "exclude_always": ["__pycache__", "*.pyc"],
@@ -276,6 +278,39 @@ class SkillSyncTests(unittest.TestCase):
 
     def run_sync(self, *args):
         return subprocess.run(["bash", str(self.script), *args], capture_output=True, text=True)
+
+    def test_public_export_preserves_private_mirrors_and_checks_rendered_parity(self):
+        policy = {'replacements': [['INTERNAL_NAME', 'Product']],
+                  'deny_patterns': ['INTERNAL_NAME']}
+        path = self.root / 'config/export.local.json'
+        path.write_text(json.dumps(policy))
+        self.config['public_export_policy'] = 'config/export.local.json'
+        (self.root / 'config/paths.json').write_text(json.dumps(self.config))
+        source = self.root / 'canonical/9to5-fixture/SKILL.md'
+        source.write_text('INTERNAL_NAME')
+        result = self.run_sync('--apply', '--skill', '9to5-fixture')
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertEqual(source.read_text(), 'INTERNAL_NAME')
+        self.assertEqual((self.root / 'mirror/9to5-fixture/SKILL.md').read_text(), 'INTERNAL_NAME')
+        self.assertEqual((self.root / 'repo/skills/9to5-fixture/SKILL.md').read_text(), 'Product')
+        self.assertEqual(self.run_sync('--check', '--leak-check', '--skill', '9to5-fixture').returncode, 0)
+
+    def test_missing_export_policy_fails_closed_before_writes(self):
+        self.config['public_export_policy'] = 'config/missing.local.json'
+        (self.root / 'config/paths.json').write_text(json.dumps(self.config))
+        result = self.run_sync('--apply', '--skill', '9to5-fixture')
+        self.assertNotEqual(result.returncode, 0)
+        self.assertFalse((self.root / 'repo/skills/9to5-fixture').exists())
+        self.assertFalse((self.root / 'mirror/9to5-fixture').exists())
+
+    def test_forbidden_public_output_fails_before_mirror_or_export_write(self):
+        self.config['public_export_policy'] = 'config/export.local.json'
+        (self.root / 'config/paths.json').write_text(json.dumps(self.config))
+        (self.root / 'config/export.local.json').write_text(json.dumps({'deny_patterns': ['fixture']}))
+        result = self.run_sync('--apply', '--skill', '9to5-fixture')
+        self.assertNotEqual(result.returncode, 0)
+        self.assertFalse((self.root / 'repo/skills/9to5-fixture').exists())
+        self.assertFalse((self.root / 'mirror/9to5-fixture').exists())
 
     def test_gradle_caches_are_ignored_and_existing_destination_cache_preserved(self):
         self.config['exclude_always'].append('.gradle/')

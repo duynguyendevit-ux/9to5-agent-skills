@@ -1,6 +1,6 @@
 ---
 name: 9to5-mqtt-notifications
-description: Design and review MQTT delivery of notification and refresh events in OTS services — the merchant gateway pattern, destination semantics, NotificationMessage payloads, QoS choice, client limits, environment configuration keys, and when MQTT is the wrong channel. Use when adding or debugging a refresh event to apps, touching a MessageGateway implementation, choosing QoS or retained messages, or deciding between MQTT and Kafka for a notification.
+description: Design and review MQTT delivery of notification and refresh events in Platform services — the merchant gateway pattern, destination semantics, NotificationMessage payloads, QoS choice, client limits, environment configuration keys, and when MQTT is the wrong channel. Use when adding or debugging a refresh event to apps, touching a MessageGateway implementation, choosing QoS or retained messages, or deciding between MQTT and Kafka for a notification.
 license: MIT
 compatibility: Review needs the service checkout and, for live checks, cluster access through 9to5-k8s-service-debug. Broker URLs and credentials live only in per-environment service configs; never hardcode or print them.
 metadata:
@@ -103,7 +103,7 @@ event-sourcing channel over QoS 0.
 - Broker keys, per-environment values → `9to5-env-config-sync`.
 - Business event delivery (the durable path) → `9to5-kafka`.
 - Live connectivity, pod logs, broker reachability → `9to5-k8s-service-debug`.
-- Device error/refresh flows feeding availability logic → `9to5-device-availability`.
+- Device error/refresh flows → inspect the selected service's own source-backed contracts.
 
 ## Stop conditions
 

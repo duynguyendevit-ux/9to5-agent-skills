@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 
 # Source this file from ~/.bashrc or ~/.bash_aliases:
-#   source /home/duynk/Documents/k8slog/rancher-log-alias.sh
+#   source /home/example/workspace/k8slog/rancher-log-alias.sh
 
 # Rancher kubeconfig file.
-export KUBECONFIG="/home/duynk/Downloads/dev-buuchinhso.yaml"
+export KUBECONFIG="/home/example/Downloads/example-dev-context.yaml"
 KUBECTL_BIN="/usr/bin/kubectl"
 KUBE_SELECTED_NAMESPACE=""
 KUBE_SELECTED_POD=""

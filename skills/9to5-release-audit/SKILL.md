@@ -32,14 +32,17 @@ the expected version; runtime deployment requires a separate read-only cluster c
 ```bash
 S=~/.config/opencode/skills/9to5-release-audit/scripts/release_audit.py
 
-# Save the current page record
+# Save the current page record as request evidence
 python3 "$S" snapshot --page '<Confluence page URL or ID>' \
-  --output /tmp/prod-release-before.json
+  --output .kit/releases/<request>/prod-release-before.json
 
 # Read the page again and compare it with the saved record
 python3 "$S" compare --page '<Confluence page URL or ID>' \
-  --before /tmp/prod-release-before.json
+  --before .kit/releases/<request>/prod-release-before.json
 ```
+
+Request evidence belongs in the working repository's `.kit/releases/<request>/`
+(gitignored), or a private state directory when no working repository applies.
 
 `--project` is optional free-form metadata; this script does not read the adjacent
 `projects.json` reference registry. `--page` is required so the audit never guesses between similarly named

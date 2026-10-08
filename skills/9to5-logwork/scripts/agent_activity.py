@@ -303,7 +303,7 @@ def claude_activity(start: datetime, end: datetime):
 # ------------------------------------------------------------------ render
 
 def project_name(directory: str) -> str:
-    parts = [p for p in directory.rstrip("/").split("/") if p and p not in ("home", "duynk")]
+    parts = [p for p in directory.rstrip("/").split("/") if p and p not in ("home", os.path.basename(HOME))]
     if not parts:
         return directory
     if len(parts) >= 2:

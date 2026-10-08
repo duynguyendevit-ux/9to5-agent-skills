@@ -93,8 +93,8 @@ If the result is a non-empty JSON array, show a sprint board table:
 Current sprint issues:
 | Key      | Summary                          | Status      |
 |----------|----------------------------------|-------------|
-| CTJ-4242 | [BE] Planning sprint...          | In Progress |
-| CTJ-100  | [BE] Implement auth redirect...  | To Do       |
+| DEMO-4242 | [BE] Planning sprint...          | In Progress |
+| DEMO-100  | [BE] Implement auth redirect...  | To Do       |
 ```
 
 Then ask the user which issue to plan (question tool where available, otherwise ask in chat):
@@ -223,7 +223,7 @@ Derive the git branch name from KEY and Summary:
 - `TASK_TYPE == Bug` → prefix `fix/`
 - `TASK_TYPE == Story` or `Task` or `Sub-task` → prefix `feat/`
 - Slug: lowercase the first 4-5 meaningful words of Summary, replace spaces with `-`, strip special chars
-- Example: `KEY=CTJ-4242`, Summary="[BE] Add OAuth redirect handler" → `feat/CTJ-4242-add-oauth-redirect-handler`
+- Example: `KEY=DEMO-4242`, Summary="[BE] Add OAuth redirect handler" → `feat/DEMO-4242-add-oauth-redirect-handler`
 
 Read [`references/plan-templates.md`](references/plan-templates.md) and use the template that matches `TASK_TYPE`.
 

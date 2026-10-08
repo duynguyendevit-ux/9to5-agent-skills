@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Audit and bump shared-library versions across OTS/C7 service checkouts.
+"""Audit and bump shared-library versions across Platform/Product service checkouts.
 
 Reads <LIB>_VERSION properties from gradle.properties, reports drift between
 services, suggests the next version from the library repository's git state, and

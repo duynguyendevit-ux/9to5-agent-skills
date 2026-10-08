@@ -1,48 +1,27 @@
 {
-  "_comment": "Cluster access registry for 9to5-k8s-service-debug. No secrets: paths only. Regenerate with the skill's config refresh step.",
-  "kubectl_bin": "/usr/bin/kubectl",
-  "kubeconfig": "/home/duynk/Downloads/dev-buuchinhso.yaml",
-  "kubeconfig_backup": "/home/duynk/Documents/k8slog/dev-buuchinhso.yaml",
-  "helpers_script": "/home/duynk/Documents/k8slog/rancher-log-alias.sh",
-  "helpers_install": "sourced from ~/.bashrc; helper snapshot kept at config/helpers/rancher-log-alias.sh",
-  "default_context": "dev-buuchinhso",
+  "_comment": "Illustrative configuration only. Populate from your own read-only cluster inventory before use.",
+  "kubectl_bin": "kubectl",
+  "kubeconfig": "~/.kube/config",
+  "helpers_script": "~/workspace/k8slog/rancher-log-alias.sh",
+  "default_context": "example-dev-context",
   "contexts": [
-    "dev-buuchinhso",
-    "dev-buuchinhso-175-APP-MASTER-01",
-    "dev-buuchinhso-175-APP-MASTER-02",
-    "dev-buuchinhso-175-APP-MASTER-03"
+    "example-dev-context"
   ],
   "environments": {
-    "dev-c7": {
-      "namespace": "dev-c7",
-      "project": "c7",
-      "space": "C7GSAFEDA",
-      "gitlab_group": "c7"
+    "example-dev": {
+      "namespace": "example-dev",
+      "project": "example-platform"
     },
-    "dev-c7-ttdvkh": {
-      "namespace": "dev-c7-ttdvkh",
-      "project": "c7-ttdvkh",
-      "space": "C7GSAFEDA",
-      "gitlab_group": "c7-ttdvkh"
+    "example-device": {
+      "namespace": "example-device",
+      "project": "example-device"
     }
   },
   "non_app_namespaces": [
-    "app", "cattle-fleet-system", "cattle-impersonation-system", "cattle-system",
-    "cert-manager", "default", "dev", "dev-physec-app", "dev-physec-dmz",
-    "dmz", "dmz-test", "gitlab-runner", "infra", "ingress-nginx",
-    "kafka-operator", "kube-node-lease", "kube-public", "kube-system",
-    "local", "logging", "monitoring", "security", "smallstep", "storage", "vault"
+    "default",
+    "kube-system"
   ],
   "not_covered": {
-    "uat_prod": "This kubeconfig exposes dev only (contexts are dev-buuchinhso*). uat/prod namespaces referenced by 9to5-env-config-sync are NOT reachable here. Ask the user for the uat/prod kubeconfig path instead of guessing.",
-    "helm_templates": "Deployed manifests come from ~/Documents/ots-env-custom/templates/helm plus per-env service-configs; the cluster is the source of truth for what is actually running."
-  },
-  "helper_commands": {
-    "kpods": "alias -> /usr/bin/kubectl get pods",
-    "klog": "klog <app> [namespace] [context]  - follow logs, tail 500",
-    "klogs": "alias of klog",
-    "kfind": "kfind <app> <regex> [namespace] [context]  - follow logs filtered by pattern",
-    "kerror": "kerror <app> [namespace] [context]  - kfind with error|exception|failed|fatal|panic|stacktrace",
-    "ksql": "ksql <app> [namespace] [context]  - follow logs, convert Hibernate show-sql + bind params into executable Oracle SQL"
+    "uat_prod": "Unverified: check your own kubeconfig; examples do not establish access."
   }
 }

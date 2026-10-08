@@ -39,7 +39,9 @@ Run from the checkout. Python 3 and PyYAML are required for metadata and auth te
 | Table editing / publication verification | `python3 -m unittest discover -s tests -p 'test_storage_tables.py'`; `python3 -m unittest discover -s tests -p 'test_confluence_publication.py'` |
 | Release links and release workflow contracts | `python3 -m unittest discover -s tests -p 'test_release_source_links.py'`; `python3 -m unittest discover -s tests -p 'test_skill_regressions.py'` |
 | Starter template generation | `python3 -m unittest discover -s tests -p 'test_core_init.py'` |
+| Spring env inventory / Java config binding scan | `python3 -m unittest discover -s tests -p 'test_spring_env_scan.py'` |
 | Legacy Jira release script | `python3 -m unittest discover -s skills/9to5-jira/scripts/tests` |
+| Upstream zjira release script | `python3 -m unittest discover -s skills/zjira/scripts/tests` |
 
 After focused checks, run `python3 -m unittest discover -s tests`.
 For canonical-owned work, use `SKILLS_ROOT` to test that source before export, then

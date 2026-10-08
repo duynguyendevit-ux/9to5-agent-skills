@@ -1,15 +1,15 @@
 {
   "projects": {
-    "dev-c7": {
-      "root": "92618728",
-      "group": "c7",
-      "space": "C7GSAFEDA",
+    "dev-product": {
+      "root": "12345",
+      "group": "product",
+      "space": "DEMO",
       "hl_color": "#998dd9"
     },
-    "dev-c7-ttdvkh": {
-      "root": "92618730",
-      "group": "c7-ttdvkh",
-      "space": "C7GSAFEDA",
+    "dev-user": {
+      "root": "23456",
+      "group": "user",
+      "space": "DEMO",
       "hl_color": "#c0b6f2"
     }
   }

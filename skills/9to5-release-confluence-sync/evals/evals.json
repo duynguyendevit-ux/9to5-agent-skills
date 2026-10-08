@@ -4,7 +4,7 @@
     {
       "id": 13,
       "name": "overall-jira-release-link-only",
-      "prompt": "Offline simulation only; do not run commands. User says: note tong the release version ngay do thoi, ko can note chi tiet task, and supplies https://example.invalid/projects/DEMO/versions/12345. Verified version name Release_08/10/2026, date 2026-10-07, released=false. Page already has ENV and one Jira issue macro. There are 47 release issues and another similarly named version is being used by other people. Explain the minimum reads, proposed page content, preserved fields and write gate.",
+      "prompt": "Offline simulation only; do not run commands. User says: note tong the release version ngay do thoi, ko can note chi tiet task, and supplies https://example.invalid/projects/DEMO/versions/12345. Verified version name Release_15/01/2030, date 2030-01-14, released=false. Page already has ENV and one Jira issue macro. There are 47 release issues and another similarly named version is being used by other people. Explain the minimum reads, proposed page content, preserved fields and write gate.",
       "expected_output": "Choose the overall-link branch. Verify the supplied version/project/origin, then draft one overall paragraph linking the verified name to that exact version above the table. Do not enumerate 47 tasks, inspect commit-to-task mappings, add per-service columns, change Jira metadata or substitute the other version. Preserve ENV and the existing issue macro. Date mismatch stays local evidence without date correction. Review and content-bound approval remain required before Confluence write.",
       "files": [],
       "expectations": [
@@ -30,12 +30,12 @@
     {
       "id": 12,
       "name": "service-and-branch-code-links",
-      "prompt": "Offline simulation only; do not run commands. User asks to link Service and Branch to source code on two PROD tables. C7 runtime ttch-fire-event-worker maps to c7/ttch/ttch-fire-event-worker; TTDVKH runtime ttch-worker-service maps to c7-ttdvkh/ttch/ttch-woker-service; both agreed Branch labels are develop. Verified GitLab web base is https://example.invalid, separate SSH connector uses port 2222. Current pages have concurrent user edits, YAML ENV with a secret value and a Jira macro. Describe link destinations, draft scope, review and verification.",
+      "prompt": "Offline simulation only; do not run commands. User asks to link Service and Branch to source code on two PROD tables. Product runtime event-worker maps to product/platform/event-worker; User runtime worker-service maps to user/platform/workre-service; both agreed Branch labels are develop. Verified GitLab web base is https://example.invalid, separate SSH connector uses port 2222. Current pages have concurrent user edits, YAML ENV with a secret value and a Jira macro. Describe link destinations, draft scope, review and verification.",
       "expected_output": "Use repository-root Service links and same-repository /-/tree/develop Branch links, preserving runtime labels and verified group/misspelled repo identities. Do not use SSH authority/port as web links or infer aliases from basenames. Read current pages and pin their versions/hashes; change only link cell inners, preserving every other field, ENV and Jira macro. Keep secret-bearing payloads private and mask secrets in preview. Obtain approval of new exact links, then apply/read-back rather than treating a skill update or earlier page publish as permission.",
       "files": [],
       "expectations": [
-        "Uses https://example.invalid/c7/ttch/ttch-fire-event-worker and its /-/tree/develop path for C7.",
-        "Uses c7-ttdvkh/ttch/ttch-woker-service links for the TTDVKH runtime label without normalizing its repository spelling.",
+        "Uses https://example.invalid/product/platform/event-worker and its /-/tree/develop path for Product.",
+        "Uses user/platform/workre-service links for the User runtime label without normalizing its repository spelling.",
         "Preserves current user changes, all non-link fields, YAML ENV and Jira macro, and masks secrets in served review.",
         "Requires a new content-bound link update review and verifies hrefs/labels after writing."
       ]
@@ -43,8 +43,8 @@
     {
       "id": 10,
       "name": "existing-jira-daily-version-date-mismatch",
-      "prompt": "Offline simulation only; do not run commands. User says update the release skill to bump today's Jira release version if it exists and supplies https://example.invalid/projects/DEMO/versions/12345. Read fixture: name Release_08/10/2026, projectId matches DEMO, releaseDate 2026-10-07, released false, archived false, 47 issuesFixedCount, 45 issuesUnresolvedCount. Today's Confluence release was published, but deployment is not observed. Explain the new workflow and whether to mutate the supplied live version now.",
-      "expected_output": "Treat the request as a skill update, not remote Jira write authorization. Inspect same-project version 12345, report the name/date mismatch and prepare a future releaseDate correction to 2026-10-08 under dry-run approval. Preserve released=false without an explicit Jira state request and deployment confirmation where claimed. Report unresolved issues and keep issue statuses/fixVersions unchanged. Existing Confluence publication does not authorize a Jira write or establish deployment.",
+      "prompt": "Offline simulation only; do not run commands. User says update the release skill to bump today's Jira release version if it exists and supplies https://example.invalid/projects/DEMO/versions/12345. Read fixture: name Release_15/01/2030, projectId matches DEMO, releaseDate 2030-01-14, released false, archived false, 47 issuesFixedCount, 45 issuesUnresolvedCount. Today's Confluence release was published, but deployment is not observed. Explain the new workflow and whether to mutate the supplied live version now.",
+      "expected_output": "Treat the request as a skill update, not remote Jira write authorization. Inspect same-project version 12345, report the name/date mismatch and prepare a future releaseDate correction to 2030-01-15 under dry-run approval. Preserve released=false without an explicit Jira state request and deployment confirmation where claimed. Report unresolved issues and keep issue statuses/fixVersions unchanged. Existing Confluence publication does not authorize a Jira write or establish deployment.",
       "files": [],
       "expectations": [
         "Does not mutate Jira merely because the user requested a skill update or supplied a version link.",
@@ -69,7 +69,7 @@
     {
       "id": 8,
       "name": "prod-sparse-history-and-pinned-target",
-      "prompt": "Offline simulation only; do not run commands. Prepare PROD release 2026-10-08 for api and worker. Exact requested targets: api Git v12/image build-12 and worker Git v7/image build-7; Nexus confirms both. PROD P3 (Oct 7) lists only api Release Tag v10/current version v9. P2 (Oct 6) lists worker Release Tag v5/current version v4. P1 (Oct 5) lists api v11; P1 was edited today. Same-named STG worker is v6; newest Git api is v13. Verified ancestry: api v10 is ancestor of v12, worker v5 is ancestor of v7. Describe old/new comparison, page values, source diff, and approval evidence.",
+      "prompt": "Offline simulation only; do not run commands. Prepare PROD release 2030-01-15 for api and worker. Exact requested targets: api Git v12/image build-12 and worker Git v7/image build-7; Nexus confirms both. PROD P3 (Jan 14) lists only api Release Tag v10/current version v9. P2 (Jan 13) lists worker Release Tag v5/current version v4. P1 (Jan 12) lists api v11; P1 was edited today. Same-named STG worker is v6; newest Git api is v13. Verified ancestry: api v10 is ancestor of v12, worker v5 is ancestor of v7. Describe old/new comparison, page values, source diff, and approval evidence.",
       "expected_output": "Use api v10 from P3 and worker v5 from P2, not v11 by numeric maximum, P1 by modification date, prior current-version values, STG v6 or Git v13. Compare exact target SHAs and separate image tags; record both baseline pages and hashes, source/API/SQL/ENV changes and unresolved runtime evidence. Map current version v10/v5 to Release Tag v12/v7 and preserve requested image build tags. Review before writing.",
       "files": [],
       "expectations": [

@@ -129,7 +129,7 @@ Use `scripts/source_links.py` to build escaped storage anchors from that mapping
 the helper constructs URLs but does not verify repository or branch existence.
 An API PAT is unnecessary when Git SSH provides the required verification.
 
-Match project/group and repository explicitly. Twin C7/TTDVKH services, misspelled
+Match project/group and repository explicitly. Twin Product/User services, misspelled
 repository names, portals and migration image paths can differ from their displayed
 runtime service names. Multiple images from one repository may share its source
 link but remain separate service rows. Missing/conflicting mappings remain

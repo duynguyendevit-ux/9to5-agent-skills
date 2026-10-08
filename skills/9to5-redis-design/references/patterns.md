@@ -1,7 +1,7 @@
-# Redis naming and consistency patterns in OTS services
+# Redis naming and consistency patterns in Platform services
 
-Grounded in the ttch-worker-service / TTDVKH flows as recorded in the vault
-(`Internal/Code/TTDVKH/ttch-worker-service/`). Recheck the service checkout before
+Grounded in the worker-service / User flows as recorded in the vault
+(`Internal/Code/User/worker-service/`). Recheck the service checkout before
 relying on any specific key; treat this file as the pattern catalogue, not the registry.
 
 ## Namespace inventory seen in practice
@@ -9,7 +9,7 @@ relying on any specific key; treat this file as the pattern catalogue, not the r
 | Key | Type | Role | TTL | Owner |
 |---|---|---|---|---|
 | `cacheEventHandle:{eventHandleId}` | hash | event-handle snapshot, cache-first read in REDIS mode | 2700s | worker/write services; queue path writers |
-| `cacheTtdvkhDiaryContentTemplateConfig` | hash/config | diary template policy (`allowSendC7`, `markSendOnly`, `isActive`) | long/refresh-based | diary-service writes, worker reads |
+| `cacheUserDiaryContentTemplateConfig` | hash/config | diary template policy (`allowSendProduct`, `markSendOnly`, `isActive`) | long/refresh-based | diary-service writes, worker reads |
 | `schedule:event-handle:due` | ZSET | milestone due queue | none (drained) | worker registration + dispatcher |
 | `event-handle:schedule:processing-mode` | string | runtime mode switch (`DB`/`REDIS`) | none | operators; env-configured key name |
 

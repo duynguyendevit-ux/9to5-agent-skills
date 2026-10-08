@@ -41,5 +41,24 @@ Operation snapshots, private payloads and receipts belong in a private working
 directory. Publish only sanitized review artifacts. Record durable behavior in the
 owning skill/reference, not by checking private snapshots into this repository.
 
+Store actual config and inventory under `~/.config/opencode/skill-data/<skill>/`,
+outside both the skill installation and public checkout. Existing installed paths
+may be compatibility symlinks to these private files; the public export uses
+synthetic replacements or excludes them. Keep the dotfile directories private.
+
+Task memory belongs in `<working-repo>/.kit/memory/`; release drafts, snapshots,
+approval manifests and receipts belong in `<working-repo>/.kit/releases/<request>/`.
+Add both directories to that repo's `.gitignore` before saving private data. Without
+a working repo, use `~/.local/state/opencode/requests/<request>/` (mode 700), or the
+approved private temporary directory for short-lived work. Public skills carry the
+workflow/templates, not real request data. Serve sanitized previews separately.
+
+Public exports can differ deliberately from canonical/mirror copies. Read the
+[public-export boundary](../skills/9to5-skill-sync/references/public-export.md) when
+maintaining a public collection: use synthetic product/user examples, reserved
+example hosts and documentation IP ranges instead of publishing internal names,
+inventories, endpoints or release records. Keep disclosure rules machine-local.
+Parity compares the export with the sanitized expected representation.
+
 The installer backs up existing destinations, but running it is still a replacement
 operation. It is not an interchangeable way to synchronize canonical-owned work.

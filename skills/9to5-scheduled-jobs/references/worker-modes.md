@@ -1,7 +1,7 @@
 # Worker modes — the two-mode milestone pipeline
 
-Reference architecture: `ttch-worker-service` event-handle milestones, as recorded in the
-vault (`Internal/Code/TTDVKH/ttch-worker-service/TTCH Worker Service - Event Handle
+Reference architecture: `worker-service` event-handle milestones, as recorded in the
+vault (`Internal/Code/User/worker-service/PLATFORM Worker Service - Event Handle
 Schedule Mode.md` and the cache-flow note). Recheck the checkout before relying on
 details; this file generalizes the pattern.
 
@@ -26,7 +26,7 @@ Outbox DB -> Registration -> ZSET schedule:event-handle:due   (warm-up, always o
 
 ## Generalizing the pattern
 
-Any OTS service that owns per-entity delays (milestones, retries, expirations) can use
+Any Platform service that owns per-entity delays (milestones, retries, expirations) can use
 this architecture with the following invariants:
 
 1. **One definition of due.** Due time is computed from entity state and configured

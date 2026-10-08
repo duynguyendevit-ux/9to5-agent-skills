@@ -1,6 +1,6 @@
 ---
 name: 9to5-container-build
-description: Build and review service container images and CI release wiring for OTS services — the two-stage Dockerfile convention, internal registry base images, shared GitLab CI templates for dev-c7, CI_TAG to APP_VERSION wiring, JVM flags, and OOM dump paths inside containers. Use when adding a Dockerfile, changing builder or runtime images, adjusting JVM flags or heap in the image, or wiring a new service into the C7 CI/CD templates.
+description: Build and review service container images and CI release wiring for Platform services — the two-stage Dockerfile convention, internal registry base images, shared GitLab CI templates for dev-product, CI_TAG to APP_VERSION wiring, JVM flags, and OOM dump paths inside containers. Use when adding a Dockerfile, changing builder or runtime images, adjusting JVM flags or heap in the image, or wiring a new service into the Product CI/CD templates.
 license: MIT
 compatibility: Review is file-based and needs the service checkout; local image builds additionally need the internal registry credentials and a container engine. Runtime image verification happens on the cluster through 9to5-k8s-service-debug. Never hardcode registry hostnames in skills or notes.
 metadata:
@@ -14,11 +14,11 @@ metadata:
 Illustrative review; versions and flags come from the actual Dockerfile and pipelines.
 
 ```text
-Service: example-service, port 8082, group ots/apps/c7/<group>
-Dockerfile: two-stage — builder <registry>/ots/infras/build/gradle:8.3.0-jdk17-alpine,
-  runtime <registry>/ots/infras/images/jdk-eclipse-temurin:17.0.12_7-jre-alpine;
-  CI_TAG arg wired to APP_VERSION; user ots; TZ UTC.
-CI: includes shared templates java-ci.yaml + c7-cd.yaml from the env-config repo;
+Service: example-service, port 8082, group example/apps/product/<group>
+Dockerfile: two-stage — builder <registry>/example/infras/build/gradle:8.3.0-jdk17-alpine,
+  runtime <registry>/example/infras/images/jdk-eclipse-temurin:17.0.12_7-jre-alpine;
+  CI_TAG arg wired to APP_VERSION; user app; TZ UTC.
+CI: includes shared templates java-ci.yaml + product-cd.yaml from the env-config repo;
   CI_REGISTRY_IMAGE and CI_REGISTRY_PATH set per service.
 Findings: -XX:+HeapDumpOnOutOfMemoryError is set but no HeapDumpPath — dumps land in the
   container filesystem and vanish with the pod. Either mount a dump path or accept loss;
@@ -43,7 +43,7 @@ Unverified: local image build not run (no container engine / registry credential
 
 1. **Read the current convention first.** Open an existing service Dockerfile and its
    `.gitlab-ci.yml` (any recently touched service in the same group). The shared CI
-   templates in the env-config repository's `templates/ci-cd/c7/` are the source of
+   templates in the env-config repository's `templates/ci-cd/product/` are the source of
    truth for pipeline behaviour; the Dockerfile in the service repo is the source of
    truth for the image.
 2. **Copy the two-stage shape.** Builder stage installs and compiles (`gradle build -x

@@ -10,7 +10,7 @@ debug/artifacts/<YYYYMMDD>-<app>-<short-slug>/
 
 ## Rules
 
-- One directory per investigation, named `<date>-<app>-<slug>` (e.g. `20260922-ttch-worker-service-outbox-lag`).
+- One directory per investigation, named `<date>-<app>-<slug>` (e.g. `20260922-worker-service-outbox-lag`).
 - Save filtered excerpts, not full `--tail=500` dumps. Keep the lines that prove the point.
 - Strip before saving: bearer tokens, cookies, device credentials, phone numbers, email addresses, personal names.
 - `session.md` always ends with a next action. "No conclusion" is acceptable; a dead end written down saves the next run.
@@ -22,7 +22,7 @@ debug/artifacts/<YYYYMMDD>-<app>-<short-slug>/
 # <app> — <symptom in one line>
 
 - Date: YYYY-MM-DD
-- Namespace: dev-c7 | dev-c7-ttdvkh
+- Namespace: dev-product | dev-user
 - Pod: <pod name>
 - Trigger: <ticket / request / report>
 - Deployed image: <image tag if known>

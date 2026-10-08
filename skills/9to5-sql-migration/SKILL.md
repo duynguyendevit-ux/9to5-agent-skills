@@ -1,6 +1,6 @@
 ---
 name: 9to5-sql-migration
-description: Write and review Oracle migration scripts for the C7/TTDVKH schemas (admin/sql/oracle, V<YYYYMMDD>_<NN>__<type>_<description>.sql). Use when the user asks to add or alter Oracle tables, columns, indexes, constraints, or seed/data fixes, mentions a migration/DDL/script file, or asks to review a migration before release.
+description: Write and review Oracle migration scripts for the Product/User schemas (admin/sql/oracle, V<YYYYMMDD>_<NN>__<type>_<description>.sql). Use when the user asks to add or alter Oracle tables, columns, indexes, constraints, or seed/data fixes, mentions a migration/DDL/script file, or asks to review a migration before release.
 license: MIT
 metadata:
   version: "1.0.1"
@@ -27,8 +27,8 @@ Write Flyway-style Oracle scripts that match the existing repository conventions
 
 ## Locations
 
-- C7: `~/Documents/C777777777777/ttch-migration/admin/sql/oracle/`
-- TTDVKH migrations live in the matching `migrations` repositories (`~/Documents/migration/...`).
+- Product: `~/workspace/product/platform-migration/admin/sql/oracle/`
+- User migrations live in the matching `migrations` repositories (`~/workspace/migration/...`).
 - Confirm with `git rev-parse --show-toplevel` before editing; never assume.
 
 ## Naming

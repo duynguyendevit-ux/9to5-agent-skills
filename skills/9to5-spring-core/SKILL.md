@@ -1,6 +1,6 @@
 ---
 name: 9to5-spring-core
-description: Code and initialize OTS Spring services using microservice-spring-boot-starter. Use when asked to init core, bootstrap a service, scaffold controller/use-case/repository layers, use tech.outsource.core responses/auditing, configure writer-reader routing, or integrate the microservice starter. Derive APIs from the checked-out starter; generate an environment-driven Java 17 template rather than copying credentials or assuming stock Spring defaults.
+description: Code and initialize Platform Spring services using microservice-spring-boot-starter. Use when asked to init core, bootstrap a service, scaffold controller/use-case/repository layers, use tech.outsource.core responses/auditing, configure writer-reader routing, or integrate the microservice starter. Derive APIs from the checked-out starter; generate an environment-driven Java 17 template rather than copying credentials or assuming stock Spring defaults.
 license: MIT
 compatibility: Python 3 for scaffolding; Java 17 and a compatible Gradle wrapper for compilation. Full startup requires the selected published starter and its dependencies, Oracle writer/reader settings, Redis and external JWT keys.
 metadata:
@@ -9,7 +9,7 @@ metadata:
 
 # Spring Core — coding và init service
 
-Nguồn: `/home/duynk/Documents/microservice-spring-boot-starter`, package
+Nguồn: `/home/example/workspace/microservice-spring-boot-starter`, package
 `tech.outsource.core`. Snapshot đã đọc: `bfa01dd7623dc48c2dabbe400a591036929ec44e`.
 Đây là thư viện starter, không phải executable service; không copy nguyên build.gradle
 của thư viện làm application. Chi tiết bằng chứng: `references/source-map.md`.
