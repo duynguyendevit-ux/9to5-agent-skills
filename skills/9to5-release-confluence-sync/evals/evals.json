@@ -172,14 +172,53 @@
     {
       "id": 15,
       "name": "env-var-check-tag-versus-develop",
-      "prompt": "Offline simulation only; do not run commands. A release page has a worker service whose ENV cell lists three feature switches but no dates. For that service the release tag and origin/develop have identical config trees except two Java files. The tag's deployed application.yml defines BACKFILL_FROM=2024-01-01T17:00:00 and BACKFILL_TO=2026-11-01T17:00:00; the local profile uses 2027-01-01. The env-config repo has the service's Elasticsearch address but none of the feature vars. Explain the check and what belongs in the cell.",
-      "expected_output": "Treat the identical config trees as no env delta and ignore the Java-only diff and the local profile. Read the deployed application.yml at the tag, not application-local.yml. Classify the vars: switches (already set), the date window (most critical), connection values. Flag that the backfill TO default bounds the job at 2026-11-01 and that the feature vars are absent from the env configs. Add the window dates (and other missing release vars) to the cell only on request, quoting values, keeping the rest of the body byte-identical, applying with the version gate and verifying after.",
+      "prompt": "Offline simulation only; do not run commands. A PROD release page has a worker service whose ENV cell lists three feature switches but no dates. The release tag and origin/develop have identical config files and two Java-only changes whose ENV relevance has not been inspected. Deployment evidence confirms only the base application.yml and no external overrides are active. At the tag it defines BACKFILL_FROM=2024-01-01T17:00:00 and BACKFILL_TO=2026-11-01T17:00:00; an inactive local profile uses 2027-01-01. The PROD values.yaml and .env have Elasticsearch configuration but omit the backfill keys. Explain the check and proposed page handling. No exact page diff has been approved yet.",
+      "expected_output": "Report no config-file delta but inspect the Java changes and scan a tag snapshot before concluding no ENV delta. Use the confirmed active base config, not the inactive local profile. Prioritize the switches and date window; explain the tag's TO bound and distinguish omitted PROD overrides from values supplied by defaults. Propose the relevant window dates without overwriting existing operational values. Show an exact body/value diff and obtain content-bound approval before the expected-version-gated write, then verify saved storage and rendered text. No deployment is implied.",
       "files": [],
       "expectations": [
-        "Compares the release tag with develop and reports the config delta (none) separately from code-only differences.",
-        "Reads the tag's deployed application.yml rather than the local profile and uses its values.",
+        "Reports no config-file delta but inspects Java ENV consumers and inventories the release tag before concluding no ENV delta.",
+        "Uses the confirmed active base configuration rather than the inactive local profile and distinguishes defaults from deployment overrides.",
         "Prioritizes switches and date windows, flagging the backfill TO default as the critical bound.",
-        "Keeps the page write behind an explicit request, the version gate and read-back verification."
+        "Requires an exact reviewed body/value diff and content-bound approval, plus the version gate and read-back verification; does not claim deployment."
+      ]
+    },
+    {
+      "id": 16,
+      "name": "java-env-consumer-and-active-prod-profile",
+      "prompt": "Offline simulation only; do not run commands. User requests a PROD release ENV check. Tag and develop have identical resource files, but develop adds @Value(\"${FUTURE_SWITCH:false}\") in Java. Java at the tag already calls System.getenv(\"BACKFILL_RUN_ID\"). The tag's application.yml has BACKFILL_TO=2026-11-01T17:00:00; application-prod.properties sets its fallback to 2027-01-01T17:00:00. Deployment configuration proves prod is active. The current checkout is develop with uncommitted edits. Describe the inventory, comparison and date evidence without applying any changes.",
+      "expected_output": "Inventory a clean release-tag snapshot with the Spring env scanner, including Java and properties. Treat FUTURE_SWITCH as an ENV-relevant develop-only change, not a tag variable or requested release setting. Include the tag's BACKFILL_RUN_ID consumer. Resolve the active prod profile and precedence; use the active 2027-01-01 fallback as source evidence unless an external override changes it, rather than the base date. Report scanner limits and unresolved external sources, keep the working tree unchanged and propose no unapproved write.",
+      "files": [],
+      "expectations": [
+        "Scans a clean tag snapshot rather than the current develop working tree and reuses the Spring env scanner.",
+        "Recognizes Java ENV changes but excludes develop-only FUTURE_SWITCH from the shipped tag inventory.",
+        "Accounts for tag Java consumers and active application-prod.properties precedence over base configuration.",
+        "Reports unresolved external sources and leaves source, deployment and Confluence untouched."
+      ]
+    },
+    {
+      "id": 17,
+      "name": "no-default-and-target-environment-evidence",
+      "prompt": "Offline simulation only; do not run commands. A PROD ENV review finds ${OPTIONAL_ENDPOINT} without a fallback only in an inactive local profile. A prod-active API key placeholder is supplied through a Kubernetes Secret reference. DEV values.yaml lacks BACKFILL_ENABLED, while DEV .env contains it. This env-config checkout has no PROD service directory, and PROD Helm/CI values are unavailable. Explain requiredness and what is known about missing PROD configuration. Never emit secret values.",
+      "expected_output": "Do not call OPTIONAL_ENDPOINT required for PROD because its occurrence is inactive. Record the API key's supplying Secret reference/presence without outputting its value or claiming runtime resolution from a static reference alone. Check both values.yaml and .env for the same environment, reporting DEV presence without extrapolating to PROD. Missing PROD files and unavailable overrides mean unverified PROD configuration, not missing PROD variables or an automatic ops action. Keep any page/config change behind a separately reviewed approved plan.",
+      "files": [],
+      "expectations": [
+        "Treats no_default as an occurrence-level fallback fact and checks profile/consumer activity before asserting requiredness.",
+        "Records secret references only and withholds secret values while stating resolution limits.",
+        "Checks values.yaml and .env without equating DEV evidence to PROD state.",
+        "Reports absent PROD sources as unverified rather than concluding missing variables or authorizing a write."
+      ]
+    },
+    {
+      "id": 18,
+      "name": "author-history-and-release-tag-scope",
+      "prompt": "Offline simulation only; do not run commands. User asks to check release ENV only for services they worked on. Jira maps their assigned worker subtask to a parent carrying the requested fixVersion; the subtask has no fixVersion. Worker history has no commits under their name because a maintainer squashed the work. Source evidence shows the worker tag contains that change although its branch has not merged into develop. A separate dashboard branch is recent but its change is absent from the dashboard release tag. Explain selected services, contribution evidence and shipped-feature inclusion.",
+      "expected_output": "Retain worker using the verified parent/subtask and service mapping despite missing author commits. Treat the author log as supporting, potentially partial evidence; inspect relevant parents/subtasks rather than relying only on direct assignee/fixVersion filtering. Determine feature inclusion from release-tag source/history, not develop merge status: worker ships its verified change, dashboard does not ship its feature-branch change. Label unresolved mappings unverified and stay within the user's service scope without writing pages or deployments.",
+      "files": [],
+      "expectations": [
+        "Does not exclude worker merely because author commits are absent after squash attribution.",
+        "Uses relevant parent/subtask fixVersion and verified Jira-to-service mapping as contribution evidence.",
+        "Determines feature inclusion at the tag rather than inferring it from develop merge status or recent branch work.",
+        "Preserves the requested scope, reports unresolved mappings and performs no unapproved write."
       ]
     },
     {
