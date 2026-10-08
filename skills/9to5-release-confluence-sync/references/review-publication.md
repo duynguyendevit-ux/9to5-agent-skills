@@ -24,6 +24,9 @@ For the separate `Cấu hình biến môi trường` column, follow the explicit
 branch below. Release Note cleanup alone preserves that column. Report the number
 of service rows reviewed and non-empty inherited notes removed.
 
+To verify or complete a service's env vars against its release tag, follow
+[env-var verification](env-var-verification.md).
+
 ## Cấu hình biến môi trường: clear only on request
 
 Preserve this column by default. When the user explicitly requests clearing its

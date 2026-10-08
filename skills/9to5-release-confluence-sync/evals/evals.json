@@ -170,6 +170,19 @@
       ]
     },
     {
+      "id": 15,
+      "name": "env-var-check-tag-versus-develop",
+      "prompt": "Offline simulation only; do not run commands. A release page has a worker service whose ENV cell lists three feature switches but no dates. For that service the release tag and origin/develop have identical config trees except two Java files. The tag's deployed application.yml defines BACKFILL_FROM=2024-01-01T17:00:00 and BACKFILL_TO=2026-11-01T17:00:00; the local profile uses 2027-01-01. The env-config repo has the service's Elasticsearch address but none of the feature vars. Explain the check and what belongs in the cell.",
+      "expected_output": "Treat the identical config trees as no env delta and ignore the Java-only diff and the local profile. Read the deployed application.yml at the tag, not application-local.yml. Classify the vars: switches (already set), the date window (most critical), connection values. Flag that the backfill TO default bounds the job at 2026-11-01 and that the feature vars are absent from the env configs. Add the window dates (and other missing release vars) to the cell only on request, quoting values, keeping the rest of the body byte-identical, applying with the version gate and verifying after.",
+      "files": [],
+      "expectations": [
+        "Compares the release tag with develop and reports the config delta (none) separately from code-only differences.",
+        "Reads the tag's deployed application.yml rather than the local profile and uses its values.",
+        "Prioritizes switches and date windows, flagging the backfill TO default as the critical bound.",
+        "Keeps the page write behind an explicit request, the version gate and read-back verification."
+      ]
+    },
+    {
       "id": 7,
       "name": "explicit-environment-column-cleanup",
       "prompt": "Offline simulation only; do not run commands. User first says 'clear data mục Cấu hình biến môi trường nếu có yêu cầu' while editing the skill. Later in a release-page workflow they explicitly request clearing that column for every service row. Fixture: 4 numbered rows and 1 unnumbered service row; 3 cells contain text, links and a macro. The actual header is present at a different column index than usual. An earlier reviewed plan approved Release Note cleanup only. Describe default behavior, the revised review, and apply/read-back boundaries; also explain how a request restricted to Portal would differ.",

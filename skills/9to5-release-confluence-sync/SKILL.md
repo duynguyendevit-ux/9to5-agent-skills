@@ -4,7 +4,7 @@ description: Prepare and publish Confluence release pages with verified tags/ima
 license: MIT
 compatibility: Requires the zjira CLI and Confluence credentials in ~/.config/zjira/config.yaml; GitLab SSH access for tag discovery. Reads non-secret endpoints from config/endpoints.json.
 metadata:
-  version: "1.7.0"
+  version: "1.8.0"
 ---
 
 # Release Sync
@@ -76,6 +76,10 @@ issue-list traversal nor Git-history scans.
    For cell/column edits, explicit missing-colgroup repair or width serialization,
    reuse the [Confluence storage-table helpers](../9to5-confluence/references/storage-tables.md)
    rather than rebuilding a transformer for each page.
+   For an environment-variable check or completion on the page, follow
+   [env-var verification](references/env-var-verification.md): compare each release
+   tag with develop, read the tag's deployed profile, and prioritize on/off switches
+   and date windows (dates are the most critical).
 5. Show the exact scope and a usable review link, then obtain content-bound approval.
    A request to review or a question about completion is not approval. A direct
    `ok push` / `update Confluence` after that review approves the unchanged plan.
