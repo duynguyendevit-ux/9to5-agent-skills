@@ -1,8 +1,24 @@
 #!/usr/bin/env python3
 """Render the bundled core service template without overwriting existing files."""
 import argparse
+import os
 from pathlib import Path
 import re
+
+
+GENERATED_DIRECTORIES = {'.gradle', 'build', '.git', '__pycache__', 'node_modules', '.idea', '.venv'}
+
+
+def template_files(root):
+    """Enumerate text template inputs without traversing generated caches."""
+    sources = []
+    for directory, names, files in os.walk(root, followlinks=False):
+        names[:] = sorted(name for name in names if name not in GENERATED_DIRECTORIES)
+        for name in files:
+            if name == '.DS_Store':
+                continue
+            sources.append(Path(directory) / name)
+    return sorted(sources)
 
 
 def main():
@@ -19,7 +35,7 @@ def main():
     root = args.output.expanduser().absolute()
     templates = Path(__file__).resolve().parents[1] / 'assets' / 'init-core'
     files = []
-    for source in sorted(templates.rglob('*')):
+    for source in template_files(templates):
         if not source.is_file():
             continue
         relative = source.relative_to(templates)

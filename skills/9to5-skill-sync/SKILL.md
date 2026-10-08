@@ -4,7 +4,7 @@ description: Keep an edited 9to5 skill consistent across its canonical directory
 license: MIT
 compatibility: Requires bash, rsync, python3, and a checkout of the skills repository. Reads paths from config/paths.json.
 metadata:
-  version: "1.0.2"
+  version: "1.0.3"
 ---
 
 # Skill Sync
@@ -27,7 +27,12 @@ orphan skill (not removed): /example/mirror/9to5-retired/
 Exit status: 1
 ```
 
-A skill exists in five places. Only one is edited by hand.
+This workflow owns **independent canonical directories** and exports copies.
+For a checkout installed with `install.sh` symlinks, edit that checkout and use
+its installer instead: canonical symlinks are deliberately skipped by this tool.
+Choose the source/copy direction first; the two modes are not interchangeable.
+
+In canonical-owned mode, a skill exists in five places. Only one is edited by hand.
 
 | Location | Role |
 |----------|------|
@@ -55,6 +60,8 @@ Mirrors receive all canonical files except `exclude_always`, including local end
 files (with their permissions), caches, and debug artifacts. They are local working
 copies, not publishable exports. Only the repository copy applies `exclude_from_repo`.
 Copy rules and hash comparisons use the same policy for each destination.
+Generated Gradle cache directories are excluded from both copying and hashes;
+excluded destination caches are preserved, not deleted to make parity pass.
 
 ## Workflow
 
@@ -77,7 +84,10 @@ Copy rules and hash comparisons use the same policy for each destination.
 
 ## When a skill is new
 
-The `--check` output shows `missing` for a location that does not have the skill yet. `--apply` creates it. After the first apply, add the skill to the repository README table so the repo documents what it ships.
+The `--check` output shows `missing` for a location that does not have the skill yet.
+`--apply` creates it. In the export checkout, run `python3 scripts/update_catalog.py`
+after synchronization, then `--check`; the README catalog is generated from current
+frontmatter rather than manually maintained names/versions.
 
 ## Reading the check output
 

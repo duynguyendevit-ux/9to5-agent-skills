@@ -1,5 +1,9 @@
 # Verification fixes — 2026-09-24
 
+**Historical snapshot.** Counts and results below describe that audit, not the
+current collection or checkout. Use [current validation commands](workflows.md#validation)
+for today's result; the [documentation index](README.md) lists active guidance.
+
 All 14 findings from the installed-collection audit were addressed. All 16 skills
 also include clearly labeled illustrative example outputs and updated version metadata.
 

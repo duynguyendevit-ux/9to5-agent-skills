@@ -2,6 +2,10 @@
 
 Agent skills for OpenCode v2, used for day-to-day development work (Jira, release pages, Oracle migrations, Kubernetes debugging, Spring conventions).
 
+Start with [workflow routes](docs/workflows.md) to select an owner and CLI.
+For edits or sync, resolve [authoring mode](docs/authoring.md) first; installation
+and canonical-owned authoring use different source/copy directions.
+
 ## Download and install
 
 ### Install with the Skills CLI
@@ -102,43 +106,48 @@ included in the public download.
 
 ## Skills
 
+Generated from skill frontmatter by `python3 scripts/update_catalog.py`.
+Validate without writing using its `--check` mode.
+
+<!-- skill-catalog:start -->
 | Skill | Version | Purpose |
-|-------|---------|---------|
-| `9to5-debug-loop` | 1.0.0 | Symptom-specific reproduction, falsifiable hypotheses and measured bug-fix verification. |
-| `9to5-code-review` | 1.0.0 | Read-only, pinned-diff review with separate Standards and Spec findings. |
-| `9to5-handoff` | 1.0.0 | Explicit-request coding-session handoff; automatic advertising disabled in OpenCode V2. |
-| `9to5-git-publish` | 1.0.0 | Commit/push the requested repo only; scoped staging, validation and remote-SHA verification. |
-| `9to5-github-audit` | 1.0.0 | Read-only paginated repo inventory and commit-specific, per-workflow Actions evidence. |
-| `9to5-github-settings` | 1.0.0 | Scoped visibility/description changes, preserved exceptions and read-back verification. |
-| `9to5-jira` | 2.1.2 | Fetch a Jira issue and linked Confluence spec, explore the repo, write an implementation plan to `.kit/plans/`. |
-| `9to5-logwork` | 1.4.1 | Log Jira worklogs via conversation, normalize duration to seconds, and derive date-filtered agent activity. |
-| `9to5-jira-day-check` | 1.0.1 | Daily read-only summary: sprint issues, missing worklogs, releases still pending tag sync. |
-| `9to5-release-confluence-sync` | 1.0.4 | Roll previous release tags into current version, verify service tags, and reset inherited highlights on cloned pages. |
-| `9to5-release-audit` | 1.0.1 | Read-only release-record comparisons; rejects duplicate service rows and reports empty records and source changes. |
-| `9to5-confluence-auth` | 1.0.0 | Load dotfile PAT config safely, verify Confluence independently of Jira, and initialize the CLI only when auth is missing. |
-| `9to5-confluence-doc` | 1.2.0 | Source-backed Vietnamese technical notes with auth preflight, local review and approved publication. |
-| `9to5-confluence` | 1.2.0 | General Confluence operations with shared auth; updates require the reviewed base version and explicit approval. |
-| `9to5-sql-migration` | 1.0.1 | Write and review Oracle migration scripts (`admin/sql/oracle`, Flyway-style naming). |
-| `9to5-oracle-index` | 1.0.1 | Oracle-specific index candidates, actual-plan verification, null coverage, top-N and write trade-offs. |
-| `9to5-sql-forensics` | 1.0.0 | Reconstruct runnable Oracle SQL from Hibernate logs; packet feeds index review and migration. |
-| `9to5-oracle-locking` | 1.0.0 | Claim-query and lock-contention review: SKIP LOCKED semantics, deadlock traces, transaction hygiene. |
-| `9to5-id-design` | 1.0.1 | Identity, explicit sequences and application IDs: Oracle storage, allocation, concurrency and exposure. |
-| `9to5-env-config-sync` | 1.0.1 | Compare and align service env configs across environments; keep secrets out. |
-| `9to5-spring-conventions` | 1.0.1 | Review Java/Spring changes against house conventions. |
-| `9to5-spring-core` | 1.0.0 | Source-backed starter coding guide and Java 17 service init template: core API contracts, JPA routing, auditing, context cleanup and environment configuration. |
-| `9to5-feature-prototype` | 1.0.0 | Explain a proposed feature in the current repository's real structure with a Mermaid diagram; design only, no application-code edits. |
-| `9to5-mydevtools` | 1.0.0 | Use the browser-first developer utilities (plan visual, log analyzer, SQL extractor, decoders) instead of one-off scripts. |
-| `9to5-k8s-service-debug` | 1.0.1 | Debug cluster services with source-filtered configuration inspection and local evidence. |
-| `9to5-heap-triage` | 1.0.0 | Triage JVM heap dumps with MAT headless; suspect patterns, dominator evidence, capture loop. |
-| `9to5-redis-design` | 1.0.0 | Redis key namespacing, TTL policy, cache consistency and guarded writes. |
-| `9to5-scheduled-jobs` | 1.0.0 | Scheduled workers and milestone pipelines: DB polling vs ZSET, mode switches, catch-up, replica safety. |
-| `9to5-kafka` | 1.1.2 | Kafka contracts, corrected Oracle outbox diagnosis, long-running jobs and share-group trade-offs. |
-| `9to5-mqtt-notifications` | 1.0.0 | MQTT refresh delivery and the merchant gateway pattern; QoS choice and channel decisions. |
-| `9to5-grpc-contracts` | 1.0.0 | Proto3 layout, wire compatibility, artifact version flow and server/client patterns. |
-| `9to5-device-availability` | 1.0.0 | Device availability math, error taxonomy, daily-index queries and export surfaces. |
-| `9to5-lib-bump` | 1.0.1 | Audit and bump shared libraries; reject ambiguous checkout names and allow explicit paths. |
-| `9to5-container-build` | 1.0.0 | Two-stage service images, internal registry bases, CI template wiring, JVM flags and dump paths. |
-| `9to5-skill-sync` | 1.0.2 | Synchronize only 9to5 skills, preserve local mirror config, filter repository exports and detect unresolved drift. |
+| --- | --- | --- |
+| [`9to5-code-review`](skills/9to5-code-review/SKILL.md) | 1.0.0 | Review a pinned diff along separate Standards and Spec axes, with concrete correctness/security findings and explicit coverage limits. |
+| [`9to5-confluence`](skills/9to5-confluence/SKILL.md) | 1.4.0 | Work with Confluence pages generally — find a page with CQL when you only know part of its title, read it as markdown, walk its hierarchy, then create, update, comment on, label, or attach files to it. |
+| [`9to5-confluence-auth`](skills/9to5-confluence-auth/SKILL.md) | 1.1.0 | Resolve Confluence PAT auth from dotfiles and provide separate masked-terminal PAT login/status for Confluence, Jira and GitLab. |
+| [`9to5-confluence-doc`](skills/9to5-confluence-doc/SKILL.md) | 1.3.0 | Draft source-backed Vietnamese API/flow notes and technical pages for local review and approved Confluence publication, with dotfile auth preflight and missing-login handling. |
+| [`9to5-container-build`](skills/9to5-container-build/SKILL.md) | 1.0.0 | Build and review service container images and CI release wiring for OTS services — the two-stage Dockerfile convention, internal registry base images, shared GitLab CI templates for dev-c7, CI_TAG to APP_VERSION wiring, JVM flags, and OOM dump paths inside containers. |
+| [`9to5-debug-loop`](skills/9to5-debug-loop/SKILL.md) | 1.0.0 | Diagnose a reported bug or performance regression with a symptom-specific reproduction loop, falsifiable hypotheses and measured verification. |
+| [`9to5-device-availability`](skills/9to5-device-availability/SKILL.md) | 1.0.0 | Query and reason about TTDVKH device availability — the error-event taxonomy recorded by availability-cron (disconnects, LAN and 4G faults, late events), downtime-based availability math over the daily index, period and threshold selection, the availability-service query and export surface, and calculation version mappings. |
+| [`9to5-env-config-sync`](skills/9to5-env-config-sync/SKILL.md) | 1.0.1 | Compare and update OTS environment service configs in ots-env-custom/service-configs/&lt;env&gt;/&lt;service&gt;/ (values.yaml and .env) — align environment variables across dev-c7, dev-c7-ttdvkh, dev-uat-*, report drift, and keep secrets out of commits. |
+| [`9to5-feature-prototype`](skills/9to5-feature-prototype/SKILL.md) | 1.0.0 | Prototype a proposed OTS/C7 feature as a source-backed explanation and diagram fitted to the current repository's real services, modules, packages, APIs and data flow. |
+| [`9to5-git-publish`](skills/9to5-git-publish/SKILL.md) | 1.0.0 | Commit and push changes in the exact repository requested, with scoped staging, repository checks and remote verification. |
+| [`9to5-github-audit`](skills/9to5-github-audit/SKILL.md) | 1.0.0 | Read-only GitHub repository inventory and workflow audit, with paginated counts and commit-specific CI evidence. |
+| [`9to5-github-settings`](skills/9to5-github-settings/SKILL.md) | 1.0.0 | Change explicitly requested GitHub repository visibility or description with a concrete plan, scoped authorization and read-back verification. |
+| [`9to5-grpc-contracts`](skills/9to5-grpc-contracts/SKILL.md) | 1.0.0 | Design and review gRPC/protobuf contracts for OTS services — the proto3 layout in the shared proto repository (service definitions versus domain messages, versioned packages), java_package conventions, wire-compatibility rules, artifact version flow, and server/client patterns with the lognet starter. |
+| [`9to5-handoff`](skills/9to5-handoff/SKILL.md) | 1.0.0 | Save a concise, source-linked handoff so another coding session can continue from verified state. |
+| [`9to5-heap-triage`](skills/9to5-heap-triage/SKILL.md) | 1.0.0 | Triage JVM heap dumps (*.hprof) with Eclipse MAT headless — locate dumps, run leak-suspect/overview reports, read the dominator evidence, and link findings to the service or IDE that wrote them. |
+| [`9to5-id-design`](skills/9to5-id-design/SKILL.md) | 1.0.1 | Choose and review primary-key ID strategy — database identity/sequence versus application UUID/ULID/UUIDv7/Snowflake, index locality, Oracle storage, generator lifetime, and exposure. |
+| [`9to5-jira`](skills/9to5-jira/SKILL.md) | 2.1.3 | Work with local Jira and Confluence through the zjira CLI — fetch a Jira issue (summary, description, acceptance criteria, last comments), read a linked Confluence spec when present, explore the repository, then write a structured implementation plan to .kit/plans/; also search and read Confluence pages. |
+| [`9to5-jira-day-check`](skills/9to5-jira-day-check/SKILL.md) | 1.0.1 | Daily Jira check — current sprint issues assigned to me, worklogs missing this week (zjira weekstatus), and release rows still pending tag sync. |
+| [`9to5-k8s-service-debug`](skills/9to5-k8s-service-debug/SKILL.md) | 1.0.1 | Debug OTS/C7 services running on Kubernetes — locate a pod by app name across dev-c7 and dev-c7-ttdvkh, tail and filter logs, extract Hibernate SQL with bound parameters into runnable Oracle statements, inspect env/limits, and correlate failures back to the local repo. |
+| [`9to5-kafka`](skills/9to5-kafka/SKILL.md) | 1.1.2 | Work on OTS/C7 Kafka contracts, transactional outbox, and Kafka-versus-work-queue design. |
+| [`9to5-lib-bump`](skills/9to5-lib-bump/SKILL.md) | 1.0.1 | Bump a shared OTS/C7 library version (kafka starter, common-core, ISC, ttch-service-common, microservice starter) across the services that consume it — audit drift, resolve the target version from the library repository's git state, write the gradle.properties change, build each service, and commit with the repository's convention. |
+| [`9to5-logwork`](skills/9to5-logwork/SKILL.md) | 1.4.1 | Log Jira worklogs via conversation: scan assigned issues, accept task/hours/note input in chat, generate Vietnamese descriptions, and submit. |
+| [`9to5-mqtt-notifications`](skills/9to5-mqtt-notifications/SKILL.md) | 1.0.0 | Design and review MQTT delivery of notification and refresh events in OTS services — the merchant gateway pattern, destination semantics, NotificationMessage payloads, QoS choice, client limits, environment configuration keys, and when MQTT is the wrong channel. |
+| [`9to5-mydevtools`](skills/9to5-mydevtools/SKILL.md) | 1.0.0 | Use and extend MyDevTools, the browser-first OTS developer utilities — Oracle execution-plan visual, Rancher log analyzer, SQL extractor, protobuf and Kafka decoding, environment-to-Kubernetes conversion, case and hash utilities, cron and nginx generators. |
+| [`9to5-oracle-index`](skills/9to5-oracle-index/SKILL.md) | 1.0.1 | Decide and verify an Oracle index for a query shape — choose columns and order, read DBMS_XPLAN access/filter predicates, inspect index-disabling conversions, and weigh read gains against write costs. |
+| [`9to5-oracle-locking`](skills/9to5-oracle-locking/SKILL.md) | 1.0.0 | Design and review work-claim queries and lock contention on Oracle — FOR UPDATE SKIP LOCKED claiming, batch refill semantics, NOWAIT versus waiting, lock waits and deadlock (ORA-00060) diagnosis, and transaction hygiene for outbox-style jobs. |
+| [`9to5-redis-design`](skills/9to5-redis-design/SKILL.md) | 1.0.0 | Review and design Redis usage in OTS services — key namespacing, TTL policy, cache-first reads with DB fallback, AFTER_COMMIT invalidation, Lua guards that protect partial cache entries, and runtime control keys with safe fallbacks. |
+| [`9to5-release-audit`](skills/9to5-release-audit/SKILL.md) | 1.0.1 | Read-only audit of a Confluence release page. |
+| [`9to5-release-confluence-sync`](skills/9to5-release-confluence-sync/SKILL.md) | 1.7.0 | Prepare and publish Confluence release pages with verified tags/images, PROD comparison, ENV notes and an overall Jira Release Version link. |
+| [`9to5-scheduled-jobs`](skills/9to5-scheduled-jobs/SKILL.md) | 1.0.0 | Design and review scheduled work and milestone pipelines in OTS services — DB polling versus Redis ZSET scheduling, dispatcher-to-Kafka handoffs, runtime mode switches, timezone and delay configuration, catch-up and missed-fire handling, and multi-replica safety. |
+| [`9to5-skill-sync`](skills/9to5-skill-sync/SKILL.md) | 1.0.3 | Keep an edited 9to5 skill consistent across its canonical directory, the three mirror directories, and the git repository copy — mirror the change, regenerate the repo copy with the correct exclusions, and verify parity by hash. |
+| [`9to5-spring-conventions`](skills/9to5-spring-conventions/SKILL.md) | 1.0.1 | Review Java/Spring changes against the house conventions — Objects.isNull/nonNull for null checks, CollectionUtils/StringUtils for emptiness and presence, explicit imports, no unused imports, and no new test files unless requested. |
+| [`9to5-spring-core`](skills/9to5-spring-core/SKILL.md) | 1.0.1 | Code and initialize OTS Spring services using microservice-spring-boot-starter. |
+| [`9to5-sql-forensics`](skills/9to5-sql-forensics/SKILL.md) | 1.0.0 | Reconstruct runnable Oracle SQL from Hibernate log output with bound parameters and assemble an index-review packet. |
+| [`9to5-sql-migration`](skills/9to5-sql-migration/SKILL.md) | 1.0.1 | Write and review Oracle migration scripts for the C7/TTDVKH schemas (admin/sql/oracle, V&lt;YYYYMMDD&gt;_&lt;NN&gt;__&lt;type&gt;_&lt;description&gt;.sql). |
+<!-- skill-catalog:end -->
 
 ## Structure
 
@@ -162,6 +171,7 @@ These examples define presentation expectations, not evidence of executed operat
 ## Validation
 
 ```bash
+python3 scripts/update_catalog.py --check
 python3 -m unittest discover -s tests -v
 python3 -m unittest discover -s skills/9to5-jira/scripts/tests -v
 ```
@@ -196,7 +206,9 @@ his collection. See [design notes and pinned sources](docs/daily-skill-design.md
 - Skills are imperative and explain the reasoning, not just the rule.
 - Registries record verified facts; unknown values are `null` or `TODO(unverified)`, never a plausible guess.
 - Never commit secrets: tokens, passwords, private keys, kubeconfig content, or production logs. `cache.json` files are working state and stay out of the repository.
-- After editing a skill, keep the four install locations in sync — `install.sh` re-links them.
+- After editing a skill, follow [the active authoring mode](docs/authoring.md):
+  checkout-owned installs use the installer; independent canonical-owned skills use
+  scoped skill synchronization. Regenerate the catalog after metadata changes.
 
 ## License
 

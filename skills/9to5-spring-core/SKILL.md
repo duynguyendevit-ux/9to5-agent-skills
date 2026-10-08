@@ -4,7 +4,7 @@ description: Code and initialize OTS Spring services using microservice-spring-b
 license: MIT
 compatibility: Python 3 for scaffolding; Java 17 and a compatible Gradle wrapper for compilation. Full startup requires the selected published starter and its dependencies, Oracle writer/reader settings, Redis and external JWT keys.
 metadata:
-  version: "1.0.0"
+  version: "1.0.1"
 ---
 
 # Spring Core — coding và init service
@@ -43,6 +43,9 @@ python3 "$S" --output /tmp/opencode/example-service \
 Placeholder version ở trên phải thay bằng version thực đã xác minh. Script mặc định
 dry-run, từ chối ghi đè bất kỳ file đích nào và không chạy Gradle, Git hay remote API.
 Không cung cấp secret qua các flag của script.
+Generate rồi build thư mục output, không build trực tiếp `assets/init-core/`.
+Script bỏ qua cache/generated directories (như `.gradle/`, `build/`) nhưng giữ
+template dotfiles như `.gitignore` và `.env.example`; không xóa cache hiện có.
 
 Template gồm build/settings/properties, application.yml, application entry point,
 core-info v2 controller → use-case → record response, và filter dọn thread-local ở

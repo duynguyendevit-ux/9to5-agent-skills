@@ -3,7 +3,7 @@ name: 9to5-confluence-doc
 description: Draft source-backed Vietnamese API/flow notes and technical pages for local review and approved Confluence publication, with dotfile auth preflight and missing-login handling. Use when asked to document a feature/flow, write or update a Confluence page, or publish reviewed Markdown. Authentication and drafting do not authorize remote writes; release tables belong to 9to5-release-confluence-sync.
 license: MIT
 metadata:
-  version: "1.2.0"
+  version: "1.3.0"
 ---
 
 # Confluence Documentation Workflow
@@ -46,12 +46,27 @@ The user's requested sections and removals take precedence over this template. K
 API references and focused flow notes focused; do not restore deleted examples,
 scope, rollout or processing prose just because the default template lists them.
 
+### Focused flow notes
+
+For a business-flow note, default to **Tổng quan**, **Luồng cơ bản** and **Tham chiếu**,
+with only the limits needed to interpret the flow. Set the audience, detail level,
+diagram placement and intended page hierarchy before drawing. A full design/API
+request still uses its requested structure, not this short-note default.
+
+Put detailed sequences, class-level gates, persistence contracts and source evidence
+in a shared technical page; link to it from the business note and back to the note.
+For a requested collapsible group, plan a separate sequence parent/container with
+the technical pages below it. An explicit request for inline diagrams overrides
+this default. Grouping, moving existing pages and replacing a detailed note with
+a shorter one all belong in the content-bound dry run; approval of a prior publish
+does not authorize these new operations.
+
 ## Source-backed notes and local review
 
 For documentation derived from code, follow
 [`references/source-backed-review.md`](references/source-backed-review.md).
 It covers observable API behavior, asynchronous handoffs, cache/Web configuration,
-safe config inspection, and inline diagrams.
+safe config inspection, and diagrams at the agreed documentation layer.
 
 When a review folder is requested, save the Markdown there before presenting the
 review link. That file becomes the publication source; temporary storage HTML and
@@ -93,8 +108,10 @@ Every remote write uses a dry-run plan, content-bound approval, and verification
    On a conflict, re-read, rebase and review; never substitute a fresh version
    onto a stale body. Report partial uploads if publication stops.
 5. GET the page again. Verify version, title/parent, normalized text, table counts,
-   image references and attachment names; explicitly check the last user-requested
-   additions. Storage checks establish saved content, not live browser rendering.
+    image references and attachment names; explicitly check the last user-requested
+    additions using the sibling's
+    [publication verification guide](../9to5-confluence/references/publication-verification.md).
+    Storage checks establish saved content, not live browser rendering.
 
 Secrets: read `confluence_url` / `confluence_token` from
 `~/.config/zjira/config.yaml` (or the overlay `~/.config/opencode/release-sync.json`);

@@ -2,6 +2,32 @@
   "skill_name": "9to5-confluence-auth",
   "evals": [
     {
+      "id": 5,
+      "name": "separate-service-setup-with-optional-jira",
+      "prompt": "Offline simulation only; do not run commands. User asks for a standalone PROD release. Confluence PAT works from its existing dotfile; Git SSH base and GitLab API token are absent. No Jira issue is supplied. They want missing fields asked initially and PATs pasted into a CLI with separate logins. Explain what to collect, login commands, storage, and what each successful check proves.",
+      "expected_output": "Reuse working Confluence login. Ask only for Git source/base and project/destination details required for this release. Do not demand Jira task or API PAT if Git SSH discovery suffices. If GitLab API is needed, user runs access.py login gitlab with hidden PAT input in a terminal, validating only GitLab and saving gitlab_url/gitlab_token into the private mode-600 release-sync dotfile. API login does not configure SSH, zjira/glab or authorize writes.",
+      "files": [],
+      "expectations": [
+        "Reuses working Confluence credentials and collects only missing task-required non-secret fields.",
+        "Does not block standalone release on a missing Jira issue or an unnecessary GitLab API token.",
+        "Keeps PAT input masked and out of chat/arguments, saves only verified service-specific credentials privately.",
+        "Separates Git API, SSH, Jira and Confluence verification from CLI login state and publication approval."
+      ]
+    },
+    {
+      "id": 6,
+      "name": "terminal-required-failed-token-and-task-replacement",
+      "prompt": "Offline simulation only; do not run commands. The agent shell has no TTY. User needs a Jira PAT login and wants to change the saved task EX-1 to EX-2 without disturbing a working Confluence token. When run locally, a pasted Jira PAT gets 403. Explain terminal commands, whether any credential is saved, how to change task context, and whether zjira is now logged in.",
+      "expected_output": "Give access.py login jira to run in the user's interactive terminal; do not read PAT from stdin pipe or chat. A failed 403 PAT is not saved or treated as success. Change only jira_task with configure jira_task --replace, preserving other keys/tokens atomically at mode 600. The separate CLI overlay does not log zjira in; zjira init/config and its own verification remain distinct.",
+      "files": [],
+      "expectations": [
+        "Reports the TTY blocker without soliciting or echoing a PAT in chat or piping answers.",
+        "Does not persist an unsuccessful credential or repeat unauthorized initialization.",
+        "Uses explicit non-secret task replacement, preserving existing credentials and unrelated config.",
+        "Does not claim separate overlay login authenticates zjira or grants publication permission."
+      ]
+    },
+    {
       "id": 1,
       "name": "valid-dotfiles-no-reinitialization",
       "prompt": "Offline simulation only; do not run commands. User asks for a local Confluence documentation draft and login only if auth is missing. Supplied fixture: the zjira YAML has a Confluence URL and separate PAT; no overlay exists; zjira whoami succeeds; GET /rest/api/user/current returns HTTP 200 with type=known. Explain the next steps and whether credentials or pages would change.",

@@ -24,6 +24,30 @@
         "Requires re-read/rebase/review rather than simply refreshing expected-version.",
         "Does not upload attachments or update pages solely because auth works."
       ]
+    },
+    {
+      "id": 3,
+      "name": "business-note-links-to-shared-sequences",
+      "prompt": "Offline simulation only; do not run commands. The user asks to update a business-flow note, says the document should contain only overview and basic flow, and wants detailed sequence diagrams in a separate collapsible group linked from the note. Existing source-backed detail and diagram artifacts are available. A previous version was already published. Describe the local draft structure and publication plan.",
+      "expected_output": "Draft a short Vietnamese business note with overview/basic flow/references and essential limits. Move detailed sequences, gates, contracts and source evidence to a shared technical page with reciprocal links; plan its separate parent/container in the page tree. Preserve existing evidence and diagram semantics rather than discarding it. Show local drafts and a content-bound dry run for the shortening, new page and hierarchy; previous publication approval does not cover these new changes.",
+      "files": [],
+      "expectations": [
+        "Keeps the business note short and links to shared details instead of embedding detailed sequences.",
+        "Preserves traceable evidence on the shared technical page and plans reciprocal links and the collapsible group.",
+        "Does not publish or reorganize pages without approval of the new content and hierarchy."
+      ]
+    },
+    {
+      "id": 4,
+      "name": "explicit-inline-and-full-api-override",
+      "prompt": "Offline simulation only; do not run commands. The user requests a full API contract reference and explicitly wants its sequence diagrams inline in the corresponding API sections. They also ask to omit request-body examples. Describe how to apply the focused-note default without overriding these requirements.",
+      "expected_output": "Honor the full API reference and explicit inline sequence placement, omit body examples, and keep source links/contract evidence. Do not force a short business-note template, create a shared sequence group or move existing pages merely because those are defaults for another branch. Draft locally and retain the normal content-bound publication gate.",
+      "files": [],
+      "expectations": [
+        "Explicit full API structure and inline diagram placement override the focused business-note default.",
+        "Keeps omitted body examples absent while preserving requested API contract evidence.",
+        "Does not create or move pages or publish an unapproved draft as an incidental default."
+      ]
     }
   ]
 }

@@ -4,7 +4,7 @@ description: Work with local Jira and Confluence through the zjira CLI — fetch
 license: MIT
 compatibility: Requires the zjira CLI on PATH, Jira/Confluence credentials in ~/.config/zjira/config.yaml, git access to the service repositories, and network access to the Jira/Confluence host.
 metadata:
-  version: "2.1.2"
+  version: "2.1.3"
 ---
 
 Get to work immediately — no preamble.
@@ -66,6 +66,13 @@ Arguments come as the skill's `args` string. Parse:
 or edit Confluence and does not ask for a Jira implementation plan, follow
 [`references/confluence.md`](references/confluence.md) and stop after presenting
 or verifying the Confluence result. Do not open the sprint picker.
+
+**Release routing:** A release table, tag/image verification, overall Jira Release
+Version link or explicitly requested version-date/state change belongs to
+[`9to5-release-confluence-sync`](../9to5-release-confluence-sync/SKILL.md).
+A project-version URL is not an issue key and does not select ticket planning or
+per-service task mapping. The legacy picker in `references/confluence.md` remains
+available for an explicitly selected legacy profile, not the default custom-PROD path.
 
 **Confluence reference normalization** — apply in this order:
 1. `?pageId=(\d+)` anywhere in the URL → extract just the numeric ID, use that

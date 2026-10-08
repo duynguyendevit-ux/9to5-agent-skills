@@ -1,10 +1,10 @@
 ---
 name: 9to5-confluence-auth
-description: Resolve Confluence PAT auth from local dotfiles, verify Confluence access separately from Jira, and initialize the CLI only when credentials are missing or unauthorized. Use before Confluence reads/publication, for missing config, expired PAT/401, dotfile credential loading, or requests to login if auth is absent. Authentication does not authorize page writes.
+description: Resolve Confluence PAT auth from dotfiles and provide separate masked-terminal PAT login/status for Confluence, Jira and GitLab. Use before Confluence reads/publication, for first-use Git source/access setup, missing credentials, expired PAT/401, dotfile loading or separate service login. Reuse working configuration; authentication does not authorize remote writes.
 compatibility: Python 3, PyYAML, and zjira for interactive initialization; Confluence Server/Data Center Bearer PAT transport.
 license: MIT
 metadata:
-  version: "1.0.0"
+  version: "1.1.0"
 ---
 
 # Confluence Auth Preflight
@@ -68,6 +68,12 @@ configuration or verify the CLI's intended target separately. Do not assume a
 successful REST preflight proves `zjira` is using the same account/server.
 
 ## Login only when needed and authorized
+
+For first-use GitLab/Jira/Confluence setup, separate masked PAT login, and optional
+Git source/Jira task configuration, follow
+[`references/access-setup.md`](references/access-setup.md) and use `scripts/access.py`.
+It stores service-specific tokens in the existing release-sync dotfile and checks
+each service independently. It does not create tokens or change zjira's config.
 
 Inspect `zjira --help` and `zjira init --help` for the installed version. The verified
 CLI's setup/login entry point is **`zjira init`**, not `zjira auth login`. Its TUI

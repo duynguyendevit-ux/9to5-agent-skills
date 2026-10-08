@@ -1,5 +1,11 @@
 # Confluence Operations
 
+For release pages, start with
+[`9to5-release-confluence-sync`](../../9to5-release-confluence-sync/SKILL.md).
+Use [`9to5-confluence`](../../9to5-confluence/SKILL.md) for a custom approved storage
+body or non-release page. The script below is a legacy picker with fixed column
+indexes and zjira-YAML-only token loading; it does not use the shared auth overlay.
+
 Use this reference for Confluence-only work and the optional Confluence step of
 Jira planning.
 

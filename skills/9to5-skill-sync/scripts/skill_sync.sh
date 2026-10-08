@@ -70,6 +70,7 @@ find_excl_always=()
 for p in "${EXCL_ALWAYS[@]}"; do
   case "$p" in
     "*.pyc") find_excl_always+=( -not -name '*.pyc' ) ;;
+    */)      find_excl_always+=( -not -path "*/${p%/}/*" ) ;;
     *)       find_excl_always+=( -not -path "*${p}*" ) ;;
   esac
 done

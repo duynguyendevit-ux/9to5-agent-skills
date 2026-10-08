@@ -10,6 +10,7 @@ import io
 import json
 import os
 from pathlib import Path
+import re
 import shutil
 import subprocess
 import tempfile
@@ -82,6 +83,29 @@ class ConfluenceTests(unittest.TestCase):
 
 
 class ReleaseSyncTests(unittest.TestCase):
+    def test_review_publication_offline_cases_are_well_formed(self):
+        path = ROOT / "9to5-release-confluence-sync/evals/evals.json"
+        data = json.loads(path.read_text())
+        self.assertEqual(data["skill_name"], "9to5-release-confluence-sync")
+        self.assertGreaterEqual(len(data["evals"]), 3)
+        ids = [case["id"] for case in data["evals"]]
+        self.assertEqual(len(ids), len(set(ids)))
+        for case in data["evals"]:
+            self.assertTrue(case["prompt"].startswith("Offline simulation only"))
+            self.assertTrue(case["expected_output"])
+            self.assertGreaterEqual(len(case["expectations"]), 3)
+            self.assertEqual(case["files"], [])
+
+    def test_release_skill_relative_reference_links_resolve(self):
+        skill = ROOT / "9to5-release-confluence-sync"
+        instructions = (skill / "SKILL.md").read_text()
+        self.assertIn("references/review-publication.md", instructions)
+        for path in [skill / "SKILL.md", skill / "references/review-publication.md"]:
+            for link in re.findall(r"\]\(([^)]+)\)", path.read_text()):
+                if link.startswith(("http://", "https://", "#")):
+                    continue
+                self.assertTrue((path.parent / link.split("#")[0]).exists(), link)
+
     def test_clone_rolls_release_into_current_including_link(self):
         module = load("9to5-release-confluence-sync", "sync_release_tags.py")
         header = '<tr><th>No</th><th>Service</th><th>Current version</th><th>Release Tag</th></tr>'
@@ -252,6 +276,29 @@ class SkillSyncTests(unittest.TestCase):
 
     def run_sync(self, *args):
         return subprocess.run(["bash", str(self.script), *args], capture_output=True, text=True)
+
+    def test_gradle_caches_are_ignored_and_existing_destination_cache_preserved(self):
+        self.config['exclude_always'].append('.gradle/')
+        (self.root / 'config/paths.json').write_text(json.dumps(self.config))
+        for location in ['canonical', 'mirror', 'repo/skills']:
+            cache = self.root / location / '9to5-fixture/.gradle'
+            cache.mkdir(parents=True)
+            (cache / 'local.bin').write_bytes(location.encode())
+        result = self.run_sync('--apply', '--skill', '9to5-fixture')
+        self.assertEqual(result.returncode, 0, result.stdout)
+        for location in ['mirror', 'repo/skills']:
+            file = self.root / location / '9to5-fixture/.gradle/local.bin'
+            self.assertEqual(file.read_bytes(), location.encode())
+        self.assertEqual(self.run_sync('--check', '--skill', '9to5-fixture').returncode, 0)
+
+    def test_gradle_directory_exclusion_does_not_hide_build_script_drift(self):
+        self.config['exclude_always'].append('.gradle/')
+        (self.root / 'config/paths.json').write_text(json.dumps(self.config))
+        source = self.root / 'canonical/9to5-fixture/build.gradle'
+        source.write_text('source build')
+        self.assertEqual(self.run_sync('--apply', '--skill', '9to5-fixture').returncode, 0)
+        (self.root / 'mirror/9to5-fixture/build.gradle').write_text('modified build')
+        self.assertNotEqual(self.run_sync('--check', '--skill', '9to5-fixture').returncode, 0)
 
     def test_invalid_scopes_never_copy(self):
         for args in [("--skill",), ("--skill=",), ("--skill", ""), ("--skill", "--apply"),

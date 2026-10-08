@@ -11,6 +11,7 @@
   "exclude_always": [
     "__pycache__",
     "*.pyc",
+    ".gradle/",
     ".DS_Store"
   ],
   "exclude_from_repo": [

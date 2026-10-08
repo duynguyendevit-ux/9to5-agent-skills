@@ -1,0 +1,187 @@
+{
+  "skill_name": "9to5-release-confluence-sync",
+  "evals": [
+    {
+      "id": 13,
+      "name": "overall-jira-release-link-only",
+      "prompt": "Offline simulation only; do not run commands. User says: note tong the release version ngay do thoi, ko can note chi tiet task, and supplies https://example.invalid/projects/DEMO/versions/12345. Verified version name Release_08/10/2026, date 2026-10-07, released=false. Page already has ENV and one Jira issue macro. There are 47 release issues and another similarly named version is being used by other people. Explain the minimum reads, proposed page content, preserved fields and write gate.",
+      "expected_output": "Choose the overall-link branch. Verify the supplied version/project/origin, then draft one overall paragraph linking the verified name to that exact version above the table. Do not enumerate 47 tasks, inspect commit-to-task mappings, add per-service columns, change Jira metadata or substitute the other version. Preserve ENV and the existing issue macro. Date mismatch stays local evidence without date correction. Review and content-bound approval remain required before Confluence write.",
+      "files": [],
+      "expectations": [
+        "Selects link-only work and limits reads to version/project metadata rather than issues or Git-history scans.",
+        "Proposes exactly one overall version note with the supplied ID and verified name, without task columns or per-service task links.",
+        "Preserves ENV, existing Jira macro and Jira metadata, despite the mismatching date and another similar version.",
+        "Requires a reviewed page/body/version scope and approval before Confluence publication."
+      ]
+    },
+    {
+      "id": 14,
+      "name": "column-repair-and-serialization-recovery",
+      "prompt": "Offline simulation only; do not run commands. A release table has 14 headers and 13 colgroup columns because the newly added DEV CHECK column after Test was omitted from colgroup. User requests another blank column after Release Note. A prior acknowledged PUT saved one numeric column width as 8.0% instead of 8% and another as 21.789461% instead of 21.789462%; all other content is unchanged. Explain table-edit helper selection, explicit repair, preservation, semantic verification and retry safety.",
+      "expected_output": "Use the shared Confluence storage-table helpers: repair the explicitly known missing DEV CHECK colgroup entry before inserting the new column; require header/cell/colgroup counts to match, preserve cells/macros and scale original widths proportionally. Numeric formatting and 0.000001 percentage rounding may pass the bounded storage_matches tolerance, while real geometry/text/href changes fail. Re-read after the acknowledged PUT rather than resending it. New column scope still needs its reviewed approval; no claim of browser or deployment verification.",
+      "files": [],
+      "expectations": [
+        "Points to reusable offline storage-table helpers and repairs the known omitted DEV CHECK colgroup entry before another insertion.",
+        "Preserves original cells/macros and verifies matching header, cell and colgroup column counts.",
+        "Allows only bounded numeric width serialization differences, not arbitrary layout or data changes.",
+        "Uses read-back after acknowledged PUT rather than blindly repeating a write."
+      ]
+    },
+    {
+      "id": 12,
+      "name": "service-and-branch-code-links",
+      "prompt": "Offline simulation only; do not run commands. User asks to link Service and Branch to source code on two PROD tables. C7 runtime ttch-fire-event-worker maps to c7/ttch/ttch-fire-event-worker; TTDVKH runtime ttch-worker-service maps to c7-ttdvkh/ttch/ttch-woker-service; both agreed Branch labels are develop. Verified GitLab web base is https://example.invalid, separate SSH connector uses port 2222. Current pages have concurrent user edits, YAML ENV with a secret value and a Jira macro. Describe link destinations, draft scope, review and verification.",
+      "expected_output": "Use repository-root Service links and same-repository /-/tree/develop Branch links, preserving runtime labels and verified group/misspelled repo identities. Do not use SSH authority/port as web links or infer aliases from basenames. Read current pages and pin their versions/hashes; change only link cell inners, preserving every other field, ENV and Jira macro. Keep secret-bearing payloads private and mask secrets in preview. Obtain approval of new exact links, then apply/read-back rather than treating a skill update or earlier page publish as permission.",
+      "files": [],
+      "expectations": [
+        "Uses https://example.invalid/c7/ttch/ttch-fire-event-worker and its /-/tree/develop path for C7.",
+        "Uses c7-ttdvkh/ttch/ttch-woker-service links for the TTDVKH runtime label without normalizing its repository spelling.",
+        "Preserves current user changes, all non-link fields, YAML ENV and Jira macro, and masks secrets in served review.",
+        "Requires a new content-bound link update review and verifies hrefs/labels after writing."
+      ]
+    },
+    {
+      "id": 10,
+      "name": "existing-jira-daily-version-date-mismatch",
+      "prompt": "Offline simulation only; do not run commands. User says update the release skill to bump today's Jira release version if it exists and supplies https://example.invalid/projects/DEMO/versions/12345. Read fixture: name Release_08/10/2026, projectId matches DEMO, releaseDate 2026-10-07, released false, archived false, 47 issuesFixedCount, 45 issuesUnresolvedCount. Today's Confluence release was published, but deployment is not observed. Explain the new workflow and whether to mutate the supplied live version now.",
+      "expected_output": "Treat the request as a skill update, not remote Jira write authorization. Inspect same-project version 12345, report the name/date mismatch and prepare a future releaseDate correction to 2026-10-08 under dry-run approval. Preserve released=false without an explicit Jira state request and deployment confirmation where claimed. Report unresolved issues and keep issue statuses/fixVersions unchanged. Existing Confluence publication does not authorize a Jira write or establish deployment.",
+      "files": [],
+      "expectations": [
+        "Does not mutate Jira merely because the user requested a skill update or supplied a version link.",
+        "Reports the calendar-date mismatch and scopes the future proposal to releaseDate correction on the verified project/version.",
+        "Preserves released=false without an explicit reviewed state change and does not infer deployment from Confluence publication.",
+        "Reports 45 unresolved issues without closing issues or modifying fixVersions."
+      ]
+    },
+    {
+      "id": 11,
+      "name": "jira-absent-partial-and-concurrent-version",
+      "prompt": "Offline simulation only; do not run commands. A release workflow has an optional Jira project configured but no issue key. Case A: authenticated version discovery finds no version for the requested day. Case B: a combined approved plan contains Confluence update and Jira releaseDate correction on version 12345; Confluence succeeds, Jira PUT times out. Case C: re-read before Jira PUT shows description/archived changed since review. Explain handling, approval scope, recovery and API concurrency limits.",
+      "expected_output": "A skips optional existing-version bump and continues Confluence; no auto-create or required Jira issue. B records partial outcome and reads version 12345 to determine whether the approved correction succeeded before any retry; do not replay Confluence or roll back either system. C stops for new review and preserves concurrent metadata. Jira version REST lacks Confluence page-number CAS, so re-read plus narrow payload/read-back reduces but cannot eliminate races.",
+      "files": [],
+      "expectations": [
+        "Skips absent existing versions without creating a version or demanding an unrelated issue key.",
+        "Reports partial publication and resolves an uncertain Jira write by read-back before retrying only pending approved work.",
+        "Stops on concurrent protected metadata changes without overwriting or broad rollback.",
+        "Does not claim Jira version updates have a Confluence-style atomic version-number gate."
+      ]
+    },
+    {
+      "id": 8,
+      "name": "prod-sparse-history-and-pinned-target",
+      "prompt": "Offline simulation only; do not run commands. Prepare PROD release 2026-10-08 for api and worker. Exact requested targets: api Git v12/image build-12 and worker Git v7/image build-7; Nexus confirms both. PROD P3 (Oct 7) lists only api Release Tag v10/current version v9. P2 (Oct 6) lists worker Release Tag v5/current version v4. P1 (Oct 5) lists api v11; P1 was edited today. Same-named STG worker is v6; newest Git api is v13. Verified ancestry: api v10 is ancestor of v12, worker v5 is ancestor of v7. Describe old/new comparison, page values, source diff, and approval evidence.",
+      "expected_output": "Use api v10 from P3 and worker v5 from P2, not v11 by numeric maximum, P1 by modification date, prior current-version values, STG v6 or Git v13. Compare exact target SHAs and separate image tags; record both baseline pages and hashes, source/API/SQL/ENV changes and unresolved runtime evidence. Map current version v10/v5 to Release Tag v12/v7 and preserve requested image build tags. Review before writing.",
+      "files": [],
+      "expectations": [
+        "Finds api v10 and worker v5 from separate historical PROD pages despite sparse history and a later edit of P1.",
+        "Pins api v12/build-12 and worker v7/build-7 without replacing them with latest Git or STG values.",
+        "Requires old/new commit diff including relevant API, SQL and ENV evidence and records both baseline page versions/hashes.",
+        "Distinguishes recorded PROD baseline from observed deployment and requests approval of the complete comparison."
+      ]
+    },
+    {
+      "id": 9,
+      "name": "prod-unknown-conflict-rollback-clean-layout",
+      "prompt": "Offline simulation only; do not run commands. PROD release: service A latest matching row has blank Release Tag but an older row says v3; service B has no record in fully searched history; service C is pinned v9 -> v8, where v8 is ancestor of v9. A row in a different project shares B's service name. Two migration images share one repository. User requests title/table only, Branch develop, numeric Order with migrations first, and ENV name/value YAML. Describe comparison states, diff direction, missing-baseline handling, page layout and whether engine --scan is sufficient.",
+      "expected_output": "A and B remain unknown baselines, not an assumed v3 or first release/other-project version. C is rollback and needs endpoint old/new diff plus removed-commit range. Match migration images separately. Keep comparison and missing-baseline caveats in local review, clean page fields and string-valued ENV YAML. The engine alone does not reconstruct sparse PROD baselines or compare sources; complete this workflow before approval.",
+      "files": [],
+      "expectations": [
+        "Does not silently use A's older v3 or classify B as New service without first-release evidence.",
+        "Classifies C rollback from ancestry and examines removed commits and the two-endpoint diff.",
+        "Keeps project and individual migration image identity in baseline matching.",
+        "Honors clean table, numeric migration-first Order, confirmed develop Branch and quoted YAML values without adding caveat sections.",
+        "Explicitly identifies that the existing sync engine does not implement this complete PROD comparison."
+      ]
+    },
+    {
+      "id": 1,
+      "name": "daily-notes-new-env-only",
+      "prompt": "Offline simulation only; do not run commands. User asks to prepare today's release page, clear Release Note on every service row and include only newly added ENV variables. Fixture: 4 numbered service rows and 1 unnumbered service row; 3 inherited notes contain bug-fix text, SQL and OLD_TIMEOUT already present in the previous release. The approved target diff adds NEW_BATCH_SIZE with source path config/application.yaml; another token VIEW_REPORT_PERMISSION appears only in a SQL permission seed. A separate environment-configuration column exists and was not requested for editing. Describe the exact note cleanup and allowed new note.",
+      "expected_output": "Clear inherited Release Note on all 5 service rows. Add only source-verified NEW_BATCH_SIZE on its service, without secrets or invented defaults; do not carry OLD_TIMEOUT, bug-fix prose or VIEW_REPORT_PERMISSION. Preserve the separate ENV configuration column and require review/approval before writing.",
+      "files": [],
+      "expectations": [
+        "Counts the unnumbered row and removes all 3 inherited non-empty notes.",
+        "Includes only NEW_BATCH_SIZE with its source evidence; does not classify permission identifiers as ENV keys.",
+        "Preserves the separate environment configuration column and avoids secret values or invented defaults.",
+        "Does not write Confluence merely because the user requested preparation."
+      ]
+    },
+    {
+      "id": 2,
+      "name": "page-created-during-review",
+      "prompt": "Offline simulation only; do not run commands. The user approved creation of today's daily release from yesterday's template. Before POST, a page for the target date now exists at version 2: Portal Release Tag and Docker image advanced from v1.2.3 to v1.2.4, its current version is v1.2.3 and its same-day highlight remains. Old inherited notes remain. Describe publication boundaries and the next review.",
+      "expected_output": "Stop the create; re-read and prepare a narrow rebased update preserving Portal v1.2.4/current v1.2.3/highlight. Show the revised version-2 update and obtain fresh approval. Do not overwrite the new body with the old clone or roll v1.2.4 into current version.",
+      "files": [],
+      "expectations": [
+        "Does not create a duplicate or overwrite the existing page with the old clone.",
+        "Preserves same-day Portal tag, Docker image, current version and highlight.",
+        "Requires new approval for the materially changed destination/version/body plan.",
+        "Does not attach a fresh page version to the stale reviewed body."
+      ]
+    },
+    {
+      "id": 3,
+      "name": "unrelated-https-checkout",
+      "prompt": "Offline simulation only; do not run commands. A release run is launched from a tools checkout whose origin is https://github.com/example/tools.git. The explicit registry project points to the requested STAGING hierarchy and its local endpoint config has a valid SSH Git base. The engine reports ssh://git@https and many Git errors; 7 rows are excluded for missing repository/tag data. Explain the repair within this task's scope and the verification limits.",
+      "expected_output": "Pass the verified configured SSH base explicitly via --git-base and re-run read-only discovery. Do not edit the tools checkout or permanent skill code as part of the release. A registry key is not deployment-environment evidence; inspect the root title. Excluded/failed rows remain Unverified, not up-to-date.",
+      "files": [],
+      "expectations": [
+        "Uses explicit --git-base from verified local config rather than treating https as an SSH host.",
+        "Keeps the incidental repair to invocation scope, without modifying unrelated source or credentials.",
+        "Labels excluded and failed rows Unverified instead of reporting a successful all-service scan.",
+        "Derives STG from the actual hierarchy, not the registry key spelling."
+      ]
+    },
+    {
+      "id": 4,
+      "name": "review-link-versus-publication",
+      "prompt": "Offline simulation only; do not run commands. A sanitized localhost review is ready for a release-page update, and Confluence has not been written. User says 'link review', then 'r u done'. Later, after explicit approval and a successful verified PUT, the returned page ID is 12345 and the configured Confluence base is https://example.invalid. Describe the responses, including a final follow-up 'full link tới confluence'.",
+      "expected_output": "First return the actual review link labelled not applied; distinguish review ready from publication pending. After verified publication report Applied and the saved version, with full Confluence URL https://example.invalid/pages/viewpage.action?pageId=12345 on its own line. The full-link follow-up returns only that actual URL, not localhost or a label-only Markdown link.",
+      "files": [],
+      "expectations": [
+        "Does not treat the review-link request or completion question as write approval.",
+        "Reports review ready separately from Confluence not applied.",
+        "After verified publication includes the full configured-base/returned-ID Confluence URL on its own line.",
+        "The full-link follow-up returns only the Confluence URL and not the local review URL."
+      ]
+    },
+    {
+      "id": 5,
+      "name": "approved-unchanged-update-applies",
+      "prompt": "Offline simulation only; do not run commands. The user inspected a revised existing-page plan at version 2 and now says 'update confluence'. The reviewed body/source hashes, destination and scope still match. Plan: clear 5 Release Note cells, complete 2 pending current version rollovers, preserve Portal's newer tag/image/highlight and the ENV configuration column. Explain the apply and completion checks.",
+      "expected_output": "Treat the direct update request as approval of the unchanged reviewed plan. Use the saved body with expected-version 2 and the approved write gate, not another approval loop or a fresh tag scan. Re-read and verify notes, rollovers, preserved Portal/ENV fields, page identity and saved version before saying Applied.",
+      "files": [],
+      "expectations": [
+        "Recognizes approval of the unchanged reviewed plan and does not request redundant approval.",
+        "Applies only the saved body under the expected-version/approval gate, without discovering and applying extra tags.",
+        "Re-reads the page and verifies changed and protected fields before reporting completion."
+      ]
+    },
+    {
+      "id": 6,
+      "name": "conflicting-repository-and-git-only-image",
+      "prompt": "Offline simulation only; do not run commands. Portal's Branch link names example/migration while its Release Tag link names example/portal. The engine's longest-path selection scans migration and skips the Portal series. A read-only check of portal finds newer Git tag v1.2.4, but paginated Nexus search finds only the existing image v1.2.3. The requested page is a baseline clone with no approved Portal tag/image promotion. Explain the proposed handling and ENV-note evidence scope.",
+      "expected_output": "Flag the conflicting links and verify using the relevant Release Tag link without silently rewriting the row. Preserve recorded v1.2.3 tag/image in the baseline, label v1.2.4 Git-only and exclude its changes from today's new ENV notes. Do not infer Nexus existence/deployment or claim the engine checked this row successfully.",
+      "files": [],
+      "expectations": [
+        "Flags the repository-link conflict instead of treating the engine skip as up-to-date.",
+        "Separates Git tag discovery, Nexus image evidence and deployment; preserves the approved baseline fields.",
+        "Does not include ENV additions from an unapproved Git-only version or silently repair unrelated links."
+      ]
+    },
+    {
+      "id": 7,
+      "name": "explicit-environment-column-cleanup",
+      "prompt": "Offline simulation only; do not run commands. User first says 'clear data mục Cấu hình biến môi trường nếu có yêu cầu' while editing the skill. Later in a release-page workflow they explicitly request clearing that column for every service row. Fixture: 4 numbered rows and 1 unnumbered service row; 3 cells contain text, links and a macro. The actual header is present at a different column index than usual. An earlier reviewed plan approved Release Note cleanup only. Describe default behavior, the revised review, and apply/read-back boundaries; also explain how a request restricted to Portal would differ.",
+      "expected_output": "The conditional skill-edit instruction does not authorize a page write. Default preserves the ENV column; a later explicit all-service request resolves it by header and proposes clearing all 5 service-row cells, including all content in the 3 non-empty cells. Preserve headers, structure, highlights, other unapproved fields and real source/runtime ENV configs. Obtain approval for the revised body, publish only that body and verify selected cells empty. A Portal-only request preserves ENV cells on other services.",
+      "files": [],
+      "expectations": [
+        "Distinguishes a conditional skill rule from immediate Confluence-write authorization and preserves the column by default.",
+        "Resolves the actual header rather than a fixed index, selects all 5 service rows and clears complete content from the 3 non-empty cells.",
+        "Requires revised-plan approval because the previous Release Note-only approval excludes this column.",
+        "Preserves headers, structure, highlights, other unapproved fields and source/runtime environment configuration.",
+        "Verifies empty selected cells after publication and preserves other services' ENV cells for a Portal-only request."
+      ]
+    }
+  ]
+}

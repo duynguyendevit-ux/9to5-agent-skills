@@ -4,7 +4,7 @@ description: Work with Confluence pages generally — find a page with CQL when 
 license: MIT
 compatibility: Requires Python 3, PyYAML, sibling 9to5-confluence-auth, the zjira CLI and Confluence PAT credentials. Reads non-secret endpoints from config/endpoints.json. Writes require --apply --approved.
 metadata:
-  version: "1.2.0"
+  version: "1.4.0"
 ---
 
 # Confluence
@@ -112,6 +112,35 @@ Two things that break silently:
 - **Tables and highlights need the attributes Confluence expects** — a highlight is
   `class="highlight-<color>"` plus `data-highlight-colour="<color>"`, because Confluence
   renders from the class. The release skills already encode this; do not invent a variant.
+
+## Publication verification
+
+For cell/column edits, missing colgroup repair or storage-width normalization,
+read [offline table helpers](references/storage-tables.md) and reuse
+`scripts/storage_tables.py` before writing a one-off transformer. Unsupported table
+layouts fail explicitly; preserve protected cells/macros and validate the full body.
+
+For page publication, image attachments, moves or a failed post-write check, follow
+[`references/publication-verification.md`](references/publication-verification.md).
+It separates storage text from rendered labels, verifies link targets without
+depending on optional HTML attributes, and resumes partial publication from saved
+state. Reuse the offline helpers in `scripts/publication_checks.py` for page-link
+matching and approved source/image hash checks; they perform no network calls.
+
+## Collapsible groups and moves
+
+When the user wants a separate collapsible group in the page tree, plan the parent
+and children before writing. Use a native folder only when the deployed API supports
+it; otherwise describe a parent-page container, not a filesystem folder. Keep
+business notes outside the sequence group and link to the detailed pages when that
+is the requested structure.
+
+Moving a page is a separately approved hierarchy operation. The current helper has
+no `move` subcommand: prepare a REST PUT with the pinned `version.number`, the new
+`ancestors` parent ID and the unchanged `body.storage`, title and page ID. If the
+container is new, put its placeholder ID in the dry run and substitute only the ID
+returned by the approved create. Preserve attachments; verify the destination's
+direct children and the page's ancestors before declaring the move complete.
 
 ## Concurrency
 

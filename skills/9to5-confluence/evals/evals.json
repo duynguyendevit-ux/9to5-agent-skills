@@ -1,0 +1,41 @@
+{
+  "skill_name": "9to5-confluence",
+  "evals": [
+    {
+      "id": 1,
+      "name": "semantic-view-and-raster-verification",
+      "prompt": "Offline simulation only; do not run commands. A published business note links to page 123 through href=/pages/viewpage.action?pageId=123, without data-linked-resource-id. The detailed page shows a sequence as a PNG attachment. Its label userName is in the reviewed Mermaid, but not in body.storage text. The source and downloaded PNG match the approved render manifest hashes. Describe verification and its limits.",
+      "expected_output": "Accept the same-origin pageId anchor after separately checking the target identity; do not require optional HTML attributes. Verify the raster label using unchanged reviewed source plus the approved image hash, not a storage prose assertion. State that saved storage/server-view/bytes do not establish live browser rendering.",
+      "files": [],
+      "expectations": [
+        "Matches the actual same-origin page target without requiring data-linked-resource-id.",
+        "Checks the raster label against reviewed source and image hashes rather than body.storage prose.",
+        "Does not repeat remote writes or claim a live browser check from server-view evidence."
+      ]
+    },
+    {
+      "id": 2,
+      "name": "recover-completed-write-before-pending-note",
+      "prompt": "Offline simulation only; do not run commands. The user approved creating a shared sequence page and simplifying business note 456 from version 7 to 8. The shared page was created with ID 123, six attachments uploaded and its body updated. A later verifier failed because it required an optional HTML attribute. These acknowledged operations are checkpointed; the business note has not been updated. Its remote base still matches version 7 and the approved hash. Describe recovery, including what changes if its remote version is now 8 instead.",
+      "expected_output": "Read the checkpointed IDs and compare the completed shared page and attachments with the approved plan. Correct the overly strict verifier and verify without replaying create/upload/update. Resume only the already approved pending business-note operation when its original base still matches. If concurrent version 8 exists, stop, re-read/rebase and obtain new approval rather than substituting it on the old draft.",
+      "files": [],
+      "expectations": [
+        "Separates acknowledged completed writes from pending operations and repeats verification read-only.",
+        "Does not create a duplicate shared page or re-upload completed attachments.",
+        "Resumes only original approved pending work with matching base; concurrent changes require re-review."
+      ]
+    },
+    {
+      "id": 3,
+      "name": "separate-collapsible-sequence-group",
+      "prompt": "Offline simulation only; do not run commands. The user wants a detailed sequence page in a separate collapsible group under an existing docs parent. The service has a parent/child page API but no verified native folder API. Existing business notes link to the sequence page by ID. A prior push approved only content publication, not this reorganization. Describe the plan and approval boundary.",
+      "expected_output": "Plan a parent-page container with the existing detailed page below it and keep business notes outside. Describe it accurately as a page-tree group, not an assumed native folder. Obtain approval for the new hierarchy operation. Pin the original version, keep the moved page's ID/title/body and attachments, resolve only the approved new container ID, and verify ancestors, direct children and existing links.",
+      "files": [],
+      "expectations": [
+        "Uses a verified parent-page hierarchy without inventing native folder support or a move CLI subcommand.",
+        "Does not treat prior content publication approval as permission for a new hierarchy change.",
+        "Preserves existing IDs, content, links and attachments and verifies the requested tree."
+      ]
+    }
+  ]
+}

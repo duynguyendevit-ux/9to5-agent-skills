@@ -37,6 +37,12 @@ set and differ, the script warns on stderr and uses this file.
 
 Credentials are not stored here. Tokens stay in `~/.config/zjira/config.yaml`
 or the `~/.config/opencode/release-sync.json` overlay (mode `600`).
+For missing GitLab/Jira/Confluence access, use the sibling auth skill's
+[separate terminal login](../../9to5-confluence-auth/references/access-setup.md).
+Its CLI reads existing settings first and saves verified service-specific PATs
+in the overlay, preserving other keys. Optional `jira_task` is task context, not
+a release prerequisite. New dotfile Git SSH settings must still be passed as
+`--git-base`; the current release engine does not automatically read that key.
 
 ## File mode
 

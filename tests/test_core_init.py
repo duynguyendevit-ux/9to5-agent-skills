@@ -1,5 +1,6 @@
 """Filesystem contract checks for the bundled init template."""
 import os
+import importlib.util
 from pathlib import Path
 import subprocess
 import tempfile
@@ -10,6 +11,21 @@ SCRIPT = ROOT / '9to5-spring-core/scripts/init_core.py'
 
 
 class CoreInitTests(unittest.TestCase):
+    def test_generated_binary_caches_excluded_but_template_dotfiles_retained(self):
+        spec = importlib.util.spec_from_file_location('init_core', SCRIPT)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            for name in ['.gradle', 'build', '.git', '__pycache__', 'node_modules']:
+                cache = root / name / 'nested'
+                cache.mkdir(parents=True)
+                (cache / 'binary.bin').write_bytes(b'\xa0\xff')
+            for name in ['.gitignore', '.env.example', 'build.gradle']:
+                (root / name).write_text('template')
+            self.assertEqual({p.relative_to(root).as_posix() for p in module.template_files(root)},
+                             {'.gitignore', '.env.example', 'build.gradle'})
+
     def run_init(self, target, *extra):
         return subprocess.run(['python3', str(SCRIPT), '--output', str(target),
                                '--service-name', 'example-service', '--starter-version',

@@ -56,9 +56,13 @@ contract. A Web reload that lists database rows does not imply cache warm-up.
 
 ## Diagrams and delivery
 
-- Place diagrams in their corresponding flow/API sections when requested. Use
-  rectangles for processing and diamonds with true/false branches for conditions;
-  keep labels short and explain detailed policy in adjacent text/tables.
+- Set the documentation layer before drawing: business notes keep overview/basic
+  flow and link to a shared technical page for detailed sequences and policies.
+  Place diagrams inline in the corresponding flow/API section when explicitly
+  requested; keep the approved placement through publication.
+- Use rectangles and diamonds with true/false branches for flowcharts. For sequence
+  diagrams, preserve ordered messages, synchronous versus asynchronous handoffs
+  and alt/opt/loop fragments; split long traces into overview and detailed stages.
 - Keep Mermaid source in the review Markdown. Reuse a known converter/renderer
   rather than repeatedly probing unrelated directories or importing functions
   from task-specific temporary scripts.
