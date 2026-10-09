@@ -2,6 +2,66 @@
   "skill_name": "9to5-confluence",
   "evals": [
     {
+      "id": 4,
+      "name": "missing-note-code-defaults-with-profile-limits",
+      "prompt": "Offline simulation only; do not run commands. User asks to replace only Không ghi trong note-env cells on a service ENV page with code defaults from release tag v2. FLAG has a true default in base application.yml. APP_TIME_ZONE has UTC only in application-local.yml; recorded active profile is prod but runtime overrides are not verified. Existing recorded API_ENABLED=true differs from code false; PASSWORD is hidden; PORT says Không ghi giá trị; EXTRA says Chưa xác minh. Develop has newer defaults. Describe the candidate changes and evidence limits.",
+      "expected_output": "Change only FLAG to true and APP_TIME_ZONE to UTC from pinned v2 source, with paths/lines and an explicit local-only source-default caveat for timezone, not a PROD-effective claim. Preserve API_ENABLED, secrets, PORT, EXTRA and the develop column. Clarify the mixed recorded/default source in the column/note. Do not publish before new body review and approval.",
+      "files": [],
+      "expectations": [
+        "Uses release-tag defaults, not develop display values, and labels the local-only timezone default.",
+        "Preserves recorded overrides, unknown-value cells and hidden secrets outside the exact selector.",
+        "Separates source defaults from effective PROD and obtains approval of the changed body."
+      ]
+    },
+    {
+      "id": 5,
+      "name": "pending-release-tag-only-service-env-update",
+      "prompt": "Offline simulation only; do not run commands. User requests a service ENV page update from yesterday's PROD release. The pinned dated page records tag v2, blank ENV and Status Pending. Target page contains 81 rows at tag v1 with historical release-repo values. Tag v2 equals freshly fetched develop and config files are unchanged. An unmerged working branch has a cache ENV key. No runtime evidence or fallback request exists. Describe scope and final claims.",
+      "expected_output": "Treat the service ENV page as the only destination; retain the source release page. Inventory the clean tag and inspect Java/dependency changes despite config equality. Exclude working-branch-only keys. Propose tag/source-note changes while preserving recorded ENV values; report 81 tag changes separately from zero value changes. State Pending, blank-cell evidence limits and no verified deployment/runtime.",
+      "files": [],
+      "expectations": [
+        "Does not infer complete ENV coverage or deployed state from equal config, a blank cell or a PROD page title.",
+        "Keeps the tag inventory and release scope separate from unmerged working branch code.",
+        "Reports tag changes separately, preserves values and avoids a source release-page write."
+      ]
+    },
+    {
+      "id": 6,
+      "name": "html-view-check-failure-after-acknowledged-put",
+      "prompt": "Offline simulation only; do not run commands. A page update was acknowledged as v8 and checkpointed. Saved storage exactly matches the approved body. body.view contains HTML with a br void tag and nbsp entities; the storage XHTML parser failed. The table is flat and rectangular. Describe recovery and remaining checks.",
+      "expected_output": "Keep the acknowledged receipt, stop writes and repair only the verifier. Re-read the exact page and use publication_checks.html_tables for server-view text, comparing full matrices/counts and protected values. Keep storage/identity/hierarchy/link checks separate. Reject nested/merged or incomplete tables explicitly. Do not repeat PUT or claim a live browser check.",
+      "files": [],
+      "expectations": [
+        "Uses HTML rather than XHTML for body.view and reuses the shared flat-table helper.",
+        "Retains the acknowledged version and verifies read-only without another PUT.",
+        "Checks preserved content and reports server-view separately from browser evidence."
+      ]
+    },
+    {
+      "id": 7,
+      "name": "new-default-body-and-contextual-push-approval",
+      "prompt": "Offline simulation only; do not run commands. An earlier tag-only page body was approved and applied at v7. User now asks for six code-default fallbacks. A new exact review at base v7 shows six value changes plus a mixed-source header/note and its body hash. The user says push. The skill git repository also has unpublished changes. Describe authorization, apply and what changes if the page is now v8.",
+      "expected_output": "The new fallback body needed its own review; contextual push now approves only the unchanged Confluence plan, not git commit/push. Verify reviewed/source hashes and base v7, then publish that saved body with expected-version 7 and checkpoint/read-back. A concurrent v8 blocks apply and requires re-read/rebase/new review rather than using v8 on stale content.",
+      "files": [],
+      "expectations": [
+        "Does not reuse prior tag-only approval for the new fallback body.",
+        "Treats contextual push as page publication only, with no git publication.",
+        "Pins body/hash/version and requires new review on concurrent changes."
+      ]
+    },
+    {
+      "id": 8,
+      "name": "missing-note-secret-and-conflicting-defaults",
+      "prompt": "Offline simulation only; do not run commands. User requests code defaults for all exact missing-note cells. SECRET_TOKEN has an explicit credential literal at the release tag. LIMIT has different defaults in base and imported profile configs whose activation is unresolved. REQUIRED has a placeholder without a default. Describe the output without exposing the credential.",
+      "expected_output": "Do not reveal the secret literal even though it has the exact missing-note status; retain a hidden/withheld representation. Keep LIMIT unresolved with source/profile conflict evidence, and REQUIRED unresolved because no explicit fallback is established. Do not choose a value based on develop or an assumed framework default. Include these limits in the review and keep the write gate.",
+      "files": [],
+      "expectations": [
+        "Never publishes secret defaults regardless of the missing-note selector.",
+        "Does not silently resolve conflicting or absent defaults into fabricated values.",
+        "Shows evidence limits and retains review/approval before publication."
+      ]
+    },
+    {
       "id": 1,
       "name": "semantic-view-and-raster-verification",
       "prompt": "Offline simulation only; do not run commands. A published business note links to page 123 through href=/pages/viewpage.action?pageId=123, without data-linked-resource-id. The detailed page shows a sequence as a PNG attachment. Its label userName is in the reviewed Mermaid, but not in body.storage text. The source and downloaded PNG match the approved render manifest hashes. Describe verification and its limits.",

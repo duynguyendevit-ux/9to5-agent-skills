@@ -2,6 +2,18 @@
   "skill_name": "9to5-confluence-doc",
   "evals": [
     {
+      "id": 5,
+      "name": "env-table-routing-not-design-template",
+      "prompt": "Offline simulation only; do not run commands. User asks to document a service's ENV table using a PROD release and code defaults, keeping four existing columns and no updater details. They did not request an API/flow design page or changes to deployment configs. Describe workflow ownership and structure.",
+      "expected_output": "Use the general Confluence per-service ENV reference, preserve the requested table instead of adding design-template/API sections or updater attribution. Pin release-repo and tag sources, distinguish recorded PROD values from defaults, and review the exact destination body. Use the general helper with the original expected-version gate only after approval; deployment and source release-page writes remain out of scope.",
+      "files": [],
+      "expectations": [
+        "Routes to the service ENV reference and retains table/no-updater requirements.",
+        "Does not force API/design sections or conflate recorded values with code defaults.",
+        "Uses scoped review/approval/version checks without deployment or source-page side effects."
+      ]
+    },
+    {
       "id": 1,
       "name": "source-backed-focused-note",
       "prompt": "Offline simulation only; do not run commands. User asks for a Vietnamese flow note in a local review folder, naming the exact Redis keys and Kafka topics from source, and removes the app-verification section. Existing Confluence auth works. Source fixture: a listener consumes events.v1, writes state:{id} with a 10-minute TTL, and emits refresh.v1 only after transaction commit. Deployment config is not observed. Outline the draft/review workflow and distinguish verified from unverified behavior.",

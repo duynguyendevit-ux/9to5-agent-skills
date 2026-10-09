@@ -4,7 +4,7 @@ description: Prepare and publish Confluence release pages with verified tags/ima
 license: MIT
 compatibility: Requires the zjira CLI and Confluence credentials in ~/.config/zjira/config.yaml; GitLab SSH access for tag discovery. Reads non-secret endpoints from config/endpoints.json.
 metadata:
-  version: "1.8.1"
+  version: "1.8.2"
 ---
 
 # Release Sync
@@ -31,6 +31,10 @@ One engine for every project. Project settings live in a registry file instead o
 per-skill hardcoding.
 
 ## End-to-end workflow
+
+If the destination is a **per-service ENV page**, not a daily release table, use
+[Confluence service ENV pages](../9to5-confluence/references/service-env-pages.md).
+The release page is a pinned source for that task, not an additional write target.
 
 Choose the Jira scope before exploring issues or source:
 

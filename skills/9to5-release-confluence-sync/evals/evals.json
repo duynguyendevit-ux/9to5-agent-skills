@@ -2,6 +2,18 @@
   "skill_name": "9to5-release-confluence-sync",
   "evals": [
     {
+      "id": 19,
+      "name": "service-env-page-is-not-a-daily-release-write",
+      "prompt": "Offline simulation only; do not run commands. User gives a per-service ENV Confluence page and asks to update it based on a dated PROD release. The source release row records tag v2, blank ENV and Pending. Historical note-env records overrides; tag v2 source includes defaults. The user wants no updater column. Describe routing, source evidence and write scope.",
+      "expected_output": "Route destination preparation through Confluence service-env-pages, using the dated release as a pinned source. Keep recorded overrides rather than copying defaults automatically. State blank-cell/Pending/runtime limits; preserve/remove the updater column as requested without adding author details. Review destination tag/value/header/note changes and publish only that page through the general helper with the original version gate; do not update the daily source release.",
+      "files": [],
+      "expectations": [
+        "Routes to the per-service ENV workflow, not a daily-release YAML-cell transformer.",
+        "Separates recorded overrides, source defaults and runtime evidence, including Pending and blank ENV limits.",
+        "Keeps no-updater preference and scopes publication only to the requested service page."
+      ]
+    },
+    {
       "id": 13,
       "name": "overall-jira-release-link-only",
       "prompt": "Offline simulation only; do not run commands. User says: note tong the release version ngay do thoi, ko can note chi tiet task, and supplies https://example.invalid/projects/DEMO/versions/12345. Verified version name Release_15/01/2030, date 2030-01-14, released=false. Page already has ENV and one Jira issue macro. There are 47 release issues and another similarly named version is being used by other people. Explain the minimum reads, proposed page content, preserved fields and write gate.",

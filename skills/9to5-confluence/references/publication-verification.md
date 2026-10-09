@@ -40,6 +40,20 @@ For table transformations and narrow numeric col-width normalization, reuse
 keep field values, hrefs, macro parameters and geometry significant. The bounded
 width tolerance handles formatting/rounding, not an actual column-layout change.
 
+### Flat table text in server-view HTML
+
+Reuse `scripts/publication_checks.py::html_tables(view)` for rendered table text.
+It returns tables in document order, each as rows of normalized cell strings.
+Compare table/row/column counts and the full expected matrix, including preserved
+cells. It accepts HTML entities, void elements and optional row/cell end tags;
+it rejects nested tables, merged cells and incomplete/ragged layouts rather than
+silently flattening them. Unsupported view layouts require a scoped verifier.
+
+Do not pass `body.view` to `storage_tables._selected` or an XML parser: valid HTML
+can fail XHTML parsing. The text helper does not verify hrefs, macros, geometry,
+visibility/CSS or runtime settings; retain full storage comparison and applicable
+link checks. Test the verifier locally on available view/fixture inputs before PUT.
+
 ## Page links without brittle HTML assumptions
 
 Reuse `scripts/publication_checks.py::has_page_link` to match anchors in a saved view.

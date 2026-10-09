@@ -1,10 +1,10 @@
 ---
 name: 9to5-confluence
-description: Work with Confluence pages generally — find a page with CQL when you only know part of its title, read it as markdown, walk its hierarchy, then create, update, comment on, label, or attach files to it. Reads go through the zjira CLI; writes go through the Confluence REST API with the same dry-run and explicit-approval gate as the other skills. Use when asked to find, read, create, edit, move, comment on, or attach something to a Confluence page, or when you need a page's children or labels.
+description: Work with Confluence pages generally — find, read, create, edit, move, comment, label or attach files. Also use for per-service ENV tables, comparing release-record values with code defaults, or filling missing ENV values from code. Reads use zjira; writes use the Confluence REST API with dry-run, content-bound approval and read-back verification.
 license: MIT
 compatibility: Requires Python 3, PyYAML, sibling 9to5-confluence-auth, the zjira CLI and Confluence PAT credentials. Reads non-secret endpoints from config/endpoints.json. Writes require --apply --approved.
 metadata:
-  version: "1.4.0"
+  version: "1.5.0"
 ---
 
 # Confluence
@@ -115,6 +115,12 @@ Two things that break silently:
 
 ## Publication verification
 
+For a per-service ENV page, an update from a dated PROD release, or replacing
+missing-note values with code defaults, follow
+[service ENV pages](references/service-env-pages.md). This branch keeps recorded
+PROD overrides, code defaults and runtime evidence separate; it does not edit
+deployment configs or the source release page as a side effect.
+
 For cell/column edits, missing colgroup repair or storage-width normalization,
 read [offline table helpers](references/storage-tables.md) and reuse
 `scripts/storage_tables.py` before writing a one-off transformer. Unsupported table
@@ -125,7 +131,8 @@ For page publication, image attachments, moves or a failed post-write check, fol
 It separates storage text from rendered labels, verifies link targets without
 depending on optional HTML attributes, and resumes partial publication from saved
 state. Reuse the offline helpers in `scripts/publication_checks.py` for page-link
-matching and approved source/image hash checks; they perform no network calls.
+matching, flat HTML table text and approved source/image hash checks; they perform
+no network calls. Parse `body.view` as HTML, not storage XHTML.
 
 ## Collapsible groups and moves
 

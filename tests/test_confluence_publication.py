@@ -76,6 +76,39 @@ class PublicationChecksTests(unittest.TestCase):
             image_sha256=hashlib.sha256(image).hexdigest()))
         self.assertNotIn("userName", "<ac:image><ri:attachment ri:filename=\"flow.png\"/></ac:image>")
 
+    def test_html_tables_accept_entities_void_tags_and_block_spacing(self):
+        view = ('<table><tbody><tr><th>Name</th><th>Value</th></tr>'
+                '<tr><td>A&amp;B</td><td><p>true</p><p>default<br> only&nbsp; local</p></td></tr>'
+                '</tbody></table>')
+        self.assertEqual(self.module.html_tables(view),
+                         [[["Name", "Value"], ["A&B", "true default only local"]]])
+
+    def test_html_tables_optional_row_and_cell_end_tags(self):
+        view = '<table><thead><tr><th>Name<th>Value</thead><tbody><tr><td>FLAG<td>true</tbody></table>'
+        self.assertEqual(self.module.html_tables(view), [[["Name", "Value"], ["FLAG", "true"]]])
+
+    def test_html_tables_multiple_tables_and_blank_cells(self):
+        view = '<table><tr><td></td><td><a href="/x">UTC</a></td></tr></table><br><table><tr><td>200</table>'
+        self.assertEqual(self.module.html_tables(view), [[["", "UTC"]], [["200"]]])
+        self.assertEqual(self.module.html_tables('<p>No table</p>'), [])
+
+    def test_html_tables_reject_unsupported_or_incomplete_layouts(self):
+        for view in ('<table><tr><td><table><tr><td>x</td></tr></table></td></tr></table>',
+                     '<table><tr><td colspan="2">x</td></tr></table>',
+                     '<table><tr><td rowspan="0">x</td></tr></table>',
+                     '<table><tr><td rowspan> x </td></tr></table>',
+                     '<table><tr><td>x</td></tr><tr><td>x</td><td>y</td></tr></table>',
+                     '<table><tr><td>x</td></tr>', '<table></table>', '<table><tr></tr></table>',
+                     '<table><td>x</td></table>', '<table><tr>lost<td>x</td></tr></table>',
+                     '<table><tr><td><script>ignored()</script></td></tr></table>'):
+            with self.subTest(view=view), self.assertRaises(ValueError):
+                self.module.html_tables(view)
+
+    def test_html_tables_unit_spans_and_inline_markup(self):
+        self.assertEqual(self.module.html_tables(
+            '<table><tr><td colspan="1" rowspan="1"><strong>demo-</strong>v1</td></tr></table>'),
+            [[["demo-v1"]]])
+
     def test_changed_source_image_or_missing_label_fail(self):
         source, image = "sequenceDiagram\nA->>B: userName\n", b"approved-image"
         hashes = {"source_sha256": hashlib.sha256(source.encode()).hexdigest(),
@@ -88,6 +121,22 @@ class PublicationChecksTests(unittest.TestCase):
 
 
 class PublicationSkillContractsTests(unittest.TestCase):
+    def test_service_env_routes_and_source_policy(self):
+        relative = "references/service-env-pages.md"
+        general = (ROOT / "9to5-confluence/SKILL.md").read_text()
+        release = (ROOT / "9to5-release-confluence-sync/SKILL.md").read_text()
+        document = (ROOT / "9to5-confluence-doc/SKILL.md").read_text()
+        self.assertIn(relative, general)
+        self.assertIn("../9to5-confluence/" + relative, release)
+        self.assertIn("../9to5-confluence/" + relative, document)
+        policy = (ROOT / "9to5-confluence" / relative).read_text()
+        for rule in ("Không ghi trong note-env", "Không ghi giá trị", "Chưa xác minh",
+                     "source-only default", "Pending", "html_tables", "--expected-version",
+                     "Confluence version history", "not git publication", "Never publish secret defaults"):
+            with self.subTest(rule=rule):
+                self.assertIn(rule, policy)
+        self.assertNotIn("`9to5-jira` release script", document)
+
     def test_offline_cases_and_metadata(self):
         for name in ["9to5-confluence", "9to5-confluence-doc"]:
             with self.subTest(skill=name):

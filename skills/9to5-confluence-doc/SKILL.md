@@ -3,7 +3,7 @@ name: 9to5-confluence-doc
 description: Draft source-backed Vietnamese API/flow notes and technical pages for local review and approved Confluence publication, with dotfile auth preflight and missing-login handling. Use when asked to document a feature/flow, write or update a Confluence page, or publish reviewed Markdown. Authentication and drafting do not authorize remote writes; release tables belong to 9to5-release-confluence-sync.
 license: MIT
 metadata:
-  version: "1.3.0"
+  version: "1.3.1"
 ---
 
 # Confluence Documentation Workflow
@@ -23,6 +23,10 @@ Thay đổi dự kiến: Bổ sung mục Xử lý lỗi và Rollout; giữ nguy�
 ```
 
 ## Page structure
+
+Per-service ENV tables use
+[Confluence service ENV pages](../9to5-confluence/references/service-env-pages.md),
+not the design template below. Preserve the table and requested removals.
 
 Use these headings, in Vietnamese, unless the user asks otherwise:
 
@@ -116,5 +120,6 @@ Every remote write uses a dry-run plan, content-bound approval, and verification
 Secrets: read `confluence_url` / `confluence_token` from
 `~/.config/zjira/config.yaml` (or the overlay `~/.config/opencode/release-sync.json`);
 the shared auth skill owns precedence and missing-login behavior. Never print or
-hardcode the token. For release-table edits prefer the
-`9to5-jira` release script and its `--dry-run` / `--approved` flow.
+hardcode the token. For release-table edits use `9to5-release-confluence-sync`
+to prepare the plan and `9to5-confluence` to publish custom approved bodies with
+the original `--expected-version --apply --approved` gate.

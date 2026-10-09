@@ -5,6 +5,12 @@ values for the services being released, or to verify a service's env vars agains
 its release tag. Verification is read-only; adding or changing page values stays
 behind the normal review, version gate and read-back.
 
+For a per-service ENV comparison page or an explicit request to replace
+`Không ghi trong note-env` with code defaults, use
+[service ENV pages](../../9to5-confluence/references/service-env-pages.md) instead
+of treating that page as a daily-release YAML cell. A blank release ENV cell is
+no recorded override, not proof of unchanged runtime configuration.
+
 ## Scope the services
 
 - Prefer the services named in the request or the release-page rows.

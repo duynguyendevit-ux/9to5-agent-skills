@@ -9,6 +9,7 @@ Choose the requested operation before loading detailed policy or inspecting sour
 | Map tasks to services | Release sync, explicitly requested task-map branch | [Jira release link](../skills/9to5-release-confluence-sync/references/jira-release-link.md#explicit-task-mapping) | Scoped source-backed mapping with limits; not automatic for a version link |
 | Verify exact PROD tags/images or prepare a release | Release sync | [PROD comparison](../skills/9to5-release-confluence-sync/references/prod-version-comparison.md) | Exact Git refs and Nexus artifacts verified; plan separate from publication |
 | Read/update another Confluence page | [Confluence](../skills/9to5-confluence/SKILL.md) | `confluence.py` and its publication reference | Approved storage and server-view checks; browser coverage stated separately |
+| Update a service ENV table from a release or fill code defaults | Confluence | [Service ENV pages](../skills/9to5-confluence/references/service-env-pages.md) | Recorded overrides/default provenance preserved; only approved destination changes, no deployment implied |
 | Plan a Jira implementation ticket | [Jira](../skills/9to5-jira/SKILL.md) | `zjira issue get`, linked spec, relevant checkout | Source-backed plan; no implementation implied |
 | Install, edit or mirror skills | [Authoring modes](authoring.md) | `install.sh` **or** scoped `skill_sync.sh`, according to source ownership | Source/mirrors/export agree; no automatic commit/push |
 | Generate a Spring starter service | [Spring core](../skills/9to5-spring-core/SKILL.md) | `init_core.py` | Dry-run/apply checked; compile/runtime evidence remains separate |
@@ -24,6 +25,7 @@ For other domains, choose one owner from the [catalog](../README.md#skills).
 | `9to5-release-confluence-sync/scripts/sync_release_tags.py` | Registry-based daily tag/paint/rollover engine | Its endpoint/project registry and shared auth resolver | Newest-tag selection is not exact PROD target pinning; engine does not verify Nexus or create the complete custom review |
 | `9to5-jira/scripts/update_confluence_release.py` | Legacy interactive service/tag picker or an explicitly requested legacy profile | Its endpoint files; token reader currently reads only zjira YAML | Fixed version/tag/image column indexes, no shared overlay-token resolution; use primary release workflow for custom PROD tables |
 | `9to5-confluence/scripts/storage_tables.py` | Offline cell/column edits and semantic read-back comparison | No credentials or network | Flat, rectangular tables only; explicit repair for a known missing colgroup column; rejects ambiguous/unsupported layouts |
+| `9to5-confluence/scripts/publication_checks.py` | Offline page-link/artifact checks and rendered flat-table text via `html_tables` | No credentials or network | Parses server-view HTML, not storage XHTML; text comparison does not prove browser rendering or link/geometry semantics |
 
 For custom release pages, prepare through the release owner and publish the saved
 body through the general Confluence helper. Read the actual CLI `--help` before
