@@ -1,11 +1,10 @@
 ---
 name: 9to5-debug-loop
-description: Diagnose a reported bug or performance regression with a symptom-specific reproduction loop, falsifiable hypotheses and measured verification. Use for debug this, diagnose a failure, wrong output, flaky behavior or a performance regression. Keep diagnosis separate from authorization to modify code, production systems or permanent tests.
+description: "Execute an evidence-driven, hypothesis-testing debug loop to isolate, reproduce, and diagnose bugs, test failures, wrong behavior, or performance regressions. Use when diagnosing an unexpected bug, flaky behavior, broken test, crash, or regression, or when the user says 'debug lỗi này', 'tìm nguyên nhân bug', 'chẩn đoán sự cố', 'trace bug', 'fix bug', 'điều tra lỗi'."
 license: MIT
 metadata:
-  version: "1.0.0"
+  version: "1.0.2"
 ---
-
 # Evidence-Driven Debug Loop
 
 ## Example output

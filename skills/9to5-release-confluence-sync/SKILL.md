@@ -1,12 +1,11 @@
 ---
 name: 9to5-release-confluence-sync
-description: Prepare and publish Confluence release pages with verified tags/images, PROD comparison, ENV notes and an overall Jira Release Version link. Use for PROD/STG release pages, tag/image verification, release-note cleanup and approved publication; Jira metadata changes or per-service task mapping are separate explicit scopes.
+description: "Prepare, verify, and publish Confluence release pages with validated Git tags, container images, PROD environment comparisons, ENV variable notes, and Jira release version links. Use when creating or updating release pages, verifying tags/images before release, publishing release notes, or says 'tạo trang release', 'sync release lên confluence', 'chuẩn bị release note', 'cập nhật phiên bản deploy', 'lập bảng release'."
 license: MIT
 compatibility: Requires the zjira CLI and Confluence credentials in ~/.config/zjira/config.yaml; GitLab SSH access for tag discovery. Reads non-secret endpoints from config/endpoints.json.
 metadata:
-  version: "1.8.2"
+  version: "1.8.4"
 ---
-
 # Release Sync
 
 ## Example output
@@ -112,7 +111,7 @@ issue-list traversal nor Git-history scans.
     },
     "dev-user": {
       "root": "12006",
-      "group": "user",
+      "group": "product-user",
       "space": "DEMO",
       "hl_color": "#c0b6f2",
       "page_link": "",
@@ -147,7 +146,7 @@ and collect the values from the user before syncing:
 1. **Project key** — registry name, e.g. `dev-user`.
 2. **Release page link** — a daily release page or its monthly parent page URL.
 3. **Document link** — the space or root page that holds the release pages.
-4. **Git group** — top-level repository namespace for tag lookup (e.g. `product`, `user`).
+4. **Git group** — top-level repository namespace for tag lookup (e.g. `product`, `product-user`).
 5. **Highlight color** — purple shade for rows that need release (default `#998dd9`).
 6. **Credentials** — resolve dotfiles with `9to5-confluence-auth`; initialize through
    the CLI when authorized, with PAT input in the terminal rather than chat.
@@ -178,7 +177,7 @@ Store non-secret project values with the registry command:
 
 ```bash
 python3 scripts/sync_release_tags.py --add-project dev-user \
-  --root 12006 --group user --hl-color '#c0b6f2' \
+  --root 12006 --group product-user --hl-color '#c0b6f2' \
   --page-link '<confluence-base>/display/<SPACE>/<page>' \
   --doc-link '<confluence-base>/display/<SPACE>'
 ```
@@ -207,7 +206,7 @@ auth and the release dry run before any `--apply`; preserve working credentials.
 
 - Treat the deployment environment, Git release tag and Docker image tag as separate
   facts. An STG release does not imply that its image tag starts with `stg-`.
-  For User, use the verified `user-*` image series unless Nexus confirms
+  For user services, use the verified `product-user-*` image series unless Nexus confirms
   a different requested tag. Do not add or strip `stg-` to invent an image tag.
 - Store Nexus API/UI URL, Docker repository name and pull registry authority in
   local `config/endpoints.json` as `nexus_url`, `nexus_docker_repository` and

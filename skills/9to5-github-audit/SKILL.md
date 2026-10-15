@@ -1,11 +1,10 @@
 ---
 name: 9to5-github-audit
-description: Read-only GitHub repository inventory and workflow audit, with paginated counts and commit-specific CI evidence. Use when asked to check GitHub repos, list public/private projects, find failing Actions, or verify CI for a pushed commit. Route requested visibility or description changes to 9to5-github-settings; code publication belongs to 9to5-git-publish.
+description: "Perform a read-only audit of visible GitHub repositories, permissions, branch protections, and Actions CI/CD workflows with commit-specific evidence. Use when inspecting GitHub repositories, listing public/private repos, investigating failing Actions, checking CI status, or when the user says 'audit github', 'kiểm tra repo github', 'xem trạng thái CI github', 'danh sách repo'."
 license: MIT
 metadata:
-  version: "1.0.0"
+  version: "1.0.2"
 ---
-
 # GitHub Repository Audit
 
 ## Example output

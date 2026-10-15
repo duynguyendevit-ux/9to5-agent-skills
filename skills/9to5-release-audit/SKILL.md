@@ -1,12 +1,11 @@
 ---
 name: 9to5-release-audit
-description: Read-only audit of a Confluence release page. Save a traceable snapshot of recorded service versions and release tags, compare a later page reading with the snapshot, and report recorded release differences without claiming that production is actually running the release. Use when checking what a Confluence release page records, comparing release snapshots, or auditing a production release record.
+description: "Audit and snapshot recorded service versions and release tags on Confluence release documentation — capture traceable snapshots, compare release pages over time, and report recorded drift without claiming production runtime verification. Use when verifying Confluence release records, comparing release snapshots, auditing release history, or says 'audit release', 'kiểm tra trang release', 'so sánh phiên bản release', 'đối soát lịch sử deploy'."
 license: MIT
 compatibility: Requires Python 3 and Confluence credentials in ~/.config/zjira/config.yaml or ~/.config/opencode/release-sync.json. Reads non-secret endpoints from config/endpoints.json. Does not require Kubernetes access and never writes Confluence.
 metadata:
-  version: "1.0.1"
+  version: "1.0.3"
 ---
-
 # Release Audit
 
 ## Example output

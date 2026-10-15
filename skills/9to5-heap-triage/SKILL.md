@@ -1,12 +1,11 @@
 ---
 name: 9to5-heap-triage
-description: Triage JVM heap dumps (*.hprof) with Eclipse MAT headless — locate dumps, run leak-suspect/overview reports, read the dominator evidence, and link findings to the service or IDE that wrote them. Use when a JVM produced an .hprof, a service or IDE hit OutOfMemoryError, memory keeps growing, someone asks what retains the heap, or a crash dump (java_error_in_*.hprof, unload-*.hprof) must be explained. Analysis is read-only and report-only; for live cluster symptoms start with 9to5-k8s-service-debug.
+description: "Analyze JVM heap dumps (*.hprof) using headless Eclipse Memory Analyzer (MAT) — detect memory leaks, identify dominator tree retainers, inspect biggest retained objects, and correlate memory exhaustion back to code. Use when analyzing an OutOfMemoryError, investigating memory leaks, inspecting .hprof files, or when the user says 'phân tích heap dump', 'triage hprof', 'tìm leak memory', 'điều tra OOM', 'bị tràn ram jvm'."
 license: MIT
-compatibility: Requires bash, curl and unzip for the one-time MAT install, and JDK 21+ to run MAT 1.17 (it rejects 17 with an "Incompatible JVM" dialog). Analysis is RAM-heavy and paced by MAT_XMX in ~/.config/hprof-autopilot.conf.
+compatibility: "Requires bash, curl and unzip for the one-time MAT install, and JDK 21+ to run MAT 1.17 (it rejects 17 with an \"Incompatible JVM\" dialog). Analysis is RAM-heavy and paced by MAT_XMX in ~/.config/hprof-autopilot.conf."
 metadata:
-  version: "1.0.0"
+  version: "1.0.2"
 ---
-
 # Heap triage — from dump to retention answer
 
 ## Example output

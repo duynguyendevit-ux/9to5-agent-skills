@@ -1,11 +1,12 @@
 ---
 name: 9to5-logwork
-description: "Log Jira worklogs via conversation: scan assigned issues, accept task/hours/note input in chat, generate Vietnamese descriptions, and submit. Flows: day, week (Mon–Fri), month, week-status, task-list, plus an agent-activity digest that derives what was actually done from local opencode/codex/claude session history. Falls back to the Jira REST API when zjira's AI drafting (claude CLI) is unavailable. Use when the user says log work, log my hours, log today, log this week, log this month, worklog, chấm công, log công, sync hôm đó làm gì, or asks which days are missing hours."
+description: "Log Jira worklogs via structured conversation: scan assigned issues, gather task/hours/note input in chat, generate professional Vietnamese worklog descriptions, and submit via zjira. Supports single day, week, month, and agent-activity sync. Use when the user asks to log work, log hours, log today/this week/this month, worklog, chấm công, log công, khai báo giờ, sync công, or asks which days are missing hours ('hôm nay chưa log công', 'tuần này thiếu bao nhiêu giờ', 'chấm công hôm nay')."
 license: MIT
 compatibility: Requires the zjira CLI on PATH and Jira credentials in ~/.config/zjira/config.yaml. Agent-activity sync reads local session stores of opencode/codex/claude (read-only, optional).
 metadata:
-  version: "1.4.1"
+  version: "1.4.3"
 ---
+# Jira Worklog Assistant
 
 Prefix your first line with `🥷` inline. Be direct: show the issue list immediately, no preamble.
 
@@ -116,8 +117,8 @@ Present the issue list as a clean markdown table:
 ```
 | Key | Summary | Status |
 |-----|---------|--------|
-| DEMO-4242 | [BE] Planning sprint... | In Progress |
-| DEMO-100  | [BE] Implement auth... | To Do |
+| DEMO-123 | [BE] Planning sprint... | In Progress |
+| DEMO-456  | [BE] Implement auth... | To Do |
 ```
 
 Show max 20 issues. If more, note "showing top 20 — add a key manually if yours isn't listed."
@@ -149,8 +150,8 @@ calls, not real work).
 Rules:
 - **Never paste raw prompts into the worklog comment.** Synthesize a Vietnamese 2–3 câu description
   from the repo/directory, the edited files, and the intent of the prompts.
-- Map the digest's repositories to Jira keys the user named (e.g. `platform-dashboard-service` ↔ the
-  CTJ ticket) and mention the technical scope in the description.
+- Map the digest's repositories to Jira keys the user named (e.g. `dashboard-service` ↔ the
+  DEMO ticket) and mention the technical scope in the description.
 - Label these descriptions `[agent-sync]` in the parsed-entries block and the confirmation table.
 - `(no agent activity found)` for a date means no local evidence — ask the user instead of inventing.
 - Agent history reveals more than the timesheet needs (private chats, unrelated projects). Surface
@@ -162,7 +163,7 @@ Rules:
 
 Ask the user (plain text, not AskUserQuestion — keep it conversational):
 
-> "Bạn làm gì hôm nay? Gõ theo format: KEY Xh ghi chú — ví dụ: DEMO-4242 4h planning sprint, DEMO-100 2h review code"
+> "Bạn làm gì hôm nay? Gõ theo format: KEY Xh ghi chú — ví dụ: DEMO-123 4h planning sprint, DEMO-456 2h review code"
 
 Parse each entry from their response:
 - Extract: `key`, `hours` (e.g. `4h`, `1h30m`, `2h`), `note` (remaining text)
@@ -180,7 +181,7 @@ Mon 2026-05-05 | Tue 2026-05-06 | Wed 2026-05-07 | Thu 2026-05-08 | Fri 2026-05-
 ```
 
 Ask the user:
-> "Mô tả công việc cả tuần. Ví dụ: mon-thu DEMO-4242 1h standup, fri DEMO-100 4h review + DEMO-200 4h planning"
+> "Mô tả công việc cả tuần. Ví dụ: mon-thu DEMO-123 1h standup, fri DEMO-456 4h review + DEMO-200 4h planning"
 
 Parse their response into per-day entries:
 - Day references: `mon/monday/thứ 2` → Monday date, etc.
@@ -210,11 +211,11 @@ After parsing all entries, generate a Vietnamese description for **every** entry
 
 ```
 Parsed entries:
-  DEMO-4242 · 4h
+  DEMO-123 · 4h
   → Mô tả: Tham gia buổi sprint planning, ước lượng story point cho các task
     trong sprint mới và thống nhất phạm vi công việc với team.
 
-  DEMO-100 · 2h  [auto-context từ DEMO-90 + Confluence "Auth Design"]
+  DEMO-456 · 2h  [auto-context từ DEMO-90 + Confluence "Auth Design"]
   → Mô tả: Triển khai API endpoint xác thực theo thiết kế đã thống nhất,
     bao gồm validate input và trả về JWT token hợp lệ.
 ```
@@ -230,15 +231,15 @@ Show before any execution. Include the Vietnamese description (from Step 2.5) be
 
 ```
 About to submit (3 entries):
-  2026-05-08  DEMO-4242  4h
+  2026-05-08  DEMO-123  4h
     → Tham gia buổi sprint planning, ước lượng story point và thống nhất
       phạm vi công việc cho sprint mới cùng với team.
 
-  2026-05-08  DEMO-100   2h  [auto-context]
+  2026-05-08  DEMO-456   2h  [auto-context]
     → Triển khai API endpoint xác thực theo thiết kế đã thống nhất,
       bao gồm validate input và trả về JWT token hợp lệ.
 
-  2026-05-07  DEMO-4242  1h
+  2026-05-07  DEMO-123  1h
     → Tham gia daily standup, cập nhật tiến độ và nêu blockers.
 ```
 
@@ -293,9 +294,9 @@ code=$(curl -sS -o /tmp/opencode/_resp.json -w '%{http_code}' \
 
 ```
 ✓ 3 logged:
-  DEMO-4242 / 2026-05-08 / 4h  [worklogId: 50671]
-  DEMO-100  / 2026-05-08 / 2h  [worklogId: 50672]
-  DEMO-4242 / 2026-05-07 / 1h  [worklogId: 50673]
+  DEMO-123 / 2026-05-08 / 4h  [worklogId: 50671]
+  DEMO-456  / 2026-05-08 / 2h  [worklogId: 50672]
+  DEMO-123 / 2026-05-07 / 1h  [worklogId: 50673]
 ```
 
 If any entry failed:
@@ -320,9 +321,9 @@ Report partial success — do not stop on first failure.
 
 ## Key parsing rules
 
-1. Full key match: `DEMO-4242` → use as-is
+1. Full key match: `DEMO-123` → use as-is
 2. Partial numeric: `4242` → match to issue ending in `4242` from the scanned list
-3. Jira URL: `https://.../browse/DEMO-4242` → extract `DEMO-4242`
+3. Jira URL: `https://.../browse/DEMO-123` → extract `DEMO-123`
 4. Summary keyword: `planning` → match to first issue with "planning" in summary (ask user to confirm)
 5. Unknown key: warn `⚠ KEY not found in issue list — include anyway?` → AskUserQuestion yes/no
 
@@ -385,7 +386,7 @@ Parse the JSON array and render a markdown table:
 Tasks (Assigned, Unresolved):
 | Key     | Summary                    | Status      |
 |---------|----------------------------|-------------|
-| DEMO-100 | [FE] Auth bug fix          | In Progress |
+| DEMO-456 | [FE] Auth bug fix          | In Progress |
 | DEMO-42  | [BE] API design            | To Do       |
 | DEMO-200 | [QA] Test coverage         | In Progress |
 ```

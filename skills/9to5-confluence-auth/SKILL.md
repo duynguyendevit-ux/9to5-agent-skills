@@ -1,13 +1,12 @@
 ---
 name: 9to5-confluence-auth
-description: Resolve Confluence PAT auth from dotfiles and provide separate masked-terminal PAT login/status for Confluence, Jira and GitLab. Use before Confluence reads/publication, for first-use Git source/access setup, missing credentials, expired PAT/401, dotfile loading or separate service login. Reuse working configuration; authentication does not authorize remote writes.
-compatibility: Python 3, PyYAML, and zjira for interactive initialization; Confluence Server/Data Center Bearer PAT transport.
+description: "Resolve, verify, and manage authentication credentials (PAT tokens) for Confluence, Jira, and GitLab from local dotfiles and configurations. Use before performing Confluence/Jira operations, when encountering 401 Unauthorized or expired tokens, setting up first-time tool access, or when the user says 'check auth confluence', 'đăng nhập jira', 'kiểm tra token', 'cấu hình pat', 'auth status'."
 license: MIT
+compatibility: Python 3, PyYAML, and zjira for interactive initialization; Confluence Server/Data Center Bearer PAT transport.
 metadata:
-  version: "1.1.0"
+  version: "1.1.2"
 ---
-
-# Confluence Auth Preflight
+# Confluence Auth Preflight and Credential Setup
 
 ## Example output
 

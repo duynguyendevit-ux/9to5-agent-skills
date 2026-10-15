@@ -1,11 +1,10 @@
 ---
 name: 9to5-github-settings
-description: Change explicitly requested GitHub repository visibility or description with a concrete plan, scoped authorization and read-back verification. Use for make public/private, keep selected repos public and privatize the rest, publish a repo's visibility, or update its About description. Distinguish visibility from git push, deployment, archival and deletion.
+description: "Safely review and update GitHub repository settings (visibility public/private, repository description, topics) with explicit dry-run planning and authorization. Use when changing repo visibility, updating repository About descriptions, auditing public vs private repositories, or when the user says 'đổi visibility repo', 'chuyển repo sang private', 'cập nhật description github', 'set public repo'."
 license: MIT
 metadata:
-  version: "1.0.0"
+  version: "1.0.2"
 ---
-
 # Scoped GitHub Settings
 
 ## Example output

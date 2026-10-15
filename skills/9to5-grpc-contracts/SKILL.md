@@ -1,12 +1,11 @@
 ---
 name: 9to5-grpc-contracts
-description: Design and review gRPC/protobuf contracts for Platform services — the proto3 layout in the shared proto repository (service definitions versus domain messages, versioned packages), java_package conventions, wire-compatibility rules, artifact version flow, and server/client patterns with the lognet starter. Use when adding or changing a proto, exposing a new gRPC API, reviewing a breaking change, or bumping a proto artifact version.
+description: "Design, review, and maintain gRPC and Protocol Buffer contracts — proto3 directory layouts, versioned packages, java_package conventions, wire-compatibility rules, artifact versioning, and client/server integrations. Use when adding or modifying a proto definition, exposing new gRPC APIs, reviewing breaking contract changes, bumping proto library versions, or when the user says 'review gRPC', 'tạo proto', 'sửa protobuf', 'tương thích backward compatibility', 'đổi contract gRPC'."
 license: MIT
 compatibility: Reading contracts needs the shared proto/common-core checkouts. Version bumps flow through gradle.properties and the library fan-out belongs to 9to5-lib-bump. No code generation or proto edits happen in a review.
 metadata:
-  version: "1.0.0"
+  version: "1.0.2"
 ---
-
 # gRPC contracts — proto layout, compatibility, versions
 
 ## Example output

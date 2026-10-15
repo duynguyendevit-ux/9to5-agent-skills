@@ -1,11 +1,10 @@
 ---
 name: 9to5-sql-migration
-description: Write and review Oracle migration scripts for the Product/User schemas (admin/sql/oracle, V<YYYYMMDD>_<NN>__<type>_<description>.sql). Use when the user asks to add or alter Oracle tables, columns, indexes, constraints, or seed/data fixes, mentions a migration/DDL/script file, or asks to review a migration before release.
+description: "Write, review, and validate Oracle database migration scripts (admin/sql/oracle, V<YYYYMMDD>_<NN>__<type>_<description>.sql) — DDL changes, table/column additions, indexes, constraints, sequence generation, and data migrations. Use when adding or altering Oracle tables, columns, indexes, reviewing migration scripts before deployment, or says 'viết script migration', 'review sql migration', 'tạo bảng oracle', 'thêm cột database', 'kiểm tra flyway migration'."
 license: MIT
 metadata:
-  version: "1.0.1"
+  version: "1.0.3"
 ---
-
 # Oracle SQL Migration
 
 ## Example output
@@ -27,8 +26,8 @@ Write Flyway-style Oracle scripts that match the existing repository conventions
 
 ## Locations
 
-- Product: `~/workspace/product/platform-migration/admin/sql/oracle/`
-- User migrations live in the matching `migrations` repositories (`~/workspace/migration/...`).
+- Core product: `~/workspace/services/platform-migration/admin/sql/oracle/`
+- User domain migrations live in the matching `migrations` repositories (`~/workspace/services/migration/...`).
 - Confirm with `git rev-parse --show-toplevel` before editing; never assume.
 
 ## Naming

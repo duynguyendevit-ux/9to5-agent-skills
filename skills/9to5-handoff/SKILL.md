@@ -1,12 +1,11 @@
 ---
 name: 9to5-handoff
-description: Save a concise, source-linked handoff so another coding session can continue from verified state.
+description: "Save a concise, source-linked handoff document so another coding session or agent can continue from verified state without losing context. Use when pausing or concluding a work session, handing off to another agent, saving state before switching tasks, or when the user says 'handoff', 'bàn giao session', 'lưu trạng thái', 'tổng kết phiên làm việc', 'save handoff', 'tạo context tiếp tục'."
 license: MIT
 metadata:
-  version: "1.0.0"
-  opencode/autoinvoke: false
+  version: "1.0.2"
+  opencode/autoinvoke: "False"
 ---
-
 # Coding Session Handoff
 
 Run on an explicit user request. OpenCode V2 hides this skill from automatic

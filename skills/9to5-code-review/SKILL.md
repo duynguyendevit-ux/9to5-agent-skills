@@ -1,11 +1,10 @@
 ---
 name: 9to5-code-review
-description: Review a pinned diff along separate Standards and Spec axes, with concrete correctness/security findings and explicit coverage limits. Use for review this change, review a branch or PR, inspect a work-in-progress diff, or compare changes since a commit. Review is read-only; fixes and publication require separate authorization.
+description: "Perform a rigorous two-axis code review on a git diff along Standards (clean code, team patterns) and Spec (correctness, safety, edge cases) axes with concrete findings and explicit verification limits. Use when reviewing changes, reviewing a branch or pull request, inspecting a diff, evaluating code quality, or when the user says 'review code', 'review diff', 'kiểm tra code', 'đánh giá pull request', 'review PR'."
 license: MIT
 metadata:
-  version: "1.0.0"
+  version: "1.0.2"
 ---
-
 # Two-Axis Code Review
 
 ## Example output

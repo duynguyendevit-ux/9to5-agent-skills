@@ -1,11 +1,12 @@
 ---
 name: 9to5-jira
-description: Work with local Jira and Confluence through the zjira CLI — fetch a Jira issue (summary, description, acceptance criteria, last comments), read a linked Confluence spec when present, explore the repository, then write a structured implementation plan to .kit/plans/; also search and read Confluence pages. Use when the user gives a Jira key (PROJ-123), asks to plan, research, or estimate a ticket, or links a Confluence spec as implementation context. Not for release tables or release tags — use 9to5-release-confluence-sync for those.
+description: "Plan, research, or estimate Jira issues using the zjira CLI. Fetches issue details (summary, description, acceptance criteria, comments), linked Confluence specs, and relevant codebase structure to generate structured implementation plans in .kit/plans/. Use when the user gives a Jira key (e.g. DEMO-123, PROJ-456), or asks to plan, research, estimate a ticket, create an implementation plan, or says 'lập kế hoạch ticket', 'lập plan', 'phân tích ticket', 'nghiên cứu ticket', 'estimate ticket'."
 license: MIT
 compatibility: Requires the zjira CLI on PATH, Jira/Confluence credentials in ~/.config/zjira/config.yaml, git access to the service repositories, and network access to the Jira/Confluence host.
 metadata:
-  version: "2.1.3"
+  version: "2.1.5"
 ---
+# Jira Implementation Planning
 
 Get to work immediately — no preamble.
 
@@ -93,8 +94,8 @@ If the result is a non-empty JSON array, show a sprint board table:
 Current sprint issues:
 | Key      | Summary                          | Status      |
 |----------|----------------------------------|-------------|
-| DEMO-4242 | [BE] Planning sprint...          | In Progress |
-| DEMO-100  | [BE] Implement auth redirect...  | To Do       |
+| DEMO-123 | [BE] Planning sprint...          | In Progress |
+| DEMO-456  | [BE] Implement auth redirect...  | To Do       |
 ```
 
 Then ask the user which issue to plan (question tool where available, otherwise ask in chat):
@@ -223,7 +224,7 @@ Derive the git branch name from KEY and Summary:
 - `TASK_TYPE == Bug` → prefix `fix/`
 - `TASK_TYPE == Story` or `Task` or `Sub-task` → prefix `feat/`
 - Slug: lowercase the first 4-5 meaningful words of Summary, replace spaces with `-`, strip special chars
-- Example: `KEY=DEMO-4242`, Summary="[BE] Add OAuth redirect handler" → `feat/DEMO-4242-add-oauth-redirect-handler`
+- Example: `KEY=DEMO-123`, Summary="[BE] Add OAuth redirect handler" → `feat/DEMO-123-add-oauth-redirect-handler`
 
 Read [`references/plan-templates.md`](references/plan-templates.md) and use the template that matches `TASK_TYPE`.
 

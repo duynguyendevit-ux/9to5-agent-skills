@@ -1,12 +1,11 @@
 ---
 name: 9to5-redis-design
-description: Review and design Redis usage in Platform services — key namespacing, TTL policy, cache-first reads with DB fallback, AFTER_COMMIT invalidation, Lua guards that protect partial cache entries, and runtime control keys with safe fallbacks. Use when adding or reviewing a cache, diagnosing stale or missing cache data, deciding TTL versus explicit invalidation, or putting a runtime switch into Redis.
+description: "Design, review, and debug Redis caching and runtime control patterns — key namespacing, TTL strategies, cache-aside with database fallback, AFTER_COMMIT cache invalidation, Lua script concurrency guards, and runtime feature flags in Redis. Use when adding or reviewing caches, diagnosing stale/missing cache data, choosing TTL vs explicit eviction, or says 'thiết kế cache redis', 'xóa cache sau commit', 'xử lý stale cache', 'tối ưu redis', 'cache invalidation'."
 license: MIT
 compatibility: Read-only review; running examples need the service checkout and, for live inspection, cluster access through 9to5-k8s-service-debug. No FLUSH or KEYS commands against shared Redis instances.
 metadata:
-  version: "1.0.0"
+  version: "1.0.2"
 ---
-
 # Redis design — keys, TTL and consistency
 
 ## Example output

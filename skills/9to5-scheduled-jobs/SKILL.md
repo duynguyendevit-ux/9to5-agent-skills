@@ -1,12 +1,11 @@
 ---
 name: 9to5-scheduled-jobs
-description: Design and review scheduled work and milestone pipelines in Platform services — DB polling versus Redis ZSET scheduling, dispatcher-to-Kafka handoffs, runtime mode switches, timezone and delay configuration, catch-up and missed-fire handling, and multi-replica safety. Use when adding or reviewing a scheduled worker, tuning milestone delays, introducing a runtime processing-mode switch, or diagnosing workers that did not run, ran late, or ran twice.
+description: "Design, review, and troubleshoot scheduled batch jobs and milestone processing pipelines — DB polling vs Redis ZSET scheduling, dispatcher-to-Kafka handoffs, runtime mode switches, timezone handling, delay tuning, catch-up logic, and multi-replica safety. Use when adding or reviewing scheduled workers, tuning milestone delays, debugging jobs that did not run or ran late, or says 'review cron job', 'thiết kế worker', 'mốc xử lý tin', 'batch pipeline', 'tối ưu scheduled task'."
 license: MIT
-compatibility: Review is read-only; live diagnosis of a cluster worker goes through 9to5-k8s-service-debug. The reference architecture is the worker-service two-mode milestone pipeline as recorded in the vault.
+compatibility: Review is read-only; live diagnosis of a cluster worker goes through 9to5-k8s-service-debug. The reference architecture is the example-worker-service two-mode milestone pipeline as recorded in the vault.
 metadata:
-  version: "1.0.0"
+  version: "1.0.2"
 ---
-
 # Scheduled jobs and milestone pipelines
 
 ## Example output

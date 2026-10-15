@@ -1,12 +1,11 @@
 ---
 name: 9to5-kafka
-description: Work on Platform/Product Kafka contracts, transactional outbox, and Kafka-versus-work-queue design. Add events and bindings, diagnose outbox backlog, and review long-running consumers, poll timeouts, offset commits, duplicate handling, and Kafka share groups. Use for Kafka topics, partition keys, consumer groups, protobuf events, outbox_record, payload_template, unpublished events, Kafka-backed import/export jobs, rebalance loops, max.poll.interval.ms, or Kafka 4.2 share-group adoption.
+description: "Design, review, and troubleshoot Kafka event streaming, transactional outbox patterns, and work queue consumers — event schema bindings, partition keys, consumer groups, poll timeouts, offset commit strategies, duplicate handling, and outbox backlog diagnostics. Use when working on Kafka topics, protobuf events, outbox_record, long-running consumers, rebalance loops, max.poll.interval.ms, or says 'review kafka', 'xử lý lỗi outbox', 'consumer lag', 'tối ưu consumer', 'sự kiện kafka'."
 license: MIT
 compatibility: Requires git checkouts of the kafka starter and common-outbox, JDK 17, and read access to the service Oracle schema for diagnosis (directly or through the 9to5-k8s-service-debug helper).
 metadata:
-  version: "1.1.2"
+  version: "1.1.4"
 ---
-
 # Kafka Contracts, Outbox, and Work Queues
 
 ## Example output

@@ -1,12 +1,11 @@
 ---
 name: 9to5-mydevtools
-description: Use and extend MyDevTools, the browser-first Platform developer utilities — Oracle execution-plan visual, Rancher log analyzer, SQL extractor, protobuf and Kafka decoding, environment-to-Kubernetes conversion, case and hash utilities, cron and nginx generators. Use when a task involves viewing an execution plan, pulling or filtering Rancher logs, extracting SQL from Hibernate logs, decoding Kafka payloads, or converting env configs — and before writing a new script that duplicates one of these tools.
+description: "Inspect, run, and extend MyDevTools developer utilities — Oracle execution plan visualizer, log analyzer, SQL parameter extractor, Kafka/Protobuf payload decoder, environment-to-k8s converter, cron and nginx generators. Use when viewing execution plans, analyzing container logs, extracting SQL from logs, decoding Kafka messages, or says 'chạy devtools', 'phân tích explain plan', 'decode protobuf', 'convert env sang k8s'."
 license: MIT
 compatibility: Requires the MyDevTools checkout (default ~/workspace/tools/oracle-plan-visualizer) and Node.js for local runs. The Rancher log agent is loopback-only; hosted deployments cannot reach local clusters.
 metadata:
-  version: "1.0.0"
+  version: "1.0.2"
 ---
-
 # MyDevTools — the shared toolbox before the next one-off script
 
 ## Example output

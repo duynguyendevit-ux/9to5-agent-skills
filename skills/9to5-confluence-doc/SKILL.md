@@ -1,11 +1,10 @@
 ---
 name: 9to5-confluence-doc
-description: Draft source-backed Vietnamese API/flow notes and technical pages for local review and approved Confluence publication, with dotfile auth preflight and missing-login handling. Use when asked to document a feature/flow, write or update a Confluence page, or publish reviewed Markdown. Authentication and drafting do not authorize remote writes; release tables belong to 9to5-release-confluence-sync.
+description: "Draft, structure, and publish source-backed technical documentation and system design pages on Confluence in Vietnamese following standard architecture templates. Use when documenting features or services, writing technical specs, drafting architecture pages, or when the user says 'viết tài liệu confluence', 'tạo doc kỹ thuật', 'soạn thảo tài liệu thiết kế', 'viết spec', 'tài liệu hóa luồng'."
 license: MIT
 metadata:
-  version: "1.3.5"
+  version: "1.3.7"
 ---
-
 # Confluence Documentation Workflow
 
 ## Example output

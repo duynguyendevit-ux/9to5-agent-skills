@@ -1,12 +1,11 @@
 ---
 name: 9to5-spring-env-scan
-description: Inventory environment variables and their Java/Spring consumers from application YAML/properties, @Value, @ConfigurationProperties and programmatic property lookups. Use when asked to scan env vars in a Spring repository, trace a variable to config classes/code, or derive an environment-key checklist from source. For changing deployment configs use 9to5-env-config-sync instead.
+description: "Inventory environment variables and their Java/Spring consumers from application YAML/properties, @Value, @ConfigurationProperties, and programmatic property lookups. Use when asked to scan env vars in a Spring repository, trace an environment variable to config classes/code, derive an environment-key checklist from source, or says 'scan env', 'quét biến môi trường', 'tìm biến config', 'kiểm tra @Value', 'liệt kê environment variables'."
 license: MIT
 compatibility: Python 3.10+ and PyYAML; offline, no JVM or build required.
 metadata:
-  version: "1.0.0"
+  version: "1.0.2"
 ---
-
 # Spring Environment Scan
 
 ## Workflow
@@ -49,7 +48,7 @@ limits, and the artifact path if one was requested. An empty scan is not proof t
 the service uses no environment variables: dependencies and runtime sources remain
 outside this inventory.
 
-## Example
+## Example output
 
 Input: `app.timeout: ${REQUEST_TIMEOUT:5000}` and `@Value("${app.timeout}")`.
 

@@ -1,11 +1,10 @@
 ---
 name: 9to5-spring-conventions
-description: Review Java/Spring changes against the house conventions — Objects.isNull/nonNull for null checks, CollectionUtils/StringUtils for emptiness and presence, explicit imports, no unused imports, and no new test files unless requested. Use when the user asks to review an MR or diff, check coding conventions or style, or asks whether a Java/Spring change follows the project standards.
+description: "Review Java and Spring Boot code changes against established team coding standards — Objects.isNull/nonNull, CollectionUtils/StringUtils, explicit imports, clean exception handling, and test file discipline. Use when reviewing pull requests, checking Java code style, validating conventions before commit, or says 'review coding conventions', 'kiểm tra quy chuẩn code', 'check code style java', 'tuân thủ coding convention'."
 license: MIT
 metadata:
-  version: "1.0.1"
+  version: "1.0.3"
 ---
-
 # Spring Conventions Review
 
 ## Example output

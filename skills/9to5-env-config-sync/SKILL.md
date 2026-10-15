@@ -1,11 +1,10 @@
 ---
 name: 9to5-env-config-sync
-description: Compare and update Platform environment service configs in env-config/service-configs/<env>/<service>/ (values.yaml and .env) — align environment variables across dev-product, dev-user, dev-uat-*, report drift, and keep secrets out of commits. Use when the user asks to sync env configs, add or change a service env variable, compare dev vs uat values, or investigate config drift between environments.
+description: "Compare, validate, and synchronize environment service configurations (values.yaml, .env) across deployment environments (dev, staging, uat, prod) — align environment variables, report configuration drift, and keep secrets out of source control. Use when asked to sync env configs, add or change an environment variable, compare dev vs uat/prod values, investigate config drift, or when the user says 'đồng bộ env', 'sync biến môi trường', 'so sánh config giữa các môi trường', 'kiểm tra config drift'."
 license: MIT
 metadata:
-  version: "1.0.1"
+  version: "1.0.3"
 ---
-
 # Environment Config Sync
 
 ## Example output
@@ -14,14 +13,14 @@ Illustrative comparison; replace values with verified non-secret configuration.
 
 ```text
 Service: example-worker
-Variable                 dev-product   dev-uat-product   Action
+Variable                 dev-product   uat-product   Action
 WORKER_BATCH_SIZE         100      50           Intentional load difference; preserve
 WORKER_RETRY_ENABLED      true     missing      Add true to requested UAT config
 Validation: YAML parsed; git diff --check passed
-Changed: service-configs/dev-uat-product/example-worker/values.yaml
+Changed: service-configs/uat-product/example-worker/values.yaml
 ```
 
-Keep per-environment service configs consistent across the Platform environments.
+Keep per-environment service configs consistent across the deployment environments.
 
 ## Layout
 
@@ -33,15 +32,15 @@ service-configs/<env>/<service>/
 └── .env          # env vars (tracked)
 ```
 
-Environments seen: `dev-product`, `dev-user`, `dev-uat-product`, `uat-user`,
-`dev-example`, `prod-example`, ... Compare like-for-like (Product vs Product, User vs User).
+Environments seen: `dev-product`, `dev-user`, `uat-product`, `uat-user`,
+`dev-example`, `prod-example`, ... Compare like-for-like (product vs product, user vs user).
 
 ## Workflow
 
 1. Find the service dirs across environments:
    `find service-configs -maxdepth 2 -type d -name '<service>'`
 2. Diff the pairs:
-   - `diff -u service-configs/dev-product/<svc>/values.yaml service-configs/dev-uat-product/<svc>/values.yaml`
+   - `diff -u service-configs/dev-product/<svc>/values.yaml service-configs/uat-product/<svc>/values.yaml`
    - env keys: `grep -oE '^[A-Za-z_]+' <env>/.env | sort`
 3. Make the change in every environment that should match, one commit per intent.
    Keep placeholders intact: `${IMAGE_NAME}`, `${IMAGE_TAG}`, `${SERVICE_NAME}` —
@@ -51,7 +50,7 @@ Environments seen: `dev-product`, `dev-user`, `dev-uat-product`, `uat-user`,
 5. Report a drift table:
 
 ```
-| Variable | dev-product | dev-uat-product | Action |
+| Variable | dev-product | uat-product | Action |
 ```
 
 ## Secrets

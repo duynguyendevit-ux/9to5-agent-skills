@@ -1,12 +1,11 @@
 ---
 name: 9to5-oracle-locking
-description: Design and review work-claim queries and lock contention on Oracle — FOR UPDATE SKIP LOCKED claiming, batch refill semantics, NOWAIT versus waiting, lock waits and deadlock (ORA-00060) diagnosis, and transaction hygiene for outbox-style jobs. Use when writing or reviewing a claim query, investigating blocked sessions or deadlocks, judging SKIP LOCKED behaviour under concurrency, or checking foreign-key TM contention. Produces structural review and read-only diagnosis steps; index decisions go to 9to5-oracle-index and DDL to 9to5-sql-migration.
+description: "Design and review concurrent work claiming and lock contention on Oracle databases — SELECT FOR UPDATE SKIP LOCKED batch claiming, NOWAIT semantics, lock wait analysis, ORA-00060 deadlock diagnosis, and transaction hygiene for high-throughput workers. Use when reviewing work-claim queries, debugging blocked database sessions, resolving deadlocks, or says 'xử lý deadlock', 'lock contention', 'review SKIP LOCKED', 'tranh chấp lock database', 'tối ưu khóa bản ghi'."
 license: MIT
 compatibility: Read-only. Diagnosis views (v$lock, v$session, DBA_WAITERS) need SELECT_CATALOG_ROLE or specific grants; without them, deliver the review and the exact queries to run.
 metadata:
-  version: "1.0.0"
+  version: "1.0.2"
 ---
-
 # Oracle locking and work claiming
 
 ## Example output

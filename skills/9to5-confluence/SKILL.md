@@ -1,13 +1,12 @@
 ---
 name: 9to5-confluence
-description: Work with Confluence pages generally — find, read, create, edit, move, comment, label or attach files. Also use for per-service ENV tables, comparing release-record values with code defaults, or filling missing ENV values from code. Reads use zjira; writes use the Confluence REST API with dry-run, content-bound approval and read-back verification.
+description: "Search, read, create, update, and manage Confluence documentation pages via zjira CLI and REST API — navigate page trees, inspect versions, update storage format content, manage comments, labels, and attachments with dry-run verification. Use when finding or reading Confluence pages, creating design docs, updating wiki content, or when the user says 'tìm trang confluence', 'đọc confluence', 'cập nhật wiki', 'sửa trang confluence', 'tra cứu confluence'."
 license: MIT
 compatibility: Requires Python 3, PyYAML, sibling 9to5-confluence-auth, the zjira CLI and Confluence PAT credentials. Reads non-secret endpoints from config/endpoints.json. Writes require --apply --approved.
 metadata:
-  version: "1.6.1"
+  version: "1.6.3"
 ---
-
-# Confluence
+# Confluence Management and Page Editing
 
 ## Example output
 
@@ -33,7 +32,7 @@ without a dry run and explicit approval.**
 | Create, update, comment, label, attach | `scripts/confluence.py` (dry run first) |
 
 Sibling skills own the specialised page shapes: `9to5-confluence-doc` writes Vietnamese
-Platform design pages, `9to5-release-confluence-sync` owns release tables,
+system design pages, `9to5-release-confluence-sync` owns release tables,
 `9to5-release-audit` snapshots release records, `9to5-jira` reads ticket specs.
 
 ## Reading with zjira
@@ -202,5 +201,5 @@ These paths honor `$XDG_CONFIG_HOME` when set. PyYAML is required for YAML parsi
 - Never paste secrets, tokens, or internal hostnames into page content.
 - Space-wide or hierarchy-wide edits (renaming, moving, bulk labelling) are their own
   task with their own approval, not a step inside another one.
-- If the page is a release table or an Platform design document, use the sibling skill that
+- If the page is a release table or an system design document, use the sibling skill that
   owns its structure instead of editing it by hand.

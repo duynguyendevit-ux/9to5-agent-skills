@@ -1,12 +1,11 @@
 ---
 name: 9to5-mqtt-notifications
-description: Design and review MQTT delivery of notification and refresh events in Platform services — the merchant gateway pattern, destination semantics, NotificationMessage payloads, QoS choice, client limits, environment configuration keys, and when MQTT is the wrong channel. Use when adding or debugging a refresh event to apps, touching a MessageGateway implementation, choosing QoS or retained messages, or deciding between MQTT and Kafka for a notification.
+description: "Design, review, and debug MQTT real-time message delivery and UI refresh events — merchant gateway patterns, topic hierarchy, NotificationMessage payloads, QoS selection, connection limits, and channel trade-offs (MQTT vs Kafka). Use when adding or debugging app notification/refresh events, configuring MessageGateway, tuning MQTT QoS, or says 'cấu hình MQTT', 'debug thông báo', 'push notification', 'bắn event refresh', 'gửi thông báo realtime'."
 license: MIT
 compatibility: Review needs the service checkout and, for live checks, cluster access through 9to5-k8s-service-debug. Broker URLs and credentials live only in per-environment service configs; never hardcode or print them.
 metadata:
-  version: "1.0.0"
+  version: "1.0.2"
 ---
-
 # MQTT notifications — refresh events and the gateway pattern
 
 ## Example output

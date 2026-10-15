@@ -1,11 +1,10 @@
 ---
 name: 9to5-jira-day-check
-description: Daily Jira check — current sprint issues assigned to me, worklogs missing this week (zjira weekstatus), and release rows still pending tag sync. Use when the user asks "what's left today", "check my sprint", "weekly status", "morning summary", "standup", or wants a combined view of tickets, hours, and releases.
+description: "Perform a daily Jira and workflow status check — sprint issues currently in progress or assigned, missing worklogs for the current week, and pending release tag synchronizations. Use for morning standups, daily summaries, checking weekly worklog status, or when the user says 'hôm nay còn gì', 'check sprint', 'standup', 'tóm tắt đầu ngày', 'kiểm tra công tuần này', 'sáng nay làm gì'."
 license: MIT
 metadata:
-  version: "1.0.1"
+  version: "1.0.3"
 ---
-
 # Jira Day Check
 
 ## Example output

@@ -1,12 +1,11 @@
 ---
 name: 9to5-id-design
-description: Choose and review primary-key ID strategy — database identity/sequence versus application UUID/ULID/UUIDv7/Snowflake, index locality, Oracle storage, generator lifetime, and exposure. Use for new keys, UUID versus auto-increment discussions, schema or migration review, IDs in APIs, or suspected duplicate or costly ID generation.
+description: "Evaluate, design, and review primary key and unique identifier strategies — database identity/sequence vs application UUID, ULID, UUIDv7, Snowflake, index locality, Oracle heap storage, and API exposure. Use when designing new database tables, reviewing UUID vs sequence IDs, planning ID migration, or when the user says 'chọn kiểu ID', 'thiết kế primary key', 'tư vấn UUID vs sequence', 'review ID strategy', 'đánh giá khóa chính'."
 license: MIT
 metadata:
-  version: "1.0.1"
+  version: "1.0.3"
 ---
-
-# ID Design
+# ID Design and Primary Key Strategies
 
 ## Example output
 

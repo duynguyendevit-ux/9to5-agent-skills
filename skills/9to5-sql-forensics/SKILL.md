@@ -1,12 +1,11 @@
 ---
 name: 9to5-sql-forensics
-description: Reconstruct runnable Oracle SQL from Hibernate log output with bound parameters and assemble an index-review packet. Use when a service log shows repeated or slow statements, when Hibernate SQL lines must become runnable statements before any index discussion, or when pod logs must be turned into a shareable query report. Produces report.md and queries.sql; reads logs only. Index conclusions belong to 9to5-oracle-index and DDL to 9to5-sql-migration.
+description: "Reconstruct clean, runnable Oracle SQL statements from Hibernate/JPA log output with bound parameter values, and prepare query performance review packets. Use when service logs show slow or repeated database queries, converting Hibernate debug logs into runnable SQL, or says 'trích xuất sql từ log', 'lấy query hibernate', 'format sql bind params', 'phân tích hibernate query', 'chuyển hibernate log sang sql'."
 license: MIT
 compatibility: Requires Python 3; kubectl only for the live-pod path (a saved file or stdin works offline). No database connection is made and bind substitution is best-effort.
 metadata:
-  version: "1.0.0"
+  version: "1.0.2"
 ---
-
 # SQL forensics — logs to runnable statements
 
 ## Example output

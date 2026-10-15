@@ -1,11 +1,10 @@
 ---
 name: 9to5-oracle-index
-description: Decide and verify an Oracle index for a query shape — choose columns and order, read DBMS_XPLAN access/filter predicates, inspect index-disabling conversions, and weigh read gains against write costs. Use for slow queries, index usability, CREATE INDEX review, full scans, or composite column-order decisions. Hand DDL to 9to5-sql-migration.
+description: "Analyze, design, and verify Oracle database indexes for query performance — column selection and ordering, DBMS_XPLAN access/filter predicates, implicit type conversions, and read gain vs write overhead trade-offs. Use for slow queries, index usability review, CREATE INDEX proposals, full table scan diagnosis, or says 'tối ưu index', 'tạo index oracle', 'phân tích query chậm', 'explain plan index', 'đánh chỉ mục database'."
 license: MIT
 metadata:
-  version: "1.0.1"
+  version: "1.0.3"
 ---
-
 # Oracle Index
 
 ## Example output

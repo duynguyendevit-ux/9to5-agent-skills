@@ -1,11 +1,10 @@
 ---
 name: 9to5-git-publish
-description: Commit and push changes in the exact repository requested, with scoped staging, repository checks and remote verification. Use for push changes, publish code, commit and push, or checking whether a named checkout has unpublished commits. A clean target stays a no-op; it does not authorize publishing another repository.
+description: "Safely stage, check, commit, and push git changes in the explicitly targeted repository with pre-commit validation and remote branch verification. Use when ready to publish changes, commit and push code, check for unpublished commits, or when the user says 'commit và push', 'push code', 'publish changes', 'đẩy code lên git', 'publish repo'."
 license: MIT
 metadata:
-  version: "1.0.0"
+  version: "1.0.2"
 ---
-
 # Scoped Git Publish
 
 ## Example output

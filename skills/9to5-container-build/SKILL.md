@@ -1,12 +1,11 @@
 ---
 name: 9to5-container-build
-description: Build and review service container images and CI release wiring for Platform services — the two-stage Dockerfile convention, internal registry base images, shared GitLab CI templates for dev-product, CI_TAG to APP_VERSION wiring, JVM flags, and OOM dump paths inside containers. Use when adding a Dockerfile, changing builder or runtime images, adjusting JVM flags or heap in the image, or wiring a new service into the Product CI/CD templates.
+description: "Build, review, and optimize container images and CI release configurations for service containers — two-stage Dockerfiles, internal registry base images, shared CI/CD pipeline templates, APP_VERSION wiring, JVM flags, and container OOM dump paths. Use when adding or modifying a Dockerfile, changing base images, adjusting JVM flags/heap memory in containers, reviewing CI build templates, or when the user says 'build image', 'review Dockerfile', 'chỉnh JVM container', 'tối ưu Dockerfile', 'cấu hình container'."
 license: MIT
 compatibility: Review is file-based and needs the service checkout; local image builds additionally need the internal registry credentials and a container engine. Runtime image verification happens on the cluster through 9to5-k8s-service-debug. Never hardcode registry hostnames in skills or notes.
 metadata:
-  version: "1.0.0"
+  version: "1.0.2"
 ---
-
 # Container build — images and CI release wiring
 
 ## Example output
