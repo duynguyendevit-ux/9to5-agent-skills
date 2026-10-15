@@ -113,9 +113,9 @@ Validate without writing using its `--check` mode.
 | Skill | Version | Purpose |
 | --- | --- | --- |
 | [`9to5-code-review`](skills/9to5-code-review/SKILL.md) | 1.0.0 | Review a pinned diff along separate Standards and Spec axes, with concrete correctness/security findings and explicit coverage limits. |
-| [`9to5-confluence`](skills/9to5-confluence/SKILL.md) | 1.5.0 | Work with Confluence pages generally — find, read, create, edit, move, comment, label or attach files. |
+| [`9to5-confluence`](skills/9to5-confluence/SKILL.md) | 1.6.1 | Work with Confluence pages generally — find, read, create, edit, move, comment, label or attach files. |
 | [`9to5-confluence-auth`](skills/9to5-confluence-auth/SKILL.md) | 1.1.0 | Resolve Confluence PAT auth from dotfiles and provide separate masked-terminal PAT login/status for Confluence, Jira and GitLab. |
-| [`9to5-confluence-doc`](skills/9to5-confluence-doc/SKILL.md) | 1.3.1 | Draft source-backed Vietnamese API/flow notes and technical pages for local review and approved Confluence publication, with dotfile auth preflight and missing-login handling. |
+| [`9to5-confluence-doc`](skills/9to5-confluence-doc/SKILL.md) | 1.3.5 | Draft source-backed Vietnamese API/flow notes and technical pages for local review and approved Confluence publication, with dotfile auth preflight and missing-login handling. |
 | [`9to5-container-build`](skills/9to5-container-build/SKILL.md) | 1.0.0 | Build and review service container images and CI release wiring for Platform services — the two-stage Dockerfile convention, internal registry base images, shared GitLab CI templates for dev-product, CI_TAG to APP_VERSION wiring, JVM flags, and OOM dump paths inside containers. |
 | [`9to5-debug-loop`](skills/9to5-debug-loop/SKILL.md) | 1.0.0 | Diagnose a reported bug or performance regression with a symptom-specific reproduction loop, falsifiable hypotheses and measured verification. |
 | [`9to5-env-config-sync`](skills/9to5-env-config-sync/SKILL.md) | 1.0.1 | Compare and update Platform environment service configs in env-config/service-configs/&lt;env&gt;/&lt;service&gt;/ (values.yaml and .env) — align environment variables across dev-product, dev-user, dev-uat-*, report drift, and keep secrets out of commits. |

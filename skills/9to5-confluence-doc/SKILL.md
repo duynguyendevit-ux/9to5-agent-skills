@@ -3,7 +3,7 @@ name: 9to5-confluence-doc
 description: Draft source-backed Vietnamese API/flow notes and technical pages for local review and approved Confluence publication, with dotfile auth preflight and missing-login handling. Use when asked to document a feature/flow, write or update a Confluence page, or publish reviewed Markdown. Authentication and drafting do not authorize remote writes; release tables belong to 9to5-release-confluence-sync.
 license: MIT
 metadata:
-  version: "1.3.1"
+  version: "1.3.5"
 ---
 
 # Confluence Documentation Workflow
@@ -52,10 +52,50 @@ scope, rollout or processing prose just because the default template lists them.
 
 ### Focused flow notes
 
-For a business-flow note, default to **Tổng quan**, **Luồng cơ bản** and **Tham chiếu**,
+Write business notes in direct, ordinary Vietnamese: what happens, which records
+are handled, the eligibility conditions, and the configuration needed. Use the
+user's latest refined page as the vocabulary/structure reference; preserve their
+manual wording and removed rows. Describe the business effect, not merely a worker
+or method name. Check behavior against source; raise contradictions separately.
+
+For milestone notes, use **milestone summary → one section per milestone → shared
+configuration**, unless the user requests a condensed table. Each milestone covers
+**xử lý gì, tin nào, điều kiện nào, ENV nào**. In a short business note, list only
+variables that change eligibility, routing, processing mode or recovery, using
+**variable → effect**. Include defaults only for a requested ENV reference or when
+explicitly requested; preserve existing ENV tables outside the refinement scope.
+Distinguish delay from polling interval and configurable source filters from fixed
+eligibility rules. A cache source-type ENV does not automatically filter DB polling.
+
+When refining a verbose note, retain business actions, eligibility, service handoffs
+and requested links. Condense repeated prose and omit implementation inventories,
+binding tuning and numbered diagram legends unless needed by the requested audience.
+Changing diagram placement/references belongs in the preview; preserve attachments.
+For a database note, include only the tables/views used by that feature and explain
+what each is used for. For a cache, state the decision or query it serves and why
+caching helps; a label such as “cache alarm data” is not a purpose. Related repositories
+or an audit of the page tree do not expand the user's business scope.
+
+Keep review/publication status and verification caveats in the conversation or
+evidence bundle, not boilerplate “Lưu ý”/“Cần xác nhận” sections in a short business
+note. When defaults are requested, label them as defaults rather than deployed values. A full
+technical document can still include explicitly requested operational limits.
+
+Keep source provenance in the private review/evidence bundle by default. Add a
+page section **Tham chiếu**, **Source code**, or an equivalent reference list only
+when the user requests it; renaming the heading does not satisfy an omission.
+Preserve explicitly requested inline source links and existing content outside
+the authorized edit scope.
+
+For a business-flow note, default to **Tổng quan** and **Luồng cơ bản**,
 with only the limits needed to interpret the flow. Set the audience, detail level,
 diagram placement and intended page hierarchy before drawing. A full design/API
 request still uses its requested structure, not this short-note default.
+
+When asked to match an existing overview, read that reference and the target's latest
+content. Reuse its structure, not unrelated business rules: summarize service roles,
+communication direction/protocol/purpose, main flow and links to feature notes.
+Keep existing diagrams, topic tables and hierarchy outside the approved edit intact.
 
 Put detailed sequences, class-level gates, persistence contracts and source evidence
 in a shared technical page; link to it from the business note and back to the note.
@@ -76,6 +116,14 @@ When a review folder is requested, save the Markdown there before presenting the
 review link. That file becomes the publication source; temporary storage HTML and
 rendered images are derived artifacts. Further edits belong in the review file,
 not in a second draft. Local edits do not authorize remote writes.
+
+For small revisions, reuse existing conversion/publication helpers and keep the
+review URL stable when practical. Refresh the latest review from the Markdown;
+preserve approval-bound snapshots and checkpoints instead of rewriting evidence.
+For a scoped edit to an existing page, use the sibling's
+[scoped update tool](../9to5-confluence/references/scoped-updates.md) for text,
+sections or table cells; its reviewed patch and derived storage are the source
+for that narrow operation. A new/full document still uses the Markdown workflow.
 
 ## Read and search
 

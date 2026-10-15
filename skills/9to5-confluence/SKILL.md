@@ -4,7 +4,7 @@ description: Work with Confluence pages generally — find, read, create, edit, 
 license: MIT
 compatibility: Requires Python 3, PyYAML, sibling 9to5-confluence-auth, the zjira CLI and Confluence PAT credentials. Reads non-secret endpoints from config/endpoints.json. Writes require --apply --approved.
 metadata:
-  version: "1.5.0"
+  version: "1.6.1"
 ---
 
 # Confluence
@@ -74,6 +74,13 @@ CQL notes that save a round trip:
 - Escape embedded quotes by doubling them inside the string.
 
 ## Reading and writing with the script
+
+For small text, section or table edits, use the shared
+[scoped update workflow](references/scoped-updates.md): `scripts/doc_update.py`
+prepares a minimal patch/diff, serves one stable review URL and applies an approved
+bundle with version/hash checks and checkpointed read-back. Reuse it instead of
+writing a new publisher/server for each revision. Page moves and uploads retain
+their separate explicit scopes below.
 
 ```bash
 python3 "$S" get      --page 12003 --body       # metadata + body

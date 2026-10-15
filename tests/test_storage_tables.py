@@ -114,6 +114,16 @@ class StorageTableTests(unittest.TestCase):
         saved = approved.replace('width: 21.789462%;', 'width: 21.789461%;').replace('width: 30%;', 'width: 30.0%;')
         self.assertTrue(tables.storage_matches(approved, saved))
 
+    def test_only_outer_xml_whitespace_is_ignored(self):
+        body = fixture().replace('fixture-private', ' code\n')
+        self.assertTrue(tables.storage_matches('\n\t' + body + '\r\n', body))
+        for saved in [body.replace(' code\n', 'code'),
+                      body.replace('Protected intro', 'Protected  intro'),
+                      body.replace('</p><table', '</p>\n<table'),
+                      body + '\u00a0']:
+            with self.subTest(saved_length=len(saved)):
+                self.assertFalse(tables.storage_matches(body, saved))
+
     def test_real_layout_text_href_and_macro_changes_are_significant(self):
         approved = fixture().replace('<p>Passed</p>', '<p><a href="https://example.invalid/one">Passed</a></p>')
         for saved in [approved.replace('width: 20%;', 'width: 21%;'),

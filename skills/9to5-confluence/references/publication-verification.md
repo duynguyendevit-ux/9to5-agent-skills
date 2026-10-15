@@ -39,6 +39,8 @@ For table transformations and narrow numeric col-width normalization, reuse
 [offline storage-table helpers](storage-tables.md). Compare the whole body;
 keep field values, hrefs, macro parameters and geometry significant. The bounded
 width tolerance handles formatting/rounding, not an actual column-layout change.
+The storage comparator also tolerates XML whitespace outside the body fragment;
+whitespace within text, code/macros or between elements stays significant.
 
 ### Flat table text in server-view HTML
 
@@ -63,6 +65,11 @@ space/title or its resource ID. Treat explicit conflicting IDs, wrong origins,
 attachment resource types and unresolved links as failures. Link text alone does
 not establish the target. GET the target ID separately to verify that it exists
 and has the expected identity; matching the HTML anchor does not perform that GET.
+
+Scoped updates use this page-target check for same-origin `pageId` links, accepting
+relative/absolute URLs without accepting another origin or a conflicting resource ID.
+Fragments and the number of expected link occurrences remain significant. Other
+hrefs retain their resolved URL, query and fragment contract.
 
 For rasterized labels, reuse `verify_diagram_label` with the source and image hashes
 from the approved render manifest. The helper only checks a label against unchanged

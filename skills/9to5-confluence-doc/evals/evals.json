@@ -2,6 +2,78 @@
   "skill_name": "9to5-confluence-doc",
   "evals": [
     {
+      "id": 9,
+      "name": "refine-logic-only-without-defaults",
+      "prompt": "Offline simulation only; do not run commands. Refine an existing Vietnamese fire-event worker note: bỏ các giá trị config mặc định và miêu tả dài; note biến ảnh hưởng logic hoặc luồng thôi. Existing content includes eligibility, DB/Redis modes, a long class list, partition counts, scheduler tuning and approved attachments. Describe the replacement structure and publication boundary.",
+      "expected_output": "Keep a concise flow, milestone action/eligibility table, recovery and only variable-to-effect configuration. Omit default values and class/binding tuning inventories. Preserve unrelated content and attachments; include any removed diagram references in the preview. Do not publish before approval of this revision.",
+      "files": [],
+      "expectations": [
+        "Uses variable/effect rather than restoring a default-value column.",
+        "Retains business decisions, eligibility and DB/Redis/recovery behavior without long implementation inventories.",
+        "Preserves attachment files and publication approval boundaries."
+      ]
+    },
+    {
+      "id": 10,
+      "name": "feature-view-and-cache-purpose-scope",
+      "prompt": "Offline simulation only; do not run commands. User documents the fire-event performance report and says only note vw_event_handle_processing_performances in the report section, not other tables or CRM. Separately explain cacheAlarmState: fixture caches the last event ID and alarm state by serial/type to decide whether to increase notify count for an old case or create a new event; miss reads Oracle. Draft the two short notes without publication.",
+      "expected_output": "Mention only the requested view inside the performance-report section. Explain the cache's business decision and reduced repeated Oracle reads, with DB fallback, not a generic cache-data label. Do not expand to adjacent tables, CRM or a new DB section.",
+      "files": [],
+      "expectations": [
+        "Keeps the view in the requested report section and excludes adjacent inventories/CRM.",
+        "States increase notify count versus create new event, reduced DB reads and miss fallback.",
+        "Keeps the note local until publication approval."
+      ]
+    },
+    {
+      "id": 11,
+      "name": "overview-matches-reference-without-copying-domain",
+      "prompt": "Offline simulation only; do not run commands. Add an overview to a fire-event page like a dispatch-system overview. Reference structure has service roles, communication direction/protocol/business purpose and links to DB/flows. Target already has a service diagram and topic table. Dispatch-specific business rules are unrelated; user excludes CRM and default config values. Describe the scoped change.",
+      "expected_output": "Read current reference and target, then add a concise fire-event overview, handoffs, basic flow and relevant document links. Reuse the structure, not dispatch rules. Preserve existing diagrams/topics/hierarchy and exclude CRM/default values. Prepare a content-bound draft, not a remote write.",
+      "files": [],
+      "expectations": [
+        "Reuses overview structure without unrelated business rules or inventory expansion.",
+        "Preserves existing diagram/topic sections and hierarchy.",
+        "Adds no default config values and waits for approval."
+      ]
+    },
+    {
+      "id": 8,
+      "name": "no-default-reference-section",
+      "prompt": "Offline simulation only; do not run commands. User asks for a direct Vietnamese worker note and says 'ko cần note ## Tham chiếu'. Pinned source evidence is available. Describe page structure and where source provenance belongs; do not publish or remove unrelated existing content.",
+      "expected_output": "Use only the requested business and configuration sections. Keep pinned source provenance in the private review bundle, without adding Tham chiếu, Source code or an equivalent renamed list. Honor separately requested inline links and preserve unrelated existing content; publication remains gated.",
+      "files": [],
+      "expectations": [
+        "Omits default reference headings and equivalent renamed source lists.",
+        "Retains source evidence privately rather than discarding provenance.",
+        "Preserves unrelated existing content and normal publication boundaries."
+      ]
+    },
+    {
+      "id": 6,
+      "name": "direct-business-note-user-refinement",
+      "prompt": "Offline simulation only; do not run commands. User asks for a Vietnamese worker note, says 'đừng viết kiểu lưu ý hay xác nhận, đi vào trực diện', and supplies a refined page: a 90s milestone raises priority and sends a no-verification result to Product; a 30m milestone completes processing and ends user operations. Describe the note structure and how to handle source/runtime uncertainty without publishing.",
+      "expected_output": "Use the refined vocabulary and concrete business effects, with a summary and one section per milestone. Keep review/verification commentary outside the page instead of adding boilerplate caveat sections. Check source contradictions separately, avoid claims about deployed values, preserve user edits, and retain local review and approved publication boundaries.",
+      "files": [],
+      "expectations": [
+        "Uses direct business prose and records both concrete milestone effects.",
+        "Keeps verification/publication commentary outside the note and avoids unproven runtime claims.",
+        "Preserves refined wording and normal content-bound approval requirements."
+      ]
+    },
+    {
+      "id": 7,
+      "name": "milestone-env-versus-fixed-source-filter",
+      "prompt": "Offline simulation only; do not run commands. Draft the structure of a milestone note with ENV for timing and eligible types. Fixture: a 15m delay ENV defaults to PT15M; an enabled ENV controls the DB worker; a source-type ENV filters only cache entries; the DB query fixes the 15m milestone to four device types. The user wants each milestone and its configuration, without generic warning sections.",
+      "expected_output": "Give each milestone its business action, applicable types/eligibility and ENV variable/default/purpose table, followed by shared configuration. Keep source provenance in the private evidence bundle. Explain the cache-only ENV beside that setting and fixed DB eligibility beside the milestone; do not invent an ENV that changes the DB filter. Distinguish milestone delay from polling interval and keep metadata outside the note.",
+      "files": [],
+      "expectations": [
+        "Includes all four per-milestone dimensions: action, types, conditions, ENV.",
+        "Distinguishes cache configuration from fixed DB eligibility and invents no filter ENV.",
+        "Uses defaults as defaults, not deployed values, without boilerplate caveat sections."
+      ]
+    },
+    {
       "id": 5,
       "name": "env-table-routing-not-design-template",
       "prompt": "Offline simulation only; do not run commands. User asks to document a service's ENV table using a PROD release and code defaults, keeping four existing columns and no updater details. They did not request an API/flow design page or changes to deployment configs. Describe workflow ownership and structure.",
@@ -41,7 +113,7 @@
       "id": 3,
       "name": "business-note-links-to-shared-sequences",
       "prompt": "Offline simulation only; do not run commands. The user asks to update a business-flow note, says the document should contain only overview and basic flow, and wants detailed sequence diagrams in a separate collapsible group linked from the note. Existing source-backed detail and diagram artifacts are available. A previous version was already published. Describe the local draft structure and publication plan.",
-      "expected_output": "Draft a short Vietnamese business note with overview/basic flow/references and essential limits. Move detailed sequences, gates, contracts and source evidence to a shared technical page with reciprocal links; plan its separate parent/container in the page tree. Preserve existing evidence and diagram semantics rather than discarding it. Show local drafts and a content-bound dry run for the shortening, new page and hierarchy; previous publication approval does not cover these new changes.",
+      "expected_output": "Draft a short Vietnamese business note with only overview/basic flow and requested inline links. Move detailed sequences, gates and contracts to a shared technical page with reciprocal links; plan its separate parent/container in the page tree. Preserve private source evidence and diagram semantics rather than discarding them. Show local drafts and a content-bound dry run for the shortening, new page and hierarchy; previous publication approval does not cover these new changes.",
       "files": [],
       "expectations": [
         "Keeps the business note short and links to shared details instead of embedding detailed sequences.",

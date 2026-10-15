@@ -157,7 +157,10 @@ def repair_colgroup(body, omitted_header, *, width=8, table_index=0):
     return _replace_table(body, match, updated)
 
 def storage_matches(approved, saved, *, width_tolerance='0.000002'):
-    """Compare all body content, allowing only specified serialization differences."""
+    """Compare content; tolerate outer XML whitespace and bounded serialization differences.
+
+    Whitespace inside elements or between sibling elements remains significant.
+    """
     try:
         tolerance = Decimal(str(width_tolerance))
     except InvalidOperation:
@@ -180,4 +183,4 @@ def storage_matches(approved, saved, *, width_tolerance='0.000002'):
                 except InvalidOperation:
                     return False
         return aa == bb and all(same(x, y) for x, y in zip(a, b))
-    return same(_tree(approved), _tree(saved))
+    return same(_tree(approved.strip(' \t\r\n')), _tree(saved.strip(' \t\r\n')))
