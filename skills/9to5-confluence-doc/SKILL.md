@@ -1,9 +1,9 @@
 ---
 name: 9to5-confluence-doc
-description: "Draft, structure, and publish source-backed technical documentation and system design pages on Confluence in Vietnamese following standard architecture templates. Use when documenting features or services, writing technical specs, drafting architecture pages, or when the user says 'viết tài liệu confluence', 'tạo doc kỹ thuật', 'soạn thảo tài liệu thiết kế', 'viết spec', 'tài liệu hóa luồng'."
+description: "Draft, structure, and publish source-backed technical documentation and system design pages on Confluence in Vietnamese following standard architecture templates. Loads private per-project style profiles and lesson logs so every agent reuses the user's structure and wording and avoids corrected mistakes. Use when writing or editing any documentation page, documenting features or services, writing technical specs, drafting architecture pages, or when the user says 'viết tài liệu confluence', 'tạo doc kỹ thuật', 'soạn thảo tài liệu thiết kế', 'viết spec', 'tài liệu hóa luồng'."
 license: MIT
 metadata:
-  version: "1.3.7"
+  version: "1.4.0"
 ---
 # Confluence Documentation Workflow
 
@@ -20,6 +20,21 @@ Thiết kế: API đăng ký job; worker xử lý và cập nhật trạng thái
 Cần xác nhận: Thời gian giữ file và giới hạn số job mỗi khách hàng.
 Thay đổi dự kiến: Bổ sung mục Xử lý lỗi và Rollout; giữ nguyên phần API.
 ```
+
+## Profiles and lessons (always first)
+
+Applies to every document: Confluence pages, repo Markdown mirrors, handover
+checklists, READMEs written as documentation. Before drafting or editing, follow
+[`references/doc-memory.md`](references/doc-memory.md): resolve the private
+profile index, load repo `AGENTS.md`/`CLAUDE.md`, the matched project profile and
+its lessons, and the cross-project lessons. Their structure and vocabulary
+override the default template below.
+
+When the user corrects wording, structure, scope or a fact, or a linter rejects
+agent-written text, append a lesson in that file's format before continuing, and
+run every lesson's check before presenting a draft or dry run. When a repository
+keeps a Markdown file and a storage-format file per page, edit both together and
+run the repo linter before any dry run.
 
 ## Page structure
 

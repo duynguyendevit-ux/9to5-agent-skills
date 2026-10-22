@@ -132,6 +132,18 @@
         "Keeps omitted body examples absent while preserving requested API contract evidence.",
         "Does not create or move pages or publish an unapproved draft as an incidental default."
       ]
+    },
+    {
+      "id": 12,
+      "name": "profile-and-lesson-loop",
+      "prompt": "Offline simulation only; do not run commands. In a docs repository with AGENTS.md and a private profile index mapping it to a project style profile and lessons file, the user asks to add a troubleshooting page. While reviewing the draft the user says: 'đừng dùng bảng fire_events, bảng thật là events'. Describe what you load before drafting, what you do after the correction, and what you check before the dry run.",
+      "expected_output": "Read the profile index, repo AGENTS.md/linter, the matched profile, its lessons and cross-project lessons before drafting; use the profile's troubleshooting page type. After the correction, fix the draft and append (or extend) a lesson with mistake, rule, check and source in the documented format, without secrets. Run every lesson check and the repo linter before the dry run, and wait for approval.",
+      "files": [],
+      "expectations": [
+        "Loads index, repo instructions, project profile and lessons before drafting.",
+        "Records the correction as a lesson entry with a concrete check, deduplicating if it exists.",
+        "Runs lesson checks and the linter before the dry run and does not publish without approval."
+      ]
     }
   ]
 }
